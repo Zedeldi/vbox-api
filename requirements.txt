@@ -1,0 +1,14 @@
+attrs==23.2.0
+certifi==2024.2.2
+charset-normalizer==3.3.2
+idna==3.7
+isodate==0.6.1
+lxml==5.2.1
+platformdirs==4.2.0
+pytz==2024.1
+requests==2.31.0
+requests-file==2.0.0
+requests-toolbelt==1.0.0
+six==1.16.0
+urllib3==2.2.1
+zeep==4.2.1
