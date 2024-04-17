@@ -1,3 +1,4 @@
+import functools
 import re
 from abc import ABC
 
@@ -5,12 +6,37 @@ from abc import ABC
 class BaseInterface(ABC):
     """Define abstract base class for interface."""
 
+    def get_interface(self, interface_name: str) -> "ProxyInterface":
+        """Get interface instance from interface_name."""
+        return getattr(self, interface_name)
+
 
 class ProxyInterface:
     """Class to represent a proxy interface."""
 
+    def get_methods(self, handle: str) -> dict:
+        """Get dict of methods bound to handle."""
+        d = {}
+        for method_name, method in self.__dict__.items():
+            if not callable(method):
+                continue
+            d[method_name] = functools.partial(method, handle)
+        return d
 
-class PythonicInterface:
+    def get_info(self, handle: str) -> dict:
+        """Get dict of information for handle from interface."""
+        d = {}
+        for method_name, method in self.__dict__.items():
+            if not method_name.startswith("get"):
+                continue
+            try:
+                d[method_name.removeprefix("get").lstrip("_")] = method(handle)
+            except Exception:
+                pass
+        return d
+
+
+class PythonicInterface(BaseInterface):
     """Wrapper to convert methods to Python naming conventions."""
 
     def __init__(self, interface: BaseInterface, remove_prefix: bool = True) -> None:
