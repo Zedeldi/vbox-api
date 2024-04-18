@@ -1,6 +1,6 @@
-import functools
 import re
 from abc import ABC
+from typing import Callable
 
 
 class BaseInterface(ABC):
@@ -14,26 +14,23 @@ class BaseInterface(ABC):
 class ProxyInterface:
     """Class to represent a proxy interface."""
 
-    def get_methods(self, handle: str) -> dict:
-        """Get dict of methods bound to handle."""
-        d = {}
-        for method_name, method in self.__dict__.items():
-            if not callable(method):
-                continue
-            d[method_name] = functools.partial(method, handle)
-        return d
+    @property
+    def methods(self) -> dict[str, Callable]:
+        """Return list of all callable methods."""
+        return {
+            method_name: method
+            for method_name, method in self.__dict__.items()
+            if callable(method)
+        }
 
-    def get_info(self, handle: str) -> dict:
-        """Get dict of information for handle from interface."""
-        d = {}
-        for method_name, method in self.__dict__.items():
-            if not method_name.startswith("get"):
-                continue
-            try:
-                d[method_name.removeprefix("get").lstrip("_")] = method(handle)
-            except Exception:
-                pass
-        return d
+    @property
+    def properties(self) -> dict[str, Callable]:
+        """Return dict of properties and associated get methods."""
+        return {
+            method_name.removeprefix("get").lstrip("_"): method
+            for method_name, method in self.methods.items()
+            if method_name.startswith("get")
+        }
 
 
 class PythonicInterface(BaseInterface):

@@ -13,6 +13,11 @@ class Context:
     interface: PythonicInterface
     handle: Optional["Handle"]
 
+    @property
+    def session(self) -> "Session":
+        """Return Session object from Context instance."""
+        return Session(self)
+
 
 class Handle(str):
     """Class to store and provide methods to release a handle."""
