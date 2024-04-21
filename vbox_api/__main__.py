@@ -1,4 +1,5 @@
 import code
+import sys
 from getpass import getpass, getuser
 
 from vbox_api import SOAPInterface, VBoxAPI
@@ -14,7 +15,9 @@ def main() -> None:
     api = VBoxAPI(interface)
 
     username, password = getuser(), getpass()
-    api.login(username, password)
+    if not api.login(username, password):
+        print("Login failed.")
+        sys.exit(1)
 
     code.InteractiveConsole(locals={"api": api}).interact(
         banner=BANNER, exitmsg=EXITMSG

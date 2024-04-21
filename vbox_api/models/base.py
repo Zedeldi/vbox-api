@@ -1,14 +1,12 @@
 import functools
 from abc import ABC
-from typing import Any, Literal, Type
-
-from vbox_api.api.session import Context, Handle
+from typing import Any, Optional, Type
 
 
 class BaseModel(ABC):
     """Base class to handle model attributes and methods."""
 
-    def __init__(self, ctx: Context, handle: Handle) -> None:
+    def __init__(self, ctx: "Context", handle: Optional["Handle"] = None) -> None:
         """Initialise instance of model with information."""
         self.ctx = ctx
         self.handle = handle
@@ -46,12 +44,3 @@ class BaseModel(ABC):
     def from_name(cls, model_name: str) -> Type["BaseModel"]:
         """Return subclass of BaseModel for model_name."""
         return type(model_name, (cls,), {})
-
-
-class Machine(BaseModel):
-    """Class to handle machine attributes and methods."""
-
-    def start(self, front_end: Literal["gui", "headless", "sdl"] = "gui") -> None:
-        """Start virtual machine with specified front_end."""
-        with self.ctx.session as session_handle:
-            self.launch_vm_process(session_handle, front_end)

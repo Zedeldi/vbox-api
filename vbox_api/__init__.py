@@ -1,4 +1,4 @@
-from vbox_api.api import BaseModel, Session, VBoxAPI
+from vbox_api.api import VBoxAPI
 from vbox_api.interface import PythonicInterface, SOAPInterface
 
-__all__ = ["BaseModel", "PythonicInterface", "Session", "SOAPInterface", "VBoxAPI"]
+__all__ = ["PythonicInterface", "SOAPInterface", "VBoxAPI"]

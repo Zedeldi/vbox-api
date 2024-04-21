@@ -1,8 +1,10 @@
 from typing import Optional
 
-from vbox_api.api.models import Machine
-from vbox_api.api.session import Context, Handle, Session
+from vbox_api.api.context import Context
+from vbox_api.api.handle import Handle
 from vbox_api.interface.base import BaseInterface, PythonicInterface
+from vbox_api.models.machine import Machine
+from vbox_api.models.session import Session
 
 
 class VBoxAPI:
@@ -32,9 +34,6 @@ class VBoxAPI:
         """
         if self.handle and not force:
             raise RuntimeError("Already logged in.")
-        self.handle = Handle(
-            self.ctx, self.interface.WebsessionManager.logon(username, password)
-        )
         try:
             self.handle = Handle(
                 self.ctx, self.interface.WebsessionManager.logon(username, password)

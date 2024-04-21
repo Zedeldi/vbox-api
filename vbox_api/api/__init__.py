@@ -1,5 +1,5 @@
+from vbox_api.api.context import Context
 from vbox_api.api.core import VBoxAPI
-from vbox_api.api.models import BaseModel
-from vbox_api.api.session import Context, Handle, Session
+from vbox_api.api.handle import Handle
 
-__all__ = ["BaseModel", "Context", "Handle", "Session", "VBoxAPI"]
+__all__ = ["Context", "Handle", "VBoxAPI"]
