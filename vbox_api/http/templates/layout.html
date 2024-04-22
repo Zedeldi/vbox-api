@@ -8,12 +8,30 @@
     {% block head %}{% endblock %}
   </head>
   <header>
-    <nav class="navbar fixed-top navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
       <div class="container-fluid">
         <a class="navbar-brand" href="/">VirtualBox Web API</a>
       </div>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          {% if session.get("username") %}
+          <li class="nav-item">
+            <a class="nav-link" href="/logout">Logout</a>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
     </nav>
   </header>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  {% for category, message in messages %}
+  <div class="alert alert-{{ category }}" role="alert">
+    {{ message }}
+  </div>
+  {% endfor %}
+  {% endif %}
+  {% endwith %}
   <body class="container pb-5" style="padding-top: 70px;">
     {% block content %}{% endblock %}
   </body>
