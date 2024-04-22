@@ -14,7 +14,6 @@ class Session(BaseModel):
             self.ctx,
             self.ctx.interface.WebsessionManager.get_session_object(self.ctx.handle),
         )
-        self.bind_methods()  # Bind methods to new handle
 
     def close(self) -> None:
         """Close session by releasing session handle."""

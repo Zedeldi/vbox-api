@@ -9,7 +9,7 @@ class BaseModel(ABC):
     def __init__(self, ctx: "Context", handle: Optional["Handle"] = None) -> None:
         """Initialise instance of model with information."""
         self.ctx = ctx
-        self.handle = handle
+        self._handle = handle
         interface = ctx.interface.get_interface(self.__class__.__name__)
         self._properties = interface.properties
         self._methods = interface.methods
@@ -29,6 +29,17 @@ class BaseModel(ABC):
     def bind_methods(self) -> None:
         for method_name, method in self._methods.items():
             setattr(self, method_name, functools.partial(method, self.handle))
+
+    @property
+    def handle(self) -> Optional["Handle"]:
+        """Return handle attribute."""
+        return self._handle
+
+    @handle.setter
+    def handle(self, handle: Optional["Handle"]) -> None:
+        """Set new handle and bind methods."""
+        self._handle = handle
+        self.bind_methods()
 
     def to_dict(self) -> dict:
         """Return dict to represent current state of model."""
