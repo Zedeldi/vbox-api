@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% endblock %} | VirtualBox Web API</title>
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    {% block head %}{% endblock %}
+  </head>
+  <header>
+    <nav class="navbar fixed-top navbar-dark bg-primary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">VirtualBox Web API</a>
+      </div>
+    </nav>
+  </header>
+  <body class="container pb-5" style="padding-top: 70px;">
+    {% block content %}{% endblock %}
+  </body>
+</html>

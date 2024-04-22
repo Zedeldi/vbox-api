@@ -1,0 +1,7 @@
+{% extends "layout.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+{% for machine in machines %}
+  <p>{{ machine.name }}</p>
+{% endfor %}
+{% endblock %}
