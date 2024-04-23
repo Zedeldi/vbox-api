@@ -1,7 +1,17 @@
 {% extends "layout.html" %}
 {% block title %}Dashboard{% endblock %}
 {% block content %}
-{% for machine in machines %}
-  <p>{{ machine.name }}</p>
-{% endfor %}
+<div class="row row-cols-1 row-cols-md-4 g-4">
+  {% for machine in machines %}
+  <div class="col">
+    <div class="card h-100">
+      <img src="{{ machine.get_thumbnail(data_uri=True) }}" class="card-img-top" alt="Thumbnail for {{ machine.name }}">
+      <div class="card-body">
+        <h5 class="card-title">{{ machine.name }}</h5>
+        <p class="card-text">Location: {{ machine.groups[0] }}</p>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
 {% endblock %}
