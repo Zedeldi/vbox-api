@@ -8,7 +8,11 @@
       <img src="{{ machine.get_thumbnail(data_uri=True) }}" class="card-img-top" alt="Thumbnail for {{ machine.name }}">
       <div class="card-body">
         <h5 class="card-title">{{ machine.name }}</h5>
-        <p class="card-text">Location: {{ machine.groups[0] }}</p>
+        <p class="card-text">
+          <span class="badge text-bg-{{ ['secondary', 'success', 'warning', 'danger'][machine.get_health()[1]] }}">{{ machine.get_health()[0] }}</span>
+          <br>
+          Location: {{ machine.groups[0] }}
+        </p>
       </div>
     </div>
   </div>

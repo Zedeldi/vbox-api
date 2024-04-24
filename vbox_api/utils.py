@@ -1,4 +1,5 @@
 import base64
+import re
 from io import BytesIO
 
 from PIL import Image, ImageDraw, ImageFont
@@ -32,3 +33,8 @@ def text_to_image(
         fill=font_colour,
     )
     return image
+
+
+def split_pascal_case(text: str) -> str:
+    """Split PascalCase string and join with spaces."""
+    return " ".join(re.findall("[A-Z][^A-Z]*", text))

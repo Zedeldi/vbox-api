@@ -4,7 +4,6 @@ from vbox_api.api.context import Context
 from vbox_api.api.handle import Handle
 from vbox_api.interface.base import BaseInterface, PythonicInterface
 from vbox_api.models.machine import Machine
-from vbox_api.models.session import Session
 
 
 class VBoxAPI:

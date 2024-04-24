@@ -1,17 +1,18 @@
 import base64
 import functools
 import io
+from enum import IntEnum
 from typing import Any, Callable, Literal, Optional
 
 from PIL import Image
 
 from vbox_api.api.handle import Handle
 from vbox_api.models.base import BaseModel
-from vbox_api.utils import image_to_data_uri, text_to_image
+from vbox_api.utils import image_to_data_uri, split_pascal_case, text_to_image
 
 
 def requires_session(func: Callable) -> Callable:
-    """Decorator to ensure session is open."""
+    """Ensure session is open before calling wrapped function."""
 
     @functools.wraps(func)
     def inner(self, *args, **kwargs) -> Any:
@@ -19,6 +20,15 @@ def requires_session(func: Callable) -> Callable:
         return func(self, *args, **kwargs)
 
     return inner
+
+
+class MachineHealth(IntEnum):
+    """Class to store simplified health status codes."""
+
+    POWERED_OFF = 0
+    RUNNING = 1
+    WARNING = 2
+    ERROR = 3
 
 
 class Machine(BaseModel):
@@ -45,6 +55,20 @@ class Machine(BaseModel):
         self.lock_machine(self.session.handle, lock_type)
         locked_machine = self.session.get_machine()
         return Machine(self.ctx, Handle(self.ctx, locked_machine), self.session)
+
+    def get_health(self) -> tuple[str, MachineHealth]:
+        """Return tuple for health of machine in format (state, status_code)."""
+        match self.state:
+            case "PoweredOff" | "Saved":
+                health = MachineHealth.POWERED_OFF
+            case "Running":
+                health = MachineHealth.RUNNING
+            case "Aborted":
+                health = MachineHealth.ERROR
+            case _:
+                health = MachineHealth.WARNING
+        formatted_state = split_pascal_case(self.state)
+        return (formatted_state, health)
 
     def get_thumbnail(self, data_uri: bool = False) -> Image.Image | str:
         """
