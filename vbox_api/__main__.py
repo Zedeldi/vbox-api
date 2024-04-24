@@ -1,4 +1,6 @@
 import code
+import readline
+import rlcompleter
 import sys
 from getpass import getpass, getuser
 
@@ -14,14 +16,14 @@ def main() -> None:
     interface.connect()
     api = VBoxAPI(interface)
 
-    username, password = getuser(), getpass()
-    if not api.login(username, password):
+    if not api.login(getuser(), getpass()):
         print("Login failed.")
         sys.exit(1)
 
-    code.InteractiveConsole(locals={"api": api}).interact(
-        banner=BANNER, exitmsg=EXITMSG
-    )
+    namespace = {**globals(), **locals()}
+    readline.set_completer(rlcompleter.Completer(namespace).complete)
+    readline.parse_and_bind("tab: complete")
+    code.InteractiveConsole(locals=namespace).interact(banner=BANNER, exitmsg=EXITMSG)
 
 
 if __name__ == "__main__":
