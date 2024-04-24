@@ -1,6 +1,7 @@
 import base64
+import functools
 import io
-from typing import Literal, Optional
+from typing import Any, Callable, Literal, Optional
 
 from PIL import Image
 
@@ -9,20 +10,41 @@ from vbox_api.models.base import BaseModel
 from vbox_api.utils import image_to_data_uri, text_to_image
 
 
+def requires_session(func: Callable) -> Callable:
+    """Decorator to ensure session is open."""
+
+    @functools.wraps(func)
+    def inner(self, *args, **kwargs) -> Any:
+        self.session.open()
+        return func(self, *args, **kwargs)
+
+    return inner
+
+
 class Machine(BaseModel):
     """Class to handle machine attributes and methods."""
 
+    def __init__(
+        self,
+        ctx: "Context",
+        handle: Optional["Handle"] = None,
+        session: Optional["Session"] = None,
+    ) -> None:
+        """Initialise base instance and add session attribute."""
+        super().__init__(ctx, handle)
+        self.session = session or self.ctx.get_session()
+
+    @requires_session
     def start(self, front_end: Literal["gui", "headless", "sdl"] = "gui") -> None:
         """Start virtual machine with specified front_end."""
-        with self.ctx.session as session_handle:
-            self.launch_vm_process(session_handle, front_end)
+        self.launch_vm_process(self.session.handle, front_end)
 
+    @requires_session
     def lock(self, lock_type: Literal["Write", "Shared"] = "Shared") -> "Machine":
         """Lock machine and return mutable machine instance."""
-        with self.ctx.session as session_handle:
-            self.lock_machine(session_handle, lock_type)
-            locked_machine = self.ctx.session.get_machine()
-        return Machine(self.ctx, Handle(self.ctx, locked_machine))
+        self.lock_machine(self.session.handle, lock_type)
+        locked_machine = self.session.get_machine()
+        return Machine(self.ctx, Handle(self.ctx, locked_machine), self.session)
 
     def get_thumbnail(self, data_uri: bool = False) -> Image.Image | str:
         """

@@ -14,17 +14,10 @@ class VBoxAPI:
         """Initialise instance of API."""
         self.interface = PythonicInterface(interface)
         self.handle: Optional[Handle] = None
-        self._session: Optional[Session] = None
 
     @property
     def ctx(self) -> Context:
-        return Context(api=self, interface=self.interface, handle=self.handle)
-
-    @property
-    def session(self) -> Session:
-        if not self._session:
-            self._session = Session(self.ctx)
-        return self._session
+        return Context(api=self, interface=self.interface)
 
     def login(self, username: str, password: str, force: bool = False) -> bool:
         """
