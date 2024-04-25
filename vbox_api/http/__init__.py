@@ -1,11 +1,14 @@
 """Web interface for VirtualBox API."""
 
-from flask import Flask, flash, redirect, render_template, request, url_for
+from typing import Optional
+
+from flask import Flask, abort, flash, redirect, render_template, request, url_for
 from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers.response import Response
 
 from vbox_api.http import config
 from vbox_api.http.session import SessionManager, requires_session
+from vbox_api.models.machine import Machine
 
 app = Flask(__name__)
 app.config.from_object(config)
@@ -43,3 +46,15 @@ def logout() -> Response:
     """Endpoint to log out current session."""
     session_manager.logout()
     return redirect(url_for("dashboard"))
+
+
+@app.route("/machine", methods=["GET", "POST"])
+@app.route("/machine/<string:machine_id>", methods=["GET", "POST"])
+@requires_session(session_manager)
+def machine(machine_id: Optional[str] = None) -> Response | str:
+    """Endpoint to view and manage a specified machine."""
+    machine_id = machine_id or request.args.get("id")
+    machine = session_manager.api.find_machine(machine_id)
+    if not machine:
+        abort(400, "No machine specified." if not machine_id else "Machine not found.")
+    return render_template("machine.html", machine=machine)

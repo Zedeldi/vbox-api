@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block title %}{{ machine.name }}{% endblock %}
+{% block content %}
+<h3 class="text-center">{{ machine.name }}</h3>
+<hr>
+<div class="row">
+  <div class="col">
+    <img src="{{ machine.get_thumbnail(data_uri=True) }}" class="img-thumbnail" alt="Thumbnail for {{ machine.name }}">
+  </div>
+  <div class="col">
+    <p>State: <span class="badge text-bg-{{ ['secondary', 'success', 'warning', 'danger'][machine.get_health()[1]] }}">{{ machine.get_health()[0] }}</span></p>
+    <p>Location: {{ machine.groups[0] }}</p>
+  </div>
+</div>
+{% endblock %}

@@ -47,3 +47,11 @@ class VBoxAPI:
             Machine(self.ctx, self.ctx.get_handle(handle))
             for handle in self.virtualbox.get_machines()
         ]
+
+    def find_machine(self, name_or_id: str) -> Optional[Machine]:
+        """Return machine matching specified name or ID."""
+        try:
+            handle = self.virtualbox.find_machine(name_or_id)
+        except Exception:
+            return None
+        return Machine(self.ctx, self.ctx.get_handle(handle))
