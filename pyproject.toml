@@ -15,9 +15,15 @@ maintainers = [
   {name = "Zack Didcott"}
 ]
 dependencies = [
+  "Flask",
+  "pillow",
   "zeep"
 ]
 requires-python = ">= 3.10"
 
 [project.urls]
 Homepage = "https://github.com/Zedeldi/vbox-api"
+
+[project.scripts]
+vbox-api-cli = "vbox_api.__main__:main"
+vbox-api-http = "vbox_api.http.__main__:main"
