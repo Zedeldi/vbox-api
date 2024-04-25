@@ -1,7 +1,6 @@
 from types import TracebackType
 from typing import Optional, Type
 
-from vbox_api.api.handle import Handle
 from vbox_api.models.base import BaseModel
 
 
@@ -16,11 +15,8 @@ class Session(BaseModel):
         """
         if self.handle and not force:
             return None
-        self.handle = Handle(
-            self.ctx,
-            self.ctx.interface.WebsessionManager.get_session_object(
-                self.ctx.api_handle
-            ),
+        self.handle = self.ctx.get_handle(
+            self.ctx.interface.WebsessionManager.get_session_object(self.ctx.api_handle)
         )
 
     def close(self) -> None:
@@ -32,7 +28,8 @@ class Session(BaseModel):
         self.handle.release()
         self.handle = None
 
-    def __enter__(self) -> Handle:
+    def __enter__(self) -> "Handle":
+        """Context manager method to open session and return handle."""
         self.open()
         return self.handle
 
@@ -42,4 +39,5 @@ class Session(BaseModel):
         exc_val: Optional[BaseException],
         exc_tb: Optional[TracebackType],
     ) -> None:
+        """Context manager method to close session on exit."""
         self.close()

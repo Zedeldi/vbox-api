@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
+from vbox_api.api.handle import Handle
 from vbox_api.models.session import Session
 
 
@@ -12,9 +13,13 @@ class Context:
     interface: "PythonicInterface"
 
     @property
-    def api_handle(self) -> Optional["Handle"]:
+    def api_handle(self) -> Optional[Handle]:
         """Return handle of API instance."""
         return self.api.handle
+
+    def get_handle(self, handle: str) -> Handle:
+        """Get Handle instance with current context and specified handle."""
+        return Handle(self, handle)
 
     def get_session(self) -> Session:
         """Return Session object for Context instance."""

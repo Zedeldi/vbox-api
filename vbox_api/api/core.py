@@ -3,16 +3,22 @@ from typing import Optional
 from vbox_api.api.context import Context
 from vbox_api.api.handle import Handle
 from vbox_api.interface.base import BaseInterface, PythonicInterface
+from vbox_api.models.base import BaseModel
 from vbox_api.models.machine import Machine
 
 
 class VBoxAPI:
-    """Class to handle API methods via an interface."""
+    """Class to handle API methods via a VirtualBox interface."""
 
     def __init__(self, interface: BaseInterface) -> None:
         """Initialise instance of API."""
         self.interface = PythonicInterface(interface)
-        self.handle: Optional[Handle] = None
+        self.virtualbox = BaseModel.from_name("VirtualBox")(self.ctx)
+
+    @property
+    def handle(self) -> Optional[Handle]:
+        """Return handle of VirtualBox instance."""
+        return self.virtualbox.handle
 
     @property
     def ctx(self) -> Context:
@@ -24,11 +30,11 @@ class VBoxAPI:
 
         If force is specified, attempt authentication even if already logged in.
         """
-        if self.handle and not force:
+        if self.virtualbox.handle and not force:
             raise RuntimeError("Already logged in.")
         try:
-            self.handle = Handle(
-                self.ctx, self.interface.WebsessionManager.logon(username, password)
+            self.virtualbox.handle = self.ctx.get_handle(
+                self.interface.WebsessionManager.logon(username, password)
             )
             return True
         except Exception:
@@ -38,6 +44,6 @@ class VBoxAPI:
     def machines(self) -> list[Machine]:
         """Return list of Machine instances."""
         return [
-            Machine(self.ctx, Handle(self.ctx, handle))
-            for handle in self.interface.VirtualBox.get_machines(self.handle)
+            Machine(self.ctx, self.ctx.get_handle(handle))
+            for handle in self.virtualbox.get_machines()
         ]

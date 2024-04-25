@@ -6,7 +6,6 @@ from typing import Any, Callable, Literal, Optional
 
 from PIL import Image
 
-from vbox_api.api.handle import Handle
 from vbox_api.models.base import BaseModel
 from vbox_api.utils import image_to_data_uri, split_pascal_case, text_to_image
 
@@ -54,7 +53,7 @@ class Machine(BaseModel):
         """Lock machine and return mutable machine instance."""
         self.lock_machine(self.session.handle, lock_type)
         locked_machine = self.session.get_machine()
-        return Machine(self.ctx, Handle(self.ctx, locked_machine), self.session)
+        return Machine(self.ctx, self.ctx.get_handle(locked_machine), self.session)
 
     def get_health(self) -> tuple[str, MachineHealth]:
         """Return tuple for health of machine in format (state, status_code)."""
