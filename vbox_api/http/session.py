@@ -1,12 +1,29 @@
-from typing import Optional
+import functools
+from typing import Callable, Optional
 
-from flask import session
+from flask import redirect, request, session, url_for
+from werkzeug.wrappers.response import Response
 
 from vbox_api import SOAPInterface, VBoxAPI
 
 
+def requires_session(session_manager: "SessionManager") -> Callable:
+    """Redirect user to login page if no active session."""
+
+    def decorator(func: Callable) -> Callable:
+        @functools.wraps(func)
+        def inner(*args, **kwargs) -> Response | str:
+            if not session_manager.api:
+                return redirect(url_for("login", next=request.endpoint))
+            return func(*args, **kwargs)
+
+        return inner
+
+    return decorator
+
+
 class SessionManager(dict):
-    """Class to manage sessions and associated objects."""
+    """Class to manage sessions and associated API instance."""
 
     @property
     def username(self) -> Optional[str]:

@@ -4,7 +4,6 @@ import sys
 
 from vbox_api.http import app
 
-
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8080
 
