@@ -1,10 +1,25 @@
 import re
 from abc import ABC
-from typing import Callable
+from typing import Callable, Optional
 
 
 class BaseInterface(ABC):
     """Define abstract base class for interface."""
+
+    def match_interface_name(self, interface_name: str) -> Optional[str]:
+        """Match an interface name, by returning best match or None."""
+        interface_name = interface_name.casefold()
+        for name in self.__dict__.keys():
+            if name.casefold() in (interface_name, interface_name.replace("_", "")):
+                return name
+        return None
+
+    def find_interface(self, interface_name: str) -> Optional["ProxyInterface"]:
+        """Find an interface object by name, by returning best match or None."""
+        matched_name = self.match_interface_name(interface_name)
+        if not matched_name:
+            return None
+        return self.get_interface(matched_name)
 
     def get_interface(self, interface_name: str) -> "ProxyInterface":
         """Get interface instance from interface_name."""

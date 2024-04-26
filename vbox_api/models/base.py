@@ -24,7 +24,13 @@ class BaseModel(ABC):
 
     def get_property(self, name: str) -> Any:
         """Return value of property at runtime."""
-        return self._properties[name](self.handle)
+        value = self._properties[name](self.handle)
+        interface_name = self.ctx.interface.match_interface_name(name)
+        if interface_name:
+            return BaseModel.from_name(interface_name)(
+                self.ctx, self.ctx.get_handle(value)
+            )
+        return value
 
     def bind_methods(self) -> None:
         for method_name, method in self._methods.items():
@@ -44,9 +50,9 @@ class BaseModel(ABC):
     def to_dict(self) -> dict:
         """Return dict to represent current state of model."""
         info = {}
-        for property_name, method in self._properties.items():
+        for property_name in self._properties.keys():
             try:
-                info[property_name] = method(self.handle)
+                info[property_name] = self.get_property(property_name)
             except Exception:
                 pass
         return info
