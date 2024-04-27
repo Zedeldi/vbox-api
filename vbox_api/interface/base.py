@@ -8,9 +8,14 @@ class BaseInterface(ABC):
 
     def match_interface_name(self, interface_name: str) -> Optional[str]:
         """Match an interface name, by returning best match or None."""
-        interface_name = interface_name.casefold()
+        interface_name = interface_name.casefold().replace("_", "")
+        matches = (
+            interface_name,
+            interface_name.removesuffix("s"),
+            interface_name.removesuffix("es"),
+        )
         for name in self.__dict__.keys():
-            if name.casefold() in (interface_name, interface_name.replace("_", "")):
+            if name.casefold() in matches:
                 return name
         return None
 

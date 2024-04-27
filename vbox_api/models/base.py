@@ -35,9 +35,12 @@ class BaseModel(ABC):
             return value
         interface_name = self.ctx.interface.match_interface_name(name)
         if interface_name:
-            return BaseModel.from_name(interface_name)(
-                self.ctx, self.ctx.get_handle(value)
-            )
+            model = BaseModel.from_name(interface_name)
+            if isinstance(value, list):
+                return [
+                    model(self.ctx, self.ctx.get_handle(handle)) for handle in value
+                ]
+            return model(self.ctx, self.ctx.get_handle(value))
         return value
 
     def bind_methods(self) -> None:
