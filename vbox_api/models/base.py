@@ -6,6 +6,8 @@ from typing import Any, Optional, Type
 class BaseModel(ABC):
     """Base class to handle model attributes and methods."""
 
+    _models: dict[str, Type["BaseModel"]] = {}
+
     def __init__(self, ctx: "Context", handle: Optional["Handle"] = None) -> None:
         """Initialise instance of model with information."""
         self.ctx = ctx
@@ -70,4 +72,20 @@ class BaseModel(ABC):
     @classmethod
     def from_name(cls, model_name: str) -> Type["BaseModel"]:
         """Return subclass of BaseModel for model_name."""
-        return type(model_name, (cls,), {})
+        model = cls._models.get(model_name) or type(model_name, (cls,), {})
+        cls.register_model(model)
+        return model
+
+    @classmethod
+    def register_model(
+        cls, model: Type["BaseModel"], name: Optional[str] = None
+    ) -> Type["BaseModel"]:
+        """
+        Class method to register a model for the specified name.
+
+        If name is not specified, use name of the model class.
+        Can be used as a class decorator.
+        """
+        name = name or model.__name__
+        cls._models[name] = model
+        return model

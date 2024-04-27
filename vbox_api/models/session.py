@@ -4,6 +4,7 @@ from typing import Optional, Type
 from vbox_api.models.base import BaseModel
 
 
+@BaseModel.register_model
 class Session(BaseModel):
     """Context manager for a session."""
 
