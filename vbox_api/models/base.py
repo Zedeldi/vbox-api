@@ -22,9 +22,15 @@ class BaseModel(ABC):
         except KeyError:
             raise AttributeError("Attribute not found.")
 
-    def get_property(self, name: str) -> Any:
-        """Return value of property at runtime."""
+    def get_property(self, name: str, use_model: bool = True) -> Any:
+        """
+        Return value of property at runtime.
+
+        If use_model is True, return result as usable model.
+        """
         value = self._properties[name](self.handle)
+        if not use_model:
+            return value
         interface_name = self.ctx.interface.match_interface_name(name)
         if interface_name:
             return BaseModel.from_name(interface_name)(
@@ -47,12 +53,16 @@ class BaseModel(ABC):
         self._handle = handle
         self.bind_methods()
 
-    def to_dict(self) -> dict:
-        """Return dict to represent current state of model."""
+    def to_dict(self, use_models: bool = True) -> dict:
+        """
+        Return dict to represent current state of model.
+
+        If use_models is True, attempt to convert results to usable models.
+        """
         info = {}
         for property_name in self._properties.keys():
             try:
-                info[property_name] = self.get_property(property_name)
+                info[property_name] = self.get_property(property_name, use_models)
             except Exception:
                 pass
         return info

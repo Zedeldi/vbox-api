@@ -8,7 +8,6 @@ from werkzeug.wrappers.response import Response
 
 from vbox_api.http import config
 from vbox_api.http.session import SessionManager, requires_session
-from vbox_api.models.machine import Machine
 
 app = Flask(__name__)
 app.config.from_object(config)
