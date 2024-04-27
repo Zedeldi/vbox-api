@@ -8,8 +8,10 @@
     <img src="{{ machine.get_thumbnail(data_uri=True) }}" class="img-thumbnail" alt="Thumbnail for {{ machine.name }}">
   </div>
   <div class="col">
-    <p>State: <span class="badge text-bg-{{ ['secondary', 'success', 'warning', 'danger'][machine.get_health()[1]] }}">{{ machine.get_health()[0] }}</span></p>
-    <p>Location: {{ machine.groups[0] }}</p>
+    <p><b>State:</b> <span class="badge text-bg-{{ ['secondary', 'success', 'warning', 'danger'][machine.get_health()[1]] }}">{{ machine.get_health()[0] }}</span></p>
+    <p><b>Location:</b> {{ machine.groups[0] }}</p>
+    <p><b>OS:</b> {{ machine.get_os_type_description() }}</p>
+    <p><b>Firmware:</b> {{ machine.firmware_type }}</p>
   </div>
 </div>
 {% endblock %}

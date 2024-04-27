@@ -39,9 +39,11 @@ class Machine(BaseModel):
         ctx: "Context",
         handle: Optional["Handle"] = None,
         session: Optional["Session"] = None,
+        *args,
+        **kwargs,
     ) -> None:
         """Initialise base instance and add session attribute."""
-        super().__init__(ctx, handle)
+        super().__init__(ctx, handle, *args, **kwargs)
         self.session = session or self.ctx.get_session()
 
     @requires_session
@@ -92,3 +94,8 @@ class Machine(BaseModel):
         except Exception:
             return None
         return image
+
+    def get_os_type_description(self) -> str:
+        """Return description of OS type."""
+        os_type = self.ctx.api.virtualbox.get_guest_os_type(self.os_type_id)
+        return os_type["description"]
