@@ -2,6 +2,8 @@ import functools
 from abc import ABC
 from typing import Any, Optional, Type
 
+from vbox_api.api.handle import Handle
+
 
 class BaseModel(ABC):
     """Base class to handle model attributes and methods."""
@@ -28,20 +30,27 @@ class BaseModel(ABC):
         """
         Return value of property at runtime.
 
-        If use_model is True, return result as usable model.
+        If use_model is True, return result as usable model if result is a
+        valid handle.
         """
-        value = self._properties[name](self.handle)
+        result = self._properties[name](self.handle)
         if not use_model:
-            return value
+            return result
         interface_name = self.ctx.interface.match_interface_name(name)
         if interface_name:
             model = BaseModel.from_name(interface_name)
-            if isinstance(value, list):
-                return [
-                    model(self.ctx, self.ctx.get_handle(handle)) for handle in value
-                ]
-            return model(self.ctx, self.ctx.get_handle(value))
-        return value
+            if isinstance(result, list):
+                return [self._get_model_from_value(model, value) for value in result]
+            return self._get_model_from_value(model, result)
+        return result
+
+    def _get_model_from_value(self, model: "BaseModel", value: Any) -> Any:
+        """Return model if value is a handle else return value."""
+        return (
+            model(self.ctx, self.ctx.get_handle(value))
+            if Handle.is_handle(value)
+            else value
+        )
 
     def bind_methods(self) -> None:
         for method_name, method in self._methods.items():
