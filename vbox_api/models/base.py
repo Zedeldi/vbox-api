@@ -44,7 +44,7 @@ class BaseModel(ABC):
             return self._get_model_from_value(model, result)
         return result
 
-    def _get_model_from_value(self, model: "BaseModel", value: Any) -> Any:
+    def _get_model_from_value(self, model: Type["BaseModel"], value: Any) -> Any:
         """Return model if value is a handle else return value."""
         return (
             model(self.ctx, self.ctx.get_handle(value))
