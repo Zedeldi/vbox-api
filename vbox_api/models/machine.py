@@ -1,6 +1,8 @@
 import base64
 import functools
 import io
+from collections.abc import Iterator
+from contextlib import contextmanager
 from enum import IntEnum
 from typing import Any, Callable, Literal, Optional
 
@@ -52,11 +54,30 @@ class Machine(BaseModel):
         self.launch_vm_process(self.session.handle, front_end)
 
     @requires_session
+    def stop(self) -> None:
+        """Acquire lock and stop virtual machine."""
+        self.lock()
+        self.session.console.power_down()
+
+    @requires_session
     def lock(self, lock_type: Literal["Write", "Shared"] = "Shared") -> "Machine":
         """Lock machine and return mutable machine instance."""
+        if self.session.state == "Locked":
+            return self
         self.lock_machine(self.session.handle, lock_type)
         locked_machine = self.session.get_machine()
         return Machine(self.ctx, self.ctx.get_handle(locked_machine), self.session)
+
+    @contextmanager
+    @requires_session
+    def with_lock(
+        self, lock_type: Literal["Write", "Shared"] = "Shared"
+    ) -> Iterator["Machine"]:
+        """Lock machine in a context manager and unlock on exit."""
+        try:
+            yield self.lock(lock_type)
+        finally:
+            self.session.unlock_machine()
 
     def get_health(self) -> tuple[str, MachineHealth]:
         """Return tuple for health of machine in format (state, status_code)."""

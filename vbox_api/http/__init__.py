@@ -82,5 +82,5 @@ def machine_start(machine_id: Optional[str] = None) -> Response | str:
 def machine_stop(machine_id: Optional[str] = None) -> Response | str:
     """Endpoint to stop a specified machine."""
     machine = get_machine_from_id(machine_id)
-    machine.session.console.power_down()
+    machine.stop()
     return redirect(url_for("machine", machine_id=machine.id))
