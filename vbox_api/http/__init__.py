@@ -14,6 +14,15 @@ app.config.from_object(config)
 session_manager = SessionManager()
 
 
+def get_machine_from_id(machine_id: Optional[str]) -> "Machine":
+    """Return Machine instance from machine_id or abort request."""
+    machine_id = machine_id or request.args.get("id")
+    machine = session_manager.api.find_machine(machine_id)
+    if not machine:
+        abort(400, "No machine specified." if not machine_id else "Machine not found.")
+    return machine
+
+
 @app.errorhandler(HTTPException)
 def handle_exception(error: HTTPException) -> tuple[str, int]:
     """Handle HTTP errors."""
@@ -47,13 +56,31 @@ def logout() -> Response:
     return redirect(url_for("dashboard"))
 
 
-@app.route("/machine", methods=["GET", "POST"])
-@app.route("/machine/<string:machine_id>", methods=["GET", "POST"])
+@app.route("/machine", methods=["GET"])
+@app.route("/machine/<string:machine_id>", methods=["GET"])
 @requires_session(session_manager)
 def machine(machine_id: Optional[str] = None) -> Response | str:
     """Endpoint to view and manage a specified machine."""
-    machine_id = machine_id or request.args.get("id")
-    machine = session_manager.api.find_machine(machine_id)
-    if not machine:
-        abort(400, "No machine specified." if not machine_id else "Machine not found.")
+    machine = get_machine_from_id(machine_id)
     return render_template("machine.html", machine=machine)
+
+
+@app.route("/machine/start", methods=["GET"])
+@app.route("/machine/<string:machine_id>/start", methods=["GET"])
+@requires_session(session_manager)
+def machine_start(machine_id: Optional[str] = None) -> Response | str:
+    """Endpoint to start a specified machine."""
+    machine = get_machine_from_id(machine_id)
+    front_end = request.args.get("front_end", "headless")
+    machine.start(front_end)
+    return redirect(url_for("machine", machine_id=machine.id))
+
+
+@app.route("/machine/stop", methods=["GET"])
+@app.route("/machine/<string:machine_id>/stop", methods=["GET"])
+@requires_session(session_manager)
+def machine_stop(machine_id: Optional[str] = None) -> Response | str:
+    """Endpoint to stop a specified machine."""
+    machine = get_machine_from_id(machine_id)
+    machine.session.console.power_down()
+    return redirect(url_for("machine", machine_id=machine.id))

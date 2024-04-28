@@ -1,7 +1,22 @@
 {% extends "layout.html" %}
 {% block title %}{{ machine.name }}{% endblock %}
 {% block content %}
-<h3 class="text-center">{{ machine.name }}</h3>
+<div class="d-flex justify-content-between">
+  <h3>{{ machine.name }}</h3>
+  <div class="btn-group">
+    {% if machine.state == "Running" %}
+    <a class="btn btn-danger" href="{{ url_for('machine_stop', machine_id=machine.id) }}" role="button">Stop</a>
+    {% else %}
+    <a class="btn btn-primary" href="{{ url_for('machine_start', machine_id=machine.id, front_end='headless') }}" role="button">Start</a>
+    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">
+      <span class="visually-hidden"></span>
+    </button>
+    <ul class="dropdown-menu">
+      <li><a class="dropdown-item" href="{{ url_for('machine_start', machine_id=machine.id, front_end='gui') }}">GUI</a></li>
+    </ul>
+    {% endif %}
+  </div>
+</div>
 <hr>
 <div class="row">
   <div class="col">
