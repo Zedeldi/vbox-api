@@ -17,16 +17,16 @@ class BaseModel(ABC):
         interface = ctx.interface.get_interface(self.__class__.__name__)
         self._properties = interface.properties
         self._methods = interface.methods
-        self.bind_methods()
+        self._bind_methods()
 
     def __getattr__(self, name: str) -> Any:
         """Handle getting model attributes at runtime."""
         try:
-            return self.get_property(name)
+            return self._get_property(name)
         except KeyError:
             raise AttributeError("Attribute not found.")
 
-    def get_property(self, name: str, use_model: bool = True) -> Any:
+    def _get_property(self, name: str, use_model: bool = True) -> Any:
         """
         Return value of property at runtime.
 
@@ -36,23 +36,36 @@ class BaseModel(ABC):
         result = self._properties[name](self.handle)
         if not use_model:
             return result
-        interface_name = self.ctx.interface.match_interface_name(name)
-        if interface_name:
-            model = BaseModel.from_name(interface_name)
-            if isinstance(result, list):
-                return [self._get_model_from_value(model, value) for value in result]
-            return self._get_model_from_value(model, result)
-        return result
+        if not isinstance(result, list):
+            return self._get_model_from_key_value(name, result)
+        models = []
+        for element in result:
+            try:
+                # Forcefully test if element is a mapping
+                for key in element:
+                    element[key] = self._get_model_from_key_value(key, element[key])
+                models.append(element)
+            except TypeError:
+                models.append(self._get_model_from_key_value(name, element))
+        return models
 
-    def _get_model_from_value(self, model: Type["BaseModel"], value: Any) -> Any:
-        """Return model if value is a handle else return value."""
-        return (
-            model(self.ctx, self.ctx.get_handle(value))
-            if Handle.is_handle(value)
-            else value
-        )
+    def _get_model_for_interface(
+        self, interface_name: str
+    ) -> Optional[Type["BaseModel"]]:
+        """Return model class if match found, else return None."""
+        match = self.ctx.interface.match_interface_name(interface_name)
+        if not match:
+            return None
+        return BaseModel.from_name(match)
 
-    def bind_methods(self) -> None:
+    def _get_model_from_key_value(self, key: str, value: Any) -> Any:
+        """Return model from a key-value pair, or value if not a valid model."""
+        model = self._get_model_for_interface(key)
+        if not model or not Handle.is_handle(value):
+            return value
+        return model(self.ctx, self.ctx.get_handle(value))
+
+    def _bind_methods(self) -> None:
         for method_name, method in self._methods.items():
             setattr(self, method_name, functools.partial(method, self.handle))
 
@@ -65,7 +78,7 @@ class BaseModel(ABC):
     def handle(self, handle: Optional["Handle"]) -> None:
         """Set new handle and bind methods."""
         self._handle = handle
-        self.bind_methods()
+        self._bind_methods()
 
     def to_dict(self, use_models: bool = True) -> dict:
         """
@@ -76,7 +89,7 @@ class BaseModel(ABC):
         info = {}
         for property_name in self._properties.keys():
             try:
-                info[property_name] = self.get_property(property_name, use_models)
+                info[property_name] = self._get_property(property_name, use_models)
             except Exception:
                 pass
         return info
