@@ -74,8 +74,13 @@ def machine(machine_id: Optional[str] = None) -> Response | str:
 def machine_start(machine_id: Optional[str] = None) -> Response | str:
     """Endpoint to start a specified machine."""
     machine = get_machine_from_id(machine_id)
-    front_end = request.args.get("front_end", "headless")
-    machine.start(front_end)
+    if request.args.get("resume", False):
+        machine.resume()
+    else:
+        front_end = request.args.get("front_end", "headless")
+        progress = machine.start(front_end)
+        flash("Starting machine...", "info")
+        progress.wait_for_completion(-1)
     return redirect(url_for("machine", machine_id=machine.id))
 
 
@@ -85,5 +90,15 @@ def machine_start(machine_id: Optional[str] = None) -> Response | str:
 def machine_stop(machine_id: Optional[str] = None) -> Response | str:
     """Endpoint to stop a specified machine."""
     machine = get_machine_from_id(machine_id)
-    machine.stop()
+    if request.args.get("pause", False):
+        machine.pause()
+    elif request.args.get("reset", False):
+        machine.reset()
+    elif request.args.get("discard_state", False):
+        machine.discard_state()
+    else:
+        save_state = request.args.get("save_state", False)
+        progress = machine.stop(save_state=save_state)
+        flash("Stopping machine...", "info")
+        progress.wait_for_completion(-1)
     return redirect(url_for("machine", machine_id=machine.id))

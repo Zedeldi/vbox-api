@@ -4,15 +4,34 @@
 <div class="d-flex justify-content-between">
   <h3>{{ machine.name }}</h3>
   <div class="btn-group">
-    {% if machine.state == "Running" %}
-    <a class="btn btn-danger" href="{{ url_for('machine_stop', machine_id=machine.id) }}" role="button">Stop</a>
-    {% else %}
+    {% if machine.state == "Paused" %}
+    <a class="btn btn-outline-primary" href="{{ url_for('machine_start', machine_id=machine.id, resume=True) }}" role="button">Resume</a>
+    {% endif %}
+    {% if machine.state == "Saved" %}
+    <a class="btn btn-outline-primary" href="{{ url_for('machine_stop', machine_id=machine.id, discard_state=True) }}" role="button">Discard</a>
+    {% endif %}
+    {% if machine.state in ("PoweredOff", "Saved", "Aborted") %}
     <a class="btn btn-primary" href="{{ url_for('machine_start', machine_id=machine.id, front_end='headless') }}" role="button">Start</a>
     <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">
       <span class="visually-hidden"></span>
     </button>
     <ul class="dropdown-menu">
       <li><a class="dropdown-item" href="{{ url_for('machine_start', machine_id=machine.id, front_end='gui') }}">GUI</a></li>
+    </ul>
+    {% else %}
+    <a class="btn btn-primary" href="{{ url_for('machine_stop', machine_id=machine.id, save_state=True) }}" role="button">Save</a>
+    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">
+      <span class="visually-hidden"></span>
+    </button>
+    <ul class="dropdown-menu">
+      {% if machine.state != "Paused" %}
+      <li><a class="dropdown-item" href="{{ url_for('machine_stop', machine_id=machine.id, pause=True) }}">Pause</a></li>
+      {% endif %}
+      <li><a class="dropdown-item" href="{{ url_for('machine_stop', machine_id=machine.id) }}">Stop</a></li>
+      {% if machine.state != "Paused" %}
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item" href="{{ url_for('machine_stop', machine_id=machine.id, reset=True) }}">Reset</a></li>
+      {% endif %}
     </ul>
     {% endif %}
   </div>

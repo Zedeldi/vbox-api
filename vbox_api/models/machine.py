@@ -60,18 +60,30 @@ class Machine(BaseModel):
         return Progress(self.ctx, self.ctx.get_handle(handle))
 
     @requires_session
-    def stop(self) -> Progress:
-        """Acquire lock and stop virtual machine."""
+    def stop(self, save_state: bool = False) -> Progress:
+        """
+        Acquire lock and stop virtual machine.
+
+        If save_state is True, save machine state and power down.
+        """
         with self.with_lock():
-            handle = self.session.console.power_down()
+            if save_state:
+                handle = self.session.machine.save_state()
+            else:
+                handle = self.session.console.power_down()
             return Progress(self.ctx, self.ctx.get_handle(handle))
 
     @requires_session
-    def reset(self) -> Progress:
-        """Attempt to power up and shutdown machine to remove aborted state."""
-        progress = self.start()
-        progress.wait_for_completion(-1)
-        return self.stop()
+    def discard_state(self, remove_file: bool = True) -> None:
+        """Acquire lock and discard saved state of machine."""
+        with self.with_lock():
+            self.session.machine.discard_saved_state(remove_file)
+
+    @requires_session
+    def reset(self) -> None:
+        """Acquire lock and forcefully reset machine."""
+        with self.with_lock():
+            self.session.console.reset()
 
     @requires_session
     def restart(self, front_end: Literal["gui", "headless", "sdl"] = "gui") -> Progress:
@@ -81,6 +93,28 @@ class Machine(BaseModel):
         return self.start(front_end)
 
     @requires_session
+    def pause(self) -> None:
+        """Pause machine execution state."""
+        with self.with_lock():
+            self.session.console.pause()
+
+    @requires_session
+    def resume(self) -> None:
+        """Resume machine execution state."""
+        with self.with_lock():
+            self.session.console.resume()
+
+    @requires_session
+    def fix_state(self) -> Progress:
+        """Attempt to power up and shutdown machine to remove aborted state."""
+        try:
+            progress = self.start()
+            progress.wait_for_completion(-1)
+        except Exception:
+            pass
+        return self.stop()
+
+    @requires_session
     def lock(self, lock_type: Literal["Write", "Shared"] = "Shared") -> "Machine":
         """Lock machine and return mutable machine instance."""
         if self.session.state == "Locked":
@@ -88,6 +122,11 @@ class Machine(BaseModel):
         self.lock_machine(self.session.handle, lock_type)
         locked_machine = self.session.get_machine()
         return Machine(self.ctx, self.ctx.get_handle(locked_machine), self.session)
+
+    @requires_session
+    def unlock(self) -> None:
+        """Unlock machine."""
+        self.session.unlock_machine()
 
     @contextmanager
     @requires_session
@@ -111,7 +150,7 @@ class Machine(BaseModel):
             if save_on_exit:
                 self.save_settings()
             if unlock_on_exit:
-                self.session.unlock_machine()
+                self.unlock()
 
     def get_mediums(self) -> list[Medium]:
         """Return list of attached mediums."""
