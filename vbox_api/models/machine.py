@@ -1,7 +1,7 @@
 import base64
 import functools
 import io
-from collections.abc import Iterator
+from collections.abc import Iterable, Iterator
 from contextlib import contextmanager
 from enum import IntEnum
 from typing import Any, Callable, Literal, Optional
@@ -10,6 +10,8 @@ from PIL import Image
 
 from vbox_api.models.base import BaseModel
 from vbox_api.models.medium import Medium
+from vbox_api.models.network import NetworkAdapter
+from vbox_api.models.progress import Progress
 from vbox_api.utils import image_to_data_uri, split_pascal_case, text_to_image
 
 
@@ -52,15 +54,31 @@ class Machine(BaseModel):
         self.session = session or self.ctx.get_session()
 
     @requires_session
-    def start(self, front_end: Literal["gui", "headless", "sdl"] = "gui") -> None:
+    def start(self, front_end: Literal["gui", "headless", "sdl"] = "gui") -> Progress:
         """Start virtual machine with specified front_end."""
-        self.launch_vm_process(self.session.handle, front_end)
+        handle = self.launch_vm_process(self.session.handle, front_end)
+        return Progress(self.ctx, self.ctx.get_handle(handle))
 
     @requires_session
-    def stop(self) -> None:
+    def stop(self) -> Progress:
         """Acquire lock and stop virtual machine."""
-        self.lock()
-        self.session.console.power_down()
+        with self.with_lock():
+            handle = self.session.console.power_down()
+            return Progress(self.ctx, self.ctx.get_handle(handle))
+
+    @requires_session
+    def reset(self) -> Progress:
+        """Attempt to power up and shutdown machine to remove aborted state."""
+        progress = self.start()
+        progress.wait_for_completion(-1)
+        return self.stop()
+
+    @requires_session
+    def restart(self, front_end: Literal["gui", "headless", "sdl"] = "gui") -> Progress:
+        """Stop machine and restart with specified front_end."""
+        progress = self.stop()
+        progress.wait_for_completion(-1)
+        return self.start(front_end)
 
     @requires_session
     def lock(self, lock_type: Literal["Write", "Shared"] = "Shared") -> "Machine":
@@ -77,14 +95,23 @@ class Machine(BaseModel):
         self,
         lock_type: Literal["Write", "Shared"] = "Shared",
         save_on_exit: bool = False,
+        force_unlock: bool = False,
     ) -> Iterator["Machine"]:
-        """Lock machine in a context manager and unlock on exit."""
+        """
+        Lock machine in a context manager and conditionally unlock on exit.
+
+        If save_on_exit is True, save_settings will be called before locking.
+        If the machine is already locked, it will not be automatically unlocked,
+        unless force_unlock is True.
+        """
+        unlock_on_exit = self.session.state != "Locked" or force_unlock
         try:
             yield self.lock(lock_type)
         finally:
             if save_on_exit:
                 self.save_settings()
-            self.session.unlock_machine()
+            if unlock_on_exit:
+                self.session.unlock_machine()
 
     def get_mediums(self) -> list[Medium]:
         """Return list of attached mediums."""
@@ -93,6 +120,20 @@ class Machine(BaseModel):
             for mapping in self.medium_attachments
             if mapping["medium"]
         ]
+
+    def get_network_adapters(
+        self, slots: Iterable[int] = range(4), enabled_only: bool = True
+    ) -> list[NetworkAdapter]:
+        """Return list of network adapters."""
+        network_adapters = [
+            NetworkAdapter(
+                self.ctx, self.ctx.get_handle(self.get_network_adapter(slot))
+            )
+            for slot in slots
+        ]
+        if enabled_only:
+            return list(filter(lambda n: n.enabled, network_adapters))
+        return network_adapters
 
     def get_health(self) -> MachineHealth:
         """Return tuple for health of machine in format (state, status_code)."""
@@ -117,18 +158,36 @@ class Machine(BaseModel):
 
         If data_uri is True, return base64-encoded data URI.
         """
-        image = self.get_saved_screenshot()
+        image = self.get_running_screenshot() or self.get_saved_screenshot()
         if not image:
             image = text_to_image(self.name)
         if data_uri:
             image = image_to_data_uri(image)
         return image
 
-    def get_saved_screenshot(self) -> Optional[Image.Image]:
-        """Return screenshot of saved state if available."""
+    @requires_session
+    def get_running_screenshot(
+        self, screen_id: int = 0, bitmap_format: str = "PNG"
+    ) -> Optional[Image.Image]:
+        """Return screenshot of running state for screen_id if available."""
+        with self.with_lock():
+            try:
+                info = self.session.console.display.get_screen_resolution(screen_id)
+                image_b64 = self.session.console.display.take_screen_shot_to_array(
+                    screen_id, info["width"], info["height"], bitmap_format
+                )
+                image = Image.open(io.BytesIO(base64.b64decode(image_b64)))
+            except Exception:
+                return None
+        return image
+
+    def get_saved_screenshot(self, screen_id: int = 0) -> Optional[Image.Image]:
+        """Return screenshot of saved state for screen_id if available."""
         try:
-            info = self.query_saved_screenshot_info(0)
-            image_dict = self.read_saved_screenshot_to_array(0, info["returnval"][0])
+            info = self.query_saved_screenshot_info(screen_id)
+            image_dict = self.read_saved_screenshot_to_array(
+                screen_id, info["returnval"][0]
+            )
             image = Image.open(io.BytesIO(base64.b64decode(image_dict["returnval"])))
         except Exception:
             return None

@@ -40,22 +40,37 @@
     </section>
     <section id="storage">
       <h5>Storage</h5>
-      {% for medium in machine.get_mediums() %}
-      {% if medium.parent %}
-      <div class="dropdown-toggle" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#parents-{{ medium.id }}">
-      {% else %}
-      <div>
-      {% endif %}
-        <b>{{ medium.base.get_device_type_name() }}: </b>{{ medium.base.get_path() }}
-      </div>
-      {% if medium.parent %}
-      <ul class="list-group collapse py-2" id="parents-{{ medium.id }}">
-      {% for parent in medium.get_parents(include_self=True)[:-1] | reverse %}
-        <li class="list-group-item">{{ parent.get_path() }}</li>
-      {% endfor %}
-      </ul>
-      {% endif %}
-      {% endfor %}
+      <p>
+        {% for medium in machine.get_mediums() %}
+        {% if medium.parent %}
+        <div class="dropdown-toggle" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#parents-{{ medium.id }}">
+        {% else %}
+        <div>
+        {% endif %}
+          <b>{{ medium.base.get_device_type_name() }}: </b><span class="font-monospace">{{ medium.base.get_path() }}</span>
+        </div>
+        {% if medium.parent %}
+        <ul class="list-group collapse py-2" id="parents-{{ medium.id }}">
+        {% for parent in medium.get_parents(include_self=True)[:-1] | reverse %}
+          <li class="list-group-item font-monospace">{{ parent.get_path() }}</li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+        {% endfor %}
+      </p>
+    </section>
+    <section id="network">
+      <h5>Network</h5>
+      <p>
+        {% for network in machine.get_network_adapters() %}
+        <b>Adapter {{ loop.index }}: </b>{{ network.get_attachment_type_name() }}
+        {%- if network.get_interface_name() %}
+        (<span class="font-monospace">{{ network.get_interface_name() }}</span>)
+        {%- endif -%}
+        , MAC address: <span class="font-monospace">{{ network.mac_address }}</span>
+        <br>
+        {% endfor %}
+      </p>
     </section>
   </div>
 </div>
