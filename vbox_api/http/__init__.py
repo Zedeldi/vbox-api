@@ -44,8 +44,11 @@ def login() -> Response | str:
         if not session_manager.login(username, password):
             flash("Incorrect username or password.", "danger")
         else:
-            url = url_for(request.args.get("next", "dashboard"))
-            return redirect(url)
+            args = dict(request.args)
+            next = args.pop("next", None)
+            if not next:
+                return redirect(url_for("dashboard"))
+            return redirect(url_for(next, **args))
     return render_template("login.html")
 
 

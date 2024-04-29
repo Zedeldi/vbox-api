@@ -14,7 +14,7 @@ def requires_session(session_manager: "SessionManager") -> Callable:
         @functools.wraps(func)
         def inner(*args, **kwargs) -> Response | str:
             if not session_manager.api:
-                return redirect(url_for("login", next=request.endpoint))
+                return redirect(url_for("login", next=request.endpoint, **request.args))
             return func(*args, **kwargs)
 
         return inner
