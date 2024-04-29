@@ -6,11 +6,29 @@ Python bindings to the VirtualBox SOAP API.
 
 ## Description
 
-Provides a Python SOAP client using `zeep` to the VirtualBox SOAP API, with Pythonic bindings.
+Provides a Python SOAP client using `zeep` to the VirtualBox SOAP API, with Pythonic bindings, and models for object-oriented usage.
+
+`vbox_api.http` includes a Flask application to view and manage virtual machines over HTTP.
+
+## Installation
+
+After cloning the repository with: `git clone https://github.com/Zedeldi/vbox-api.git`
+
+### Build
+
+1. Install project: `pip install .`
+2. Run: `vbox-api-cli` (CLI) or `vbox-api-http` (HTTP)
+
+### Development
+
+1. Install dependencies: `pip install -r requirements.txt`
+2. Run: `python -m vbox_api` (CLI) or `python -m vbox_api.http` (HTTP)
 
 Libraries:
 
-- [zeep](https://pypi.org/project/zeep/) - SOAP client
+- [Zeep](https://pypi.org/project/zeep/) - SOAP client
+- [Flask](https://pypi.org/project/Flask/) - HTTP interface
+- [Pillow](https://pypi.org/project/pillow/) - image support
 
 ## License
 
