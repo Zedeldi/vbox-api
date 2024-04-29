@@ -6,11 +6,9 @@ from typing import Callable, Optional
 class BaseInterface(ABC):
     """Define abstract base class for interface."""
 
-    ALIASES: dict[str, str] = {"NonVolatileStore": "INvramStore"}
-
     @staticmethod
-    def _get_matches(interface_name: str) -> set[str]:
-        """Return set of matches to test."""
+    def get_matches(interface_name: str) -> set[str]:
+        """Return case-folded set of strings to match interface name."""
         interface_name = interface_name.casefold().replace("_", "")
         matches = {
             interface_name,
@@ -21,19 +19,9 @@ class BaseInterface(ABC):
         matches.update([f"i{match}" for match in matches])
         return matches
 
-    @classmethod
-    def get_alias(cls, interface_name: str) -> Optional[str]:
-        """Return alias of interface_name, if any."""
-        matches = cls._get_matches(interface_name)
-        for key, value in cls.ALIASES.items():
-            if key.casefold() in matches:
-                return value
-        return None
-
     def match_interface_name(self, interface_name: str) -> Optional[str]:
         """Match an interface name, by returning best match or None."""
-        interface_name = self.get_alias(interface_name) or interface_name
-        matches = self._get_matches(interface_name)
+        matches = self.get_matches(interface_name)
         for name in self.__dict__.keys():
             if name.casefold() in matches:
                 return name

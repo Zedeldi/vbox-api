@@ -19,4 +19,6 @@ class Handle(str):
     @classmethod
     def is_handle(cls, handle: str) -> bool:
         """Return whether specified string matches handle format."""
+        if not isinstance(handle, str):
+            return False
         return bool(re.match(cls.HANDLE_REGEX, handle))

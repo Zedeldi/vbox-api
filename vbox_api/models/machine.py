@@ -9,6 +9,7 @@ from typing import Any, Callable, Literal, Optional
 from PIL import Image
 
 from vbox_api.models.base import BaseModel
+from vbox_api.models.medium import Medium
 from vbox_api.utils import image_to_data_uri, split_pascal_case, text_to_image
 
 
@@ -35,6 +36,8 @@ class MachineHealth(IntEnum):
 @BaseModel.register_model
 class Machine(BaseModel):
     """Class to handle machine attributes and methods."""
+
+    _PROPERTY_INTERFACE_ALIASES: dict[str, str] = {"NonVolatileStore": "INvramStore"}
 
     def __init__(
         self,
@@ -71,15 +74,23 @@ class Machine(BaseModel):
     @contextmanager
     @requires_session
     def with_lock(
-        self, lock_type: Literal["Write", "Shared"] = "Shared"
+        self,
+        lock_type: Literal["Write", "Shared"] = "Shared",
+        save_on_exit: bool = False,
     ) -> Iterator["Machine"]:
         """Lock machine in a context manager and unlock on exit."""
         try:
             yield self.lock(lock_type)
         finally:
+            if save_on_exit:
+                self.save_settings()
             self.session.unlock_machine()
 
-    def get_health(self) -> tuple[str, MachineHealth]:
+    def get_mediums(self) -> list[Medium]:
+        """Return list of attached mediums."""
+        return [mapping["medium"] for mapping in self.medium_attachments]
+
+    def get_health(self) -> MachineHealth:
         """Return tuple for health of machine in format (state, status_code)."""
         match self.state:
             case "PoweredOff" | "Saved":
@@ -90,8 +101,11 @@ class Machine(BaseModel):
                 health = MachineHealth.ERROR
             case _:
                 health = MachineHealth.WARNING
-        formatted_state = split_pascal_case(self.state)
-        return (formatted_state, health)
+        return health
+
+    def get_state_name(self) -> str:
+        """Return formatted machine state."""
+        return split_pascal_case(self.state)
 
     def get_thumbnail(self, data_uri: bool = False) -> Image.Image | str:
         """

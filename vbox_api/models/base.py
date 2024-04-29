@@ -8,6 +8,7 @@ from vbox_api.api.handle import Handle
 class BaseModel(ABC):
     """Base class to handle model attributes and methods."""
 
+    _PROPERTY_INTERFACE_ALIASES: dict[str, str] = {}
     _models: dict[str, Type["BaseModel"]] = {}
 
     def __init__(self, ctx: "Context", handle: Optional["Handle"] = None) -> None:
@@ -25,6 +26,14 @@ class BaseModel(ABC):
             return self._get_property(name)
         except KeyError:
             raise AttributeError("Attribute not found.")
+
+    def _get_property_alias(self, interface_name: str) -> Optional[str]:
+        """Return alias of interface_name, if any."""
+        matches = self.ctx.interface.get_matches(interface_name)
+        for key, value in self._PROPERTY_INTERFACE_ALIASES.items():
+            if key.casefold() in matches:
+                return value
+        return None
 
     def _get_property(self, name: str, use_model: bool = True) -> Any:
         """
@@ -53,6 +62,7 @@ class BaseModel(ABC):
         self, interface_name: str
     ) -> Optional[Type["BaseModel"]]:
         """Return model class if match found, else return None."""
+        interface_name = self._get_property_alias(interface_name) or interface_name
         match = self.ctx.interface.match_interface_name(interface_name)
         if not match:
             return None

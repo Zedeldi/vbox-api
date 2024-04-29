@@ -9,7 +9,7 @@
       <div class="card-body">
         <h5 class="card-title"><a href="{{ url_for('machine', id=machine.id) }}">{{ machine.name }}</a></h5>
         <p class="card-text">
-          <span class="badge text-bg-{{ ['secondary', 'success', 'warning', 'danger'][machine.get_health()[1]] }}">{{ machine.get_health()[0] }}</span>
+          <span class="badge text-bg-{{ ['secondary', 'success', 'warning', 'danger'][machine.get_health()] }}">{{ machine.get_state_name() }}</span>
           <br>
           Location: {{ machine.groups[0] }}
         </p>
