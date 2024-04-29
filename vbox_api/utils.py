@@ -37,4 +37,4 @@ def text_to_image(
 
 def split_pascal_case(text: str) -> str:
     """Split PascalCase string and join with spaces."""
-    return " ".join(re.findall("[A-Z][^A-Z]*", text))
+    return " ".join(re.findall("([A-Z]+[^A-Z]+)", text)) or text

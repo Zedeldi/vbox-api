@@ -23,11 +23,40 @@
     <img src="{{ machine.get_thumbnail(data_uri=True) }}" class="img-thumbnail" alt="Thumbnail for {{ machine.name }}">
   </div>
   <div class="col">
-    <p><b>State: </b><span class="badge text-bg-{{ ['secondary', 'success', 'warning', 'danger'][machine.get_health()] }}">{{ machine.get_state_name() }}</span></p>
-    <p><b>Location: </b>{{ machine.groups[0] }}</p>
-    <p><b>Description: </b>{{ machine.description if machine.description else "No description provided." }}</p>
-    <p><b>OS: </b>{{ machine.get_os_type_description() }}</p>
-    <p><b>Firmware: </b>{{ machine.firmware_type }}</p>
+    <section id="general">
+      <h5>General</h5>
+      <p>
+        <b>State: </b><span class="badge text-bg-{{ ['secondary', 'success', 'warning', 'danger'][machine.get_health()] }}">{{ machine.get_state_name() }}</span><br>
+        <b>Location: </b>{{ machine.groups[0] }}<br>
+        <b>Description: </b>{{ machine.description if machine.description else "No description provided." }}
+      </p>
+    </section>
+    <section id="system">
+      <h5>System</h5>
+      <p>
+        <b>OS: </b>{{ machine.get_os_type_description() }}<br>
+        <b>Firmware: </b>{{ machine.firmware_type }}
+      </p>
+    </section>
+    <section id="storage">
+      <h5>Storage</h5>
+      {% for medium in machine.get_mediums() %}
+      {% if medium.parent %}
+      <div class="dropdown-toggle" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#parents-{{ medium.id }}">
+      {% else %}
+      <div>
+      {% endif %}
+        <b>{{ medium.base.get_device_type_name() }}: </b>{{ medium.base.get_path() }}
+      </div>
+      {% if medium.parent %}
+      <ul class="list-group collapse py-2" id="parents-{{ medium.id }}">
+      {% for parent in medium.get_parents(include_self=True)[:-1] | reverse %}
+        <li class="list-group-item">{{ parent.get_path() }}</li>
+      {% endfor %}
+      </ul>
+      {% endif %}
+      {% endfor %}
+    </section>
   </div>
 </div>
 {% endblock %}

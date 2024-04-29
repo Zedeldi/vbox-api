@@ -88,7 +88,11 @@ class Machine(BaseModel):
 
     def get_mediums(self) -> list[Medium]:
         """Return list of attached mediums."""
-        return [mapping["medium"] for mapping in self.medium_attachments]
+        return [
+            mapping["medium"]
+            for mapping in self.medium_attachments
+            if mapping["medium"]
+        ]
 
     def get_health(self) -> MachineHealth:
         """Return tuple for health of machine in format (state, status_code)."""
