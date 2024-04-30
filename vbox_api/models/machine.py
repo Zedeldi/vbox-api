@@ -209,15 +209,15 @@ class Machine(BaseModel):
         self, screen_id: int = 0, bitmap_format: str = "PNG"
     ) -> Optional[Image.Image]:
         """Return screenshot of running state for screen_id if available."""
-        with self.with_lock():
-            try:
+        try:
+            with self.with_lock():
                 info = self.session.console.display.get_screen_resolution(screen_id)
                 image_b64 = self.session.console.display.take_screen_shot_to_array(
                     screen_id, info["width"], info["height"], bitmap_format
                 )
                 image = Image.open(io.BytesIO(base64.b64decode(image_b64)))
-            except Exception:
-                return None
+        except Exception:
+            return None
         return image
 
     def get_saved_screenshot(self, screen_id: int = 0) -> Optional[Image.Image]:

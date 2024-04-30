@@ -9,6 +9,8 @@ from werkzeug.wrappers.response import Response
 from vbox_api.http import config
 from vbox_api.http.session import SessionManager, requires_session
 
+OPERATION_TIMEOUT_MS = 1000
+
 app = Flask(__name__)
 app.config.from_object(config)
 session_manager = SessionManager()
@@ -80,7 +82,7 @@ def machine_start(machine_id: Optional[str] = None) -> Response | str:
         front_end = request.args.get("front_end", "headless")
         progress = machine.start(front_end)
         flash("Starting machine...", "info")
-        progress.wait_for_completion(-1)
+        progress.wait_for_completion(OPERATION_TIMEOUT_MS)
     return redirect(url_for("machine", machine_id=machine.id))
 
 
@@ -100,5 +102,5 @@ def machine_stop(machine_id: Optional[str] = None) -> Response | str:
         save_state = request.args.get("save_state", False)
         progress = machine.stop(save_state=save_state)
         flash("Stopping machine...", "info")
-        progress.wait_for_completion(-1)
+        progress.wait_for_completion(OPERATION_TIMEOUT_MS)
     return redirect(url_for("machine", machine_id=machine.id))
