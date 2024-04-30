@@ -118,14 +118,16 @@ class Machine(BaseModel):
     def lock(self, lock_type: Literal["Write", "Shared"] = "Shared") -> "Machine":
         """Lock machine and return mutable machine instance."""
         if self.session.state == "Locked":
-            return self
+            return self.session.machine
         self.lock_machine(self.session.handle, lock_type)
         locked_machine = self.session.get_machine()
         return Machine(self.ctx, self.ctx.get_handle(locked_machine), self.session)
 
     @requires_session
-    def unlock(self) -> None:
-        """Unlock machine."""
+    def unlock(self, save_settings: bool = False) -> None:
+        """Unlock machine and optionally save settings."""
+        if save_settings:
+            self.session.machine.save_settings()
         self.session.unlock_machine()
 
     @contextmanager
@@ -133,13 +135,13 @@ class Machine(BaseModel):
     def with_lock(
         self,
         lock_type: Literal["Write", "Shared"] = "Shared",
-        save_on_exit: bool = False,
+        save_settings: bool = False,
         force_unlock: bool = False,
     ) -> Iterator["Machine"]:
         """
         Lock machine in a context manager and conditionally unlock on exit.
 
-        If save_on_exit is True, save_settings will be called before locking.
+        If save_settings is True, save_settings will be called before unlocking.
         If the machine is already locked, it will not be automatically unlocked,
         unless force_unlock is True.
         """
@@ -147,8 +149,8 @@ class Machine(BaseModel):
         try:
             yield self.lock(lock_type)
         finally:
-            if save_on_exit:
-                self.save_settings()
+            if save_settings:
+                self.session.machine.save_settings()
             if unlock_on_exit:
                 self.unlock()
 
