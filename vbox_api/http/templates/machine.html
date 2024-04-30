@@ -64,7 +64,11 @@
       <h5>Display</h5>
       <p>
         <b>Video Memory: </b><span class="font-monospace">{{ machine.graphics_adapter.vram_size }}MB</span><br>
-        <b>Graphics Controller: </b><span class="font-monospace">{{ machine.graphics_adapter.graphics_controller_type }}</span>
+        <b>Graphics Controller: </b><span class="font-monospace">{{ machine.graphics_adapter.graphics_controller_type }}</span><br>
+        <b>Remote Desktop: </b>{{ "Enabled" if machine.vrde_server.enabled else "Disabled" }},
+        Port: <span class="font-monospace">{{ machine.vrde_server.get_vrde_property("TCP/Ports") }}</span><br>
+        <b>Extension Pack: </b><span class="font-monospace">{{ machine.vrde_server.vrde_ext_pack }}</span><br>
+        <b>Multiple Connections: </b>{{ "Allowed" if machine.vrde_server.allow_multi_connection else "Disallowed" }}
       </p>
     </section>
     <section id="storage">
@@ -95,8 +99,8 @@
         <b>Adapter {{ loop.index }}: </b>{{ network.get_attachment_type_name() }}
         {%- if network.get_interface_name() %}
         (<span class="font-monospace">{{ network.get_interface_name() }}</span>)
-        {%- endif -%}
-        , MAC Address: <span class="font-monospace">{{ network.mac_address }}</span>
+        {%- endif -%},
+        MAC Address: <span class="font-monospace">{{ network.mac_address }}</span>
         <br>
         {% endfor %}
       </p>
