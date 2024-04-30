@@ -1,6 +1,8 @@
 import re
 from abc import ABC
-from typing import Callable, Optional
+from typing import Optional
+
+from vbox_api.mixins import PropertyMixin
 
 
 class BaseInterface(ABC):
@@ -39,26 +41,8 @@ class BaseInterface(ABC):
         return getattr(self, interface_name)
 
 
-class ProxyInterface:
+class ProxyInterface(PropertyMixin):
     """Class to represent a proxy interface."""
-
-    @property
-    def methods(self) -> dict[str, Callable]:
-        """Return list of all callable methods."""
-        return {
-            method_name: method
-            for method_name, method in self.__dict__.items()
-            if callable(method)
-        }
-
-    @property
-    def properties(self) -> dict[str, Callable]:
-        """Return dict of properties and associated get methods."""
-        return {
-            method_name.removeprefix("get").lstrip("_"): method
-            for method_name, method in self.methods.items()
-            if method_name.startswith("get")
-        }
 
 
 class PythonicInterface(BaseInterface):

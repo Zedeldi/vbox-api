@@ -2,10 +2,11 @@ import functools
 from abc import ABC
 from typing import Any, Optional, Type
 
+from vbox_api.mixins import PropertyMixin
 from vbox_api.api.handle import Handle
 
 
-class BaseModel(ABC):
+class BaseModel(ABC, PropertyMixin):
     """Base class to handle model attributes and methods."""
 
     _PROPERTY_INTERFACE_ALIASES: dict[str, str] = {}
@@ -15,10 +16,8 @@ class BaseModel(ABC):
         """Initialise instance of model with information."""
         self.ctx = ctx
         self._handle = handle
-        interface = ctx.interface.get_interface(self.__class__.__name__)
-        self._properties = interface.properties
-        self._methods = interface.methods
-        self._bind_methods()
+        self.interface = self.ctx.interface.get_interface(self.__class__.__name__)
+        self._bind_interface_methods()
 
     def __getattr__(self, name: str) -> Any:
         """Handle getting model attributes at runtime."""
@@ -42,7 +41,7 @@ class BaseModel(ABC):
         If use_model is True, return result as usable model if result is a
         valid handle.
         """
-        result = self._properties[name](self.handle)
+        result = self._getters[name]()
         if not use_model:
             return result
         if not isinstance(result, list):
@@ -75,8 +74,9 @@ class BaseModel(ABC):
             return value
         return model(self.ctx, self.ctx.get_handle(value))
 
-    def _bind_methods(self) -> None:
-        for method_name, method in self._methods.items():
+    def _bind_interface_methods(self) -> None:
+        """Bind methods of interface to instance of model, passing handle."""
+        for method_name, method in self.interface._methods.items():
             setattr(self, method_name, functools.partial(method, self.handle))
 
     @property
@@ -88,7 +88,7 @@ class BaseModel(ABC):
     def handle(self, handle: Optional["Handle"]) -> None:
         """Set new handle and bind methods."""
         self._handle = handle
-        self._bind_methods()
+        self._bind_interface_methods()
 
     def to_dict(self, use_models: bool = True) -> dict:
         """
@@ -97,7 +97,7 @@ class BaseModel(ABC):
         If use_models is True, attempt to convert results to usable models.
         """
         info = {}
-        for property_name in self._properties.keys():
+        for property_name in self._getters.keys():
             try:
                 info[property_name] = self._get_property(property_name, use_models)
             except Exception:

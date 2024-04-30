@@ -33,5 +33,5 @@ class SOAPInterface(BaseInterface):
             interface_name, method_name = operation.split("_")
             if (proxy_interface := getattr(self, interface_name, None)) is None:
                 proxy_interface = ProxyInterface()
-                self.__setattr__(interface_name, proxy_interface)
+                setattr(self, interface_name, proxy_interface)
             proxy_interface.__setattr__(method_name, method_callable)
