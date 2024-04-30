@@ -42,69 +42,89 @@
     <img src="{{ machine.get_thumbnail(data_uri=True) }}" class="img-thumbnail" alt="Thumbnail for {{ machine.name }}">
   </div>
   <div class="col">
-    <section id="general">
-      <h5>General</h5>
-      <p>
-        <b>State: </b><span class="badge text-bg-{{ ['secondary', 'success', 'warning', 'danger'][machine.get_health()] }}">{{ machine.get_state_name() }}</span><br>
-        <b>Location: </b>{{ machine.groups[0] }}<br>
-        <b>Description: </b>{{ machine.description if machine.description else "No description provided." }}
-      </p>
-    </section>
-    <section id="system">
-      <h5>System</h5>
-      <p>
-        <b>Operating System: </b>{{ machine.get_os_type_description() }}<br>
-        <b>Memory: </b><span class="font-monospace">{{ machine.memory_size }}MB</span><br>
-        <b>Processors: </b><span class="font-monospace">{{ machine.cpu_count }}</span><br>
-        <b>TPM: </b><span class="font-monospace">{{ machine.trusted_platform_module.type.replace("_", ".") }}</span><br>
-        <b>Firmware: </b>{{ machine.firmware_type }}
-      </p>
-    </section>
-    <section id="display">
-      <h5>Display</h5>
-      <p>
-        <b>Video Memory: </b><span class="font-monospace">{{ machine.graphics_adapter.vram_size }}MB</span><br>
-        <b>Graphics Controller: </b><span class="font-monospace">{{ machine.graphics_adapter.graphics_controller_type }}</span><br>
-        <b>Remote Desktop: </b>{{ "Enabled" if machine.vrde_server.enabled else "Disabled" }},
-        Port: <span class="font-monospace">{{ machine.vrde_server.get_vrde_property("TCP/Ports") }}</span><br>
-        <b>Extension Pack: </b><span class="font-monospace">{{ machine.vrde_server.vrde_ext_pack }}</span><br>
-        <b>Multiple Connections: </b>{{ "Allowed" if machine.vrde_server.allow_multi_connection else "Disallowed" }}
-      </p>
-    </section>
-    <section id="storage">
-      <h5>Storage</h5>
-      <p>
-        {% for medium in machine.get_mediums() %}
-        {% if medium.parent %}
-        <div class="dropdown-toggle" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#parents-{{ medium.id }}">
-        {% else %}
-        <div>
-        {% endif %}
-          <b>{{ medium.base.get_device_type_name() }}: </b><span class="font-monospace">{{ medium.base.get_path() }}</span>
-        </div>
-        {% if medium.parent %}
-        <ul class="list-group collapse py-2" id="parents-{{ medium.id }}">
-        {% for parent in medium.get_parents(include_self=True)[:-1] | reverse %}
-          <li class="list-group-item font-monospace">{{ parent.get_path() }}</li>
-        {% endfor %}
-        </ul>
-        {% endif %}
-        {% endfor %}
-      </p>
-    </section>
-    <section id="network">
-      <h5>Network</h5>
-      <p>
-        {% for network in machine.get_network_adapters() %}
-        <b>Adapter {{ loop.index }}: </b>{{ network.get_attachment_type_name() }}
-        {%- if network.get_interface_name() %}
-        (<span class="font-monospace">{{ network.get_interface_name() }}</span>)
-        {%- endif -%},
-        MAC Address: <span class="font-monospace">{{ network.mac_address }}</span>
-        <br>
-        {% endfor %}
-      </p>
-    </section>
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item">
+        <section id="general">
+          <h5>General</h5>
+          <p>
+            <b>State: </b><span class="badge text-bg-{{ ['secondary', 'success', 'warning', 'danger'][machine.get_health()] }}">{{ machine.get_state_name() }}</span><br>
+            <b>Location: </b>{{ machine.groups[0] }}<br>
+            <b>Description: </b>{{ machine.description if machine.description else "No description provided." }}
+          </p>
+        </section>
+      </li>
+      <li class="list-group-item">
+        <section id="system">
+          <h5>System</h5>
+          <p>
+            <b>Operating System: </b>{{ machine.get_os_type_description() }}<br>
+            <b>Memory: </b><span class="font-monospace">{{ machine.memory_size }}MB</span><br>
+            <b>Processors: </b><span class="font-monospace">{{ machine.cpu_count }}</span><br>
+            <b>TPM: </b><span class="font-monospace">{{ machine.trusted_platform_module.type.replace("_", ".") }}</span><br>
+            <b>Firmware: </b>{{ machine.firmware_type }}
+          </p>
+        </section>
+      </li>
+      <li class="list-group-item">
+        <section id="display">
+          <h5>Display</h5>
+          <p>
+            <b>Video Memory: </b><span class="font-monospace">{{ machine.graphics_adapter.vram_size }}MB</span><br>
+            <b>Graphics Controller: </b><span class="font-monospace">{{ machine.graphics_adapter.graphics_controller_type }}</span><br>
+            <b>Remote Desktop: </b>{{ "Enabled" if machine.vrde_server.enabled else "Disabled" }}<br>
+            {% if machine.vrde_server.enabled %}
+            {% if machine.vrde_server.get_url() %}
+            <b>URL: </b><a href="{{ machine.vrde_server.get_url() }}">{{ machine.vrde_server.get_url() }}</a><br>
+            {% elif machine.vrde_server.get_address() %}
+            <b>Address: </b><span class="font-monospace">{{ machine.vrde_server.get_address() }}:{{ machine.vrde_server.get_port() }}</span><br>
+            {% else %}
+            <b>Port: </b><span class="font-monospace">{{ machine.vrde_server.get_port() }}</span><br>
+            {% endif %}
+            <b>Extension Pack: </b><span class="font-monospace">{{ machine.vrde_server.vrde_ext_pack }}</span><br>
+            <b>Multiple Connections: </b>{{ "Allowed" if machine.vrde_server.allow_multi_connection else "Disallowed" }}
+            {% endif %}
+          </p>
+        </section>
+      </li>
+      <li class="list-group-item">
+        <section id="storage">
+          <h5>Storage</h5>
+          <p>
+            {% for medium in machine.get_mediums() %}
+            {% if medium.parent %}
+            <div class="dropdown-toggle" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#parents-{{ medium.id }}">
+            {% else %}
+            <div>
+            {% endif %}
+              <b>{{ medium.base.get_device_type_name() }}: </b><span class="font-monospace">{{ medium.base.get_path() }}</span>
+            </div>
+            {% if medium.parent %}
+            <ul class="list-group collapse py-2" id="parents-{{ medium.id }}">
+            {% for parent in medium.get_parents(include_self=True)[:-1] | reverse %}
+              <li class="list-group-item font-monospace">{{ parent.get_path() }}</li>
+            {% endfor %}
+            </ul>
+            {% endif %}
+            {% endfor %}
+          </p>
+        </section>
+      </li>
+      <li class="list-group-item">
+        <section id="network">
+          <h5>Network</h5>
+          <p>
+            {% for network in machine.get_network_adapters() %}
+            <b>Adapter {{ loop.index }}: </b>{{ network.get_attachment_type_name() }}
+            {%- if network.get_interface_name() %}
+            (<span class="font-monospace">{{ network.get_interface_name() }}</span>)
+            {%- endif -%},
+            MAC Address: <span class="font-monospace">{{ network.mac_address }}</span>
+            <br>
+            {% endfor %}
+          </p>
+        </section>
+      </li>
+    </ul>
   </div>
 </div>
 {% endblock %}
