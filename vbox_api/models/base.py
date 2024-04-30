@@ -2,8 +2,8 @@ import functools
 from abc import ABC
 from typing import Any, Optional, Type
 
-from vbox_api.mixins import PropertyMixin
 from vbox_api.api.handle import Handle
+from vbox_api.mixins import PropertyMixin
 
 
 class BaseModel(ABC, PropertyMixin):
@@ -41,21 +41,10 @@ class BaseModel(ABC, PropertyMixin):
         If use_model is True, return result as usable model if result is a
         valid handle.
         """
-        result = self._getters[name]()
+        value = self._getters[name]()
         if not use_model:
-            return result
-        if not isinstance(result, list):
-            return self._get_model_from_key_value(name, result)
-        models = []
-        for element in result:
-            try:
-                # Forcefully test if element is a mapping
-                for key in element:
-                    element[key] = self._get_model_from_key_value(key, element[key])
-                models.append(element)
-            except TypeError:
-                models.append(self._get_model_from_key_value(name, element))
-        return models
+            return value
+        return self._parse_property(name, value)
 
     def _get_model_for_interface(
         self, interface_name: str
@@ -73,6 +62,21 @@ class BaseModel(ABC, PropertyMixin):
         if not model or not Handle.is_handle(value):
             return value
         return model(self.ctx, self.ctx.get_handle(value))
+
+    def _parse_property(self, name: str, value: Any) -> Any:
+        """Parse value of a property and return model instance if possible."""
+        if not isinstance(value, list):
+            return self._get_model_from_key_value(name, value)
+        models = []
+        for element in value:
+            try:
+                # Forcefully test if element is a mapping
+                for key in element:
+                    element[key] = self._get_model_from_key_value(key, element[key])
+                models.append(element)
+            except TypeError:
+                models.append(self._get_model_from_key_value(name, element))
+        return models
 
     def _bind_interface_methods(self) -> None:
         """Bind methods of interface to instance of model, passing handle."""
