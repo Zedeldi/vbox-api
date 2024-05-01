@@ -65,17 +65,15 @@ class VBoxAPI:
     def machines(self) -> list[Machine]:
         """Return list of Machine instances."""
         return [
-            self._handles.get(handle) or Machine(self.ctx, self.ctx.get_handle(handle))
-            for handle in self.virtualbox.get_machines()
+            self._handles.get(machine.handle, machine)
+            for machine in self.virtualbox.get_machines()
         ]
 
     @register_handles
     def find_machine(self, name_or_id: str) -> Optional[Machine]:
         """Return machine matching specified name or ID."""
         try:
-            handle = self.virtualbox.find_machine(name_or_id)
+            machine = self.virtualbox.find_machine(name_or_id)
         except Exception:
             return None
-        return self._handles.get(handle) or Machine(
-            self.ctx, self.ctx.get_handle(handle)
-        )
+        return self._handles.get(machine.handle, machine)

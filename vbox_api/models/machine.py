@@ -121,7 +121,8 @@ class Machine(BaseModel):
             return self.session.machine
         self.lock_machine(self.session.handle, lock_type)
         locked_machine = self.session.get_machine()
-        return Machine(self.ctx, self.ctx.get_handle(locked_machine), self.session)
+        locked_machine.session = self.session
+        return locked_machine
 
     @requires_session
     def unlock(self, save_settings: bool = False) -> None:
@@ -166,12 +167,7 @@ class Machine(BaseModel):
         self, slots: Iterable[int] = range(4), enabled_only: bool = True
     ) -> list[NetworkAdapter]:
         """Return list of network adapters."""
-        network_adapters = [
-            NetworkAdapter(
-                self.ctx, self.ctx.get_handle(self.get_network_adapter(slot))
-            )
-            for slot in slots
-        ]
+        network_adapters = [self.get_network_adapter(slot) for slot in slots]
         if enabled_only:
             return list(filter(lambda n: n.enabled, network_adapters))
         return network_adapters

@@ -11,12 +11,20 @@ class BaseInterface(ABC):
     @staticmethod
     def get_matches(interface_name: str) -> set[str]:
         """Return case-folded set of strings to match interface name."""
-        interface_name = interface_name.casefold().replace("_", "")
+        interface_name = (
+            interface_name.casefold()
+            .replace("_", "")
+            .removeprefix("get")
+            .removeprefix("set")
+            .removeprefix("find")
+            .removeprefix("i")
+            .removesuffix("byid")
+            .removesuffix("byname")
+        )
         matches = {
             interface_name,
             interface_name.removesuffix("s"),
             interface_name.removesuffix("es"),
-            interface_name.removeprefix("i"),
         }
         matches.update([f"i{match}" for match in matches])
         return matches

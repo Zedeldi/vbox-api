@@ -1,6 +1,6 @@
 import functools
 from abc import ABC
-from typing import Any, Optional, Type
+from typing import Any, Callable, Optional, Type
 
 from vbox_api.api.handle import Handle
 from vbox_api.mixins import PropertyMixin
@@ -22,7 +22,7 @@ class BaseModel(ABC, PropertyMixin):
     def __getattr__(self, name: str) -> Any:
         """Handle getting model attributes at runtime."""
         try:
-            return self._get_property(name)
+            return self._getters[name]()
         except KeyError:
             raise AttributeError("Attribute not found.")
 
@@ -40,18 +40,6 @@ class BaseModel(ABC, PropertyMixin):
             if key.casefold() in matches:
                 return value
         return None
-
-    def _get_property(self, name: str, use_model: bool = True) -> Any:
-        """
-        Return value of property at runtime.
-
-        If use_model is True, return result as usable model if result is a
-        valid handle.
-        """
-        value = self._getters[name]()
-        if not use_model:
-            return value
-        return self._parse_property(name, value)
 
     def _get_model_for_interface(
         self, interface_name: str
@@ -85,10 +73,24 @@ class BaseModel(ABC, PropertyMixin):
                 models.append(self._get_model_from_key_value(name, element))
         return models
 
+    def _wrap_property(self, name: str, func: Callable) -> Callable:
+        """Wrap a property method to parse results."""
+
+        def inner(*args, **kwargs) -> Any:
+            return self._parse_property(name, func(*args, **kwargs))
+
+        return inner
+
     def _bind_interface_methods(self) -> None:
         """Bind methods of interface to instance of model, passing handle."""
         for method_name, method in self.interface._methods.items():
-            setattr(self, method_name, functools.partial(method, self.handle))
+            wrapped_method = functools.partial(method, self.handle)
+            if (
+                method in self.interface._getters.values()
+                or method in self.interface._finders.values()
+            ):
+                wrapped_method = self._wrap_property(method_name, wrapped_method)
+            setattr(self, method_name, wrapped_method)
 
     @property
     def handle(self) -> Optional["Handle"]:
@@ -101,16 +103,12 @@ class BaseModel(ABC, PropertyMixin):
         self._handle = handle
         self._bind_interface_methods()
 
-    def to_dict(self, use_models: bool = True) -> dict:
-        """
-        Return dict to represent current state of model.
-
-        If use_models is True, attempt to convert results to usable models.
-        """
+    def to_dict(self) -> dict:
+        """Return dict to represent current state of model."""
         info = {}
-        for property_name in self._getters.keys():
+        for property_name, method in self._getters.items():
             try:
-                info[property_name] = self._get_property(property_name, use_models)
+                info[property_name] = method()
             except Exception:
                 pass
         return info
