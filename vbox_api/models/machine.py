@@ -8,7 +8,7 @@ from typing import Any, Callable, Literal, Optional
 
 from PIL import Image
 
-from vbox_api.models.base import BaseModel
+from vbox_api.models.base import BaseModel, ModelRegister
 from vbox_api.models.medium import Medium
 from vbox_api.models.network import NetworkAdapter
 from vbox_api.models.progress import Progress
@@ -36,7 +36,7 @@ class MachineHealth(IntEnum):
 
 
 @BaseModel.register_model
-class Machine(BaseModel):
+class Machine(BaseModel, metaclass=ModelRegister):
     """Class to handle machine attributes and methods."""
 
     _PROPERTY_INTERFACE_ALIASES: dict[str, str] = {"NonVolatileStore": "INvramStore"}

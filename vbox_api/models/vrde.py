@@ -1,10 +1,10 @@
 from typing import Optional
 
-from vbox_api.models.base import BaseModel
+from vbox_api.models.base import BaseModel, ModelRegister
 
 
 @BaseModel.register_model
-class VRDEServer(BaseModel):
+class VRDEServer(BaseModel, metaclass=ModelRegister):
     """Class to handle VRDEServer attributes and methods."""
 
     def get_port(self) -> Optional[int]:

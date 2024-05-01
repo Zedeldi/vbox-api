@@ -1,12 +1,37 @@
 import functools
+import types
 from abc import ABC
 from typing import Any, Callable, Optional, Type
+from weakref import WeakValueDictionary
 
 from vbox_api.api.handle import Handle
 from vbox_api.mixins import PropertyMixin
 
 
-class BaseModel(ABC, PropertyMixin):
+class BaseModelRegister(type(ABC), type(PropertyMixin)):
+    """Metaclass to register model instances on instantiation."""
+
+    _handles: WeakValueDictionary["Handle", "BaseModel"] = WeakValueDictionary()
+
+    def __call__(
+        cls, ctx: "Context", handle: Optional["Handle"] = None, *args, **kwargs
+    ) -> "BaseModel":
+        """Return instance for given handle if exists, else create instance."""
+        instance = cls._handles.get(handle) if handle else None
+        if instance is None:
+            instance = super(BaseModelRegister, cls).__call__(
+                ctx, handle, *args, **kwargs
+            )
+            if instance.handle:
+                cls._handles[instance.handle] = instance
+        return instance
+
+
+class ModelRegister(BaseModelRegister):
+    """Metaclass for derived classes of BaseModel."""
+
+
+class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
     """Base class to handle model attributes and methods."""
 
     _PROPERTY_INTERFACE_ALIASES: dict[str, str] = {}
@@ -116,7 +141,9 @@ class BaseModel(ABC, PropertyMixin):
     @classmethod
     def from_name(cls, model_name: str) -> Type["BaseModel"]:
         """Return subclass of BaseModel for model_name."""
-        model = cls._models.get(model_name) or type(model_name, (cls,), {})
+        model = cls._models.get(model_name) or types.new_class(
+            model_name, (cls,), {"metaclass": ModelRegister}
+        )
         cls.register_model(model)
         return model
 

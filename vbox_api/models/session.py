@@ -1,11 +1,11 @@
 from types import TracebackType
 from typing import Optional, Type
 
-from vbox_api.models.base import BaseModel
+from vbox_api.models.base import BaseModel, ModelRegister
 
 
 @BaseModel.register_model
-class Session(BaseModel):
+class Session(BaseModel, metaclass=ModelRegister):
     """Context manager for a session."""
 
     def open(self, force: bool = False) -> None:
