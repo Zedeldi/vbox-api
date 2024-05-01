@@ -60,6 +60,11 @@ class VBoxAPI:
         except Exception:
             return False
 
+    def logoff(self) -> None:
+        """Logoff current session."""
+        self.interface.WebsessionManager.logoff(self.virtualbox.handle)
+        self.virtualbox.handle = None
+
     @property
     @register_handles
     def machines(self) -> list[Machine]:
