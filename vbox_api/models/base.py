@@ -26,6 +26,13 @@ class BaseModel(ABC, PropertyMixin):
         except KeyError:
             raise AttributeError("Attribute not found.")
 
+    def __setattr__(self, name: str, value: Any) -> None:
+        """Handle setting model attributes at runtime."""
+        try:
+            self._setters[name](value)
+        except KeyError:
+            super().__setattr__(name, value)
+
     def _get_property_alias(self, interface_name: str) -> Optional[str]:
         """Return alias of interface_name, if any."""
         matches = self.ctx.interface.get_matches(interface_name)
