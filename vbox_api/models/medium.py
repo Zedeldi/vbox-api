@@ -4,7 +4,6 @@ from vbox_api.models.base import BaseModel, ModelRegister
 from vbox_api.utils import split_pascal_case
 
 
-@BaseModel.register_model
 class Medium(BaseModel, metaclass=ModelRegister):
     """Class to handle medium attributes and methods."""
 

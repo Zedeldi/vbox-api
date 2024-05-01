@@ -35,7 +35,6 @@ class MachineHealth(IntEnum):
     ERROR = 3
 
 
-@BaseModel.register_model
 class Machine(BaseModel, metaclass=ModelRegister):
     """Class to handle machine attributes and methods."""
 

@@ -1,6 +1,6 @@
 import functools
 import types
-from abc import ABC
+from abc import ABC, ABCMeta
 from typing import Any, Callable, Optional, Type
 from weakref import WeakValueDictionary
 
@@ -8,7 +8,7 @@ from vbox_api.api.handle import Handle
 from vbox_api.mixins import PropertyMixin
 
 
-class BaseModelRegister(type(ABC), type(PropertyMixin)):
+class BaseModelRegister(ABCMeta, type):
     """Metaclass to register model instances on instantiation."""
 
     _handles: WeakValueDictionary["Handle", "BaseModel"] = WeakValueDictionary()
@@ -29,6 +29,18 @@ class BaseModelRegister(type(ABC), type(PropertyMixin)):
 
 class ModelRegister(BaseModelRegister):
     """Metaclass for derived classes of BaseModel."""
+
+    _models: dict[str, Type["BaseModel"]] = {}
+
+    def __new__(
+        cls, name: str, bases: tuple[Type["BaseModel"]], namespace: dict[str, Any]
+    ) -> Type["BaseModel"]:
+        """Return class for given name if exists, else create class."""
+        model = cls._models.get(name)
+        if model is None:
+            model = super().__new__(cls, name, bases, namespace)
+            cls._models[name] = model
+        return model
 
 
 class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
@@ -141,22 +153,4 @@ class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
     @classmethod
     def from_name(cls, model_name: str) -> Type["BaseModel"]:
         """Return subclass of BaseModel for model_name."""
-        model = cls._models.get(model_name) or types.new_class(
-            model_name, (cls,), {"metaclass": ModelRegister}
-        )
-        cls.register_model(model)
-        return model
-
-    @classmethod
-    def register_model(
-        cls, model: Type["BaseModel"], name: Optional[str] = None
-    ) -> Type["BaseModel"]:
-        """
-        Class method to register a model for the specified name.
-
-        If name is not specified, use name of the model class.
-        Can be used as a class decorator.
-        """
-        name = name or model.__name__
-        cls._models[name] = model
-        return model
+        return types.new_class(model_name, (cls,), {"metaclass": ModelRegister})
