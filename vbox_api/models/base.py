@@ -61,7 +61,9 @@ class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
         try:
             return self._getters[name]()
         except KeyError:
-            raise AttributeError("Attribute not found.")
+            raise AttributeError(
+                f"'{self.__class__.__name__}' model has no attribute '{name}'"
+            ) from None
 
     def __setattr__(self, name: str, value: Any) -> None:
         """Handle setting model attributes at runtime."""
