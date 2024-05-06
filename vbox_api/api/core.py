@@ -1,58 +1,22 @@
 from typing import Optional
 
 from vbox_api.api.context import Context
-from vbox_api.api.handle import Handle
 from vbox_api.interface.base import BaseInterface, PythonicInterface
-from vbox_api.models.base import BaseModel
-from vbox_api.models.machine import Machine
+from vbox_api.models.virtualbox import VirtualBox
 
 
-class VBoxAPI:
+class VBoxAPI(VirtualBox):
     """Class to handle API methods via a VirtualBox interface."""
 
-    def __init__(self, interface: BaseInterface) -> None:
+    def __init__(
+        self, interface: BaseInterface, handle: Optional["Handle"] = None
+    ) -> None:
         """Initialise instance of API."""
-        self.interface = PythonicInterface(interface)
-        self.virtualbox = BaseModel.from_name("VirtualBox")(self.ctx)
+        if not isinstance(interface, PythonicInterface):
+            interface = PythonicInterface(interface)
+        self.interface = interface
+        super().__init__(self.get_context(), handle, model_name="VirtualBox")
 
-    @property
-    def handle(self) -> Optional[Handle]:
-        """Return handle of VirtualBox instance."""
-        return self.virtualbox.handle
-
-    @property
-    def ctx(self) -> Context:
+    def get_context(self) -> Context:
+        """Return instance of current Context for API."""
         return Context(api=self, interface=self.interface)
-
-    def login(self, username: str, password: str, force: bool = False) -> bool:
-        """
-        Login with specified username and password.
-
-        If force is specified, attempt authentication even if already logged in.
-        """
-        if self.virtualbox.handle and not force:
-            raise RuntimeError("Already logged in.")
-        try:
-            self.virtualbox.handle = self.ctx.get_handle(
-                self.interface.WebsessionManager.logon(username, password)
-            )
-            return True
-        except Exception:
-            return False
-
-    def logoff(self) -> None:
-        """Logoff current session."""
-        self.interface.WebsessionManager.logoff(self.virtualbox.handle)
-        self.virtualbox.handle = None
-
-    @property
-    def machines(self) -> list[Machine]:
-        """Return list of Machine instances."""
-        return [machine for machine in self.virtualbox.get_machines()]
-
-    def find_machine(self, name_or_id: str) -> Optional[Machine]:
-        """Return machine matching specified name or ID."""
-        try:
-            return self.virtualbox.find_machine(name_or_id)
-        except Exception:
-            return None

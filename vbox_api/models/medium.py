@@ -9,6 +9,7 @@ class Medium(BaseModel, metaclass=ModelRegister):
 
     _PROPERTY_INTERFACE_ALIASES: dict[str, str] = {
         "Base": "IMedium",
+        "Children": "IMedium",
         "Parent": "IMedium",
     }
 

@@ -20,6 +20,7 @@ class BaseInterface(ABC):
             .removeprefix("i")
             .removesuffix("byid")
             .removesuffix("byname")
+            .removesuffix("bygroups")
         )
         matches = {
             interface_name,

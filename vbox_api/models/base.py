@@ -49,11 +49,18 @@ class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
     _PROPERTY_INTERFACE_ALIASES: dict[str, str] = {}
     _models: dict[str, Type["BaseModel"]] = {}
 
-    def __init__(self, ctx: "Context", handle: Optional["Handle"] = None) -> None:
+    def __init__(
+        self,
+        ctx: "Context",
+        handle: Optional["Handle"] = None,
+        model_name: Optional[str] = None,
+    ) -> None:
         """Initialise instance of model with information."""
         self.ctx = ctx
         self._handle = handle
-        self.interface = self.ctx.interface.get_interface(self.__class__.__name__)
+        self._proxy_interface = self.ctx.interface.get_interface(
+            model_name or self.__class__.__name__
+        )
         self._bind_interface_methods()
 
     def __getattr__(self, name: str) -> Any:
@@ -122,11 +129,11 @@ class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
 
     def _bind_interface_methods(self) -> None:
         """Bind methods of interface to instance of model, passing handle."""
-        for method_name, method in self.interface._methods.items():
+        for method_name, method in self._proxy_interface._methods.items():
             wrapped_method = functools.partial(method, self.handle)
             if (
-                method in self.interface._getters.values()
-                or method in self.interface._finders.values()
+                method in self._proxy_interface._getters.values()
+                or method in self._proxy_interface._finders.values()
             ):
                 wrapped_method = self._wrap_property(method_name, wrapped_method)
             setattr(self, method_name, wrapped_method)
