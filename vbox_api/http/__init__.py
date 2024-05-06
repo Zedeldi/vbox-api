@@ -19,8 +19,9 @@ session_manager = SessionManager()
 def get_machine_from_id(machine_id: Optional[str]) -> "Machine":
     """Return Machine instance from machine_id or abort request."""
     machine_id = machine_id or request.args.get("id")
-    machine = session_manager.api.find_machine(machine_id)
-    if not machine:
+    try:
+        machine = session_manager.api.find_machine(machine_id)
+    except Exception:
         abort(400, "No machine specified." if not machine_id else "Machine not found.")
     return machine
 
