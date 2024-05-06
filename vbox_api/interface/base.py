@@ -1,12 +1,22 @@
 import re
 from abc import ABC
-from typing import Optional
+from typing import Callable, Optional
 
 from vbox_api.mixins import PropertyMixin
 
 
 class BaseInterface(ABC):
     """Define abstract base class for interface."""
+
+    def _register_interface(
+        self, interface_name: str, proxy_interface: "ProxyInterface"
+    ) -> None:
+        """Register proxy interface to interface instance."""
+        if not isinstance(proxy_interface, ProxyInterface):
+            raise TypeError(
+                "Passed interface object is not an instance of 'ProxyInterface'"
+            )
+        setattr(self, interface_name, proxy_interface)
 
     @staticmethod
     def get_matches(interface_name: str) -> set[str]:
@@ -53,6 +63,12 @@ class BaseInterface(ABC):
 class ProxyInterface(PropertyMixin):
     """Class to represent a proxy interface."""
 
+    def _register_method(self, method_name: str, method: Callable) -> None:
+        """Register method to proxy interface instance."""
+        if not callable(method):
+            raise TypeError("Passed method is not callable")
+        setattr(self, method_name, method)
+
 
 class PythonicInterface(BaseInterface):
     """Wrapper to convert methods to Python naming conventions."""
@@ -70,10 +86,10 @@ class PythonicInterface(BaseInterface):
             if remove_prefix:
                 interface_name = interface_name.lstrip("I")
             proxy_interface = ProxyInterface()
-            self.__setattr__(interface_name, proxy_interface)
+            self._register_interface(interface_name, proxy_interface)
             for method_name, method_callable in interface_obj.__dict__.items():
                 method_name = self.camel_to_snake(method_name)
-                proxy_interface.__setattr__(method_name, method_callable)
+                proxy_interface._register_method(method_name, method_callable)
 
     @staticmethod
     def camel_to_snake(text: str) -> str:

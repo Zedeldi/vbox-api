@@ -28,10 +28,10 @@ class SOAPInterface(BaseInterface):
     def _register_methods(self) -> None:
         """Add methods from SOAP service to instance."""
         if not self.service:
-            raise RuntimeError("Service has not yet been created.")
+            raise RuntimeError("Service has not yet been created")
         for operation, method_callable in self.service._operations.items():
             interface_name, method_name = operation.split("_")
             if (proxy_interface := getattr(self, interface_name, None)) is None:
                 proxy_interface = ProxyInterface()
-                setattr(self, interface_name, proxy_interface)
-            proxy_interface.__setattr__(method_name, method_callable)
+                self._register_interface(interface_name, proxy_interface)
+            proxy_interface._register_method(method_name, method_callable)

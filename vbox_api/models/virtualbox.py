@@ -20,7 +20,7 @@ class VirtualBox(BaseModel, metaclass=ModelRegister):
         If force is specified, attempt authentication even if already logged in.
         """
         if self.handle and not force:
-            raise RuntimeError("Already logged in.")
+            raise RuntimeError("Already logged in and force not specified")
         try:
             self.handle = self.ctx.get_handle(
                 self.ctx.interface.WebsessionManager.logon(username, password)
