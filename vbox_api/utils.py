@@ -1,8 +1,21 @@
 import base64
 import re
+import socket
 from io import BytesIO
 
 from PIL import Image, ImageDraw, ImageFont
+
+
+def get_available_port(host: str = "127.0.0.1") -> int:
+    """
+    Return available port number by binding to port 0.
+
+    Please note that this function is subject to race conditions.
+    """
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.bind((host, 0))
+        return sock.getsockname()[1]
 
 
 def image_to_data_uri(image: Image.Image) -> str:

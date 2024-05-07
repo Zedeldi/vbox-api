@@ -6,6 +6,7 @@ from flask import Flask, abort, flash, redirect, render_template, request, url_f
 from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers.response import Response
 
+from vbox_api.helpers import WebSocketProxyProcess
 from vbox_api.http import config
 from vbox_api.http.session import SessionManager, requires_session
 
@@ -103,3 +104,24 @@ def machine_stop(machine_id: Optional[str] = None) -> Response | str:
         flash("Stopping machine...", "info")
         progress.wait_for_completion(app.config["OPERATION_TIMEOUT_MS"])
     return redirect(url_for("machine", machine_id=machine.id))
+
+
+@app.route("/machine/remote", methods=["GET"])
+@app.route("/machine/<string:machine_id>/remote", methods=["GET"])
+@requires_session(session_manager)
+def machine_remote(machine_id: Optional[str] = None) -> Response | str:
+    """Endpoint to remote control a specified machine."""
+    vrde_server = get_machine_from_id(machine_id).vrde_server
+    if vrde_server.protocol.lower() == "vnc":
+        process, address = WebSocketProxyProcess.for_address(
+            vrde_server.address,
+            vrde_server.port,
+            listen_host=app.config["WEBSOCKET_PROXY_LISTEN_HOST"],
+            web=app.config["WEBSOCKET_PROXY_VNC_PATH"],
+            timeout=app.config["WEBSOCKET_PROXY_TIMEOUT"],
+        )
+        address = f"{address}/vnc.html"
+    else:
+        abort(405, f"VRDE protocol '{vrde_server.protocol}' not implemented.")
+    process.start()
+    return redirect(address)

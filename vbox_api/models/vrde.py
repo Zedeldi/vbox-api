@@ -33,12 +33,16 @@ class VRDEServer(BaseModel, metaclass=ModelRegister):
         """Set VNC password for VRDE server."""
         return self.set_vrde_property("VNCPassword", password)
 
+    def get_protocol(self) -> str:
+        """Get procotol for VRDE server."""
+        if self.vrde_ext_pack and self.vrde_ext_pack.upper() == "VNC":
+            protocol = "VNC"
+        else:
+            protocol = "RDP"
+        return protocol
+
     def get_url(self) -> Optional[str]:
         """Get URL to connect to VRDE server."""
-        if not (addr := self.get_address()):
+        if not self.address:
             return None
-        if self.vrde_ext_pack and self.vrde_ext_pack.upper() == "VNC":
-            protocol = "vnc"
-        else:
-            protocol = "rdp"
-        return f"{protocol}://{addr}:{self.get_port()}"
+        return f"{self.protocol.lower()}://{self.address}:{self.port}"
