@@ -112,6 +112,8 @@ def machine_stop(machine_id: Optional[str] = None) -> Response | str:
 def machine_remote(machine_id: Optional[str] = None) -> Response | str:
     """Endpoint to remote control a specified machine."""
     vrde_server = get_machine_from_id(machine_id).vrde_server
+    if not vrde_server.address:
+        abort(422, "VRDE server does not have host information.")
     if vrde_server.protocol.lower() == "vnc":
         process, address = WebSocketProxyProcess.for_address(
             vrde_server.address,

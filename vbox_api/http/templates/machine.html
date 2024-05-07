@@ -1,13 +1,14 @@
 {% extends "layout.html" %}
 {% block title %}{{ machine.name }}{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between">
-  <h3>{{ machine.name }}</h3>
+<div class="d-flex">
+  <h3 class="me-auto">{{ machine.name }}</h3>
   <div class="btn-group">
-    {% if machine.state == "Paused" %}
+    {% if machine.state == "Running" and machine.vrde_server.enabled and machine.vrde_server.protocol.lower() == "vnc" %}
+    <a class="btn btn-outline-primary" href="{{ url_for('machine_remote', machine_id=machine.id) }}" target="_blank" rel="noopener noreferrer" role="button">Remote Control</a>
+    {% elif machine.state == "Paused" %}
     <a class="btn btn-outline-primary" href="{{ url_for('machine_start', machine_id=machine.id, resume=True) }}" role="button">Resume</a>
-    {% endif %}
-    {% if machine.state == "Saved" %}
+    {% elif machine.state == "Saved" %}
     <a class="btn btn-outline-primary" href="{{ url_for('machine_stop', machine_id=machine.id, discard_state=True) }}" role="button">Discard</a>
     {% endif %}
     {% if machine.state in ("PoweredOff", "Saved", "Aborted") %}
