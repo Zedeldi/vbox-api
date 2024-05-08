@@ -159,6 +159,11 @@ class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
                 pass
         return info
 
+    def from_dict(self, info: dict[str, Any]) -> None:
+        """Set properties of model from passed dictionary."""
+        for property_name, property_value in info.items():
+            self._setters[property_name](property_value)
+
     @classmethod
     def from_name(cls, model_name: str) -> Type["BaseModel"]:
         """Return subclass of BaseModel for model_name."""
