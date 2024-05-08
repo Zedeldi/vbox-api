@@ -3,6 +3,9 @@
 {% block content %}
 <div class="d-flex">
   <h3 class="me-auto">{{ machine.name }}</h3>
+  {% if machine.state in ("PoweredOff", "Saved", "Aborted") %}
+  <a class="btn btn-secondary me-2" href="{{ url_for('machine_edit', machine_id=machine.id) }}" role="button">Edit</a>
+  {% endif %}
   <div class="btn-group">
     {% if machine.state == "Running" and machine.vrde_server.enabled and machine.vrde_server.protocol.lower() == "vnc" %}
     <a class="btn btn-outline-primary" href="{{ url_for('machine_remote', machine_id=machine.id) }}" target="_blank" rel="noopener noreferrer" role="button">Remote Control</a>
@@ -49,7 +52,7 @@
           <h5>General</h5>
           <p>
             <b>State: </b><span class="badge text-bg-{{ ['secondary', 'success', 'warning', 'danger'][machine.get_health()] }}">{{ machine.get_state_name() }}</span><br>
-            <b>Location: </b>{{ machine.groups[0] }}<br>
+            <b>Group: </b>{{ machine.groups[0] }}<br>
             <b>Description: </b>{{ machine.description if machine.description else "No description provided." }}
           </p>
         </section>

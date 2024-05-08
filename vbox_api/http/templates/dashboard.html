@@ -11,7 +11,7 @@
         <p class="card-text">
           <span class="badge text-bg-{{ ['secondary', 'success', 'warning', 'danger'][machine.get_health()] }}">{{ machine.get_state_name() }}</span>
           <br>
-          Location: {{ machine.groups[0] }}
+          Group: {{ machine.groups[0] }}
         </p>
       </div>
     </div>

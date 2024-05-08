@@ -127,3 +127,22 @@ def machine_remote(machine_id: Optional[str] = None) -> Response | str:
         abort(405, f"VRDE protocol '{vrde_server.protocol}' not implemented.")
     process.start()
     return redirect(address)
+
+
+@app.route("/machine/edit", methods=["GET", "POST"])
+@app.route("/machine/<string:machine_id>/edit", methods=["GET", "POST"])
+@requires_session(session_manager)
+def machine_edit(machine_id: Optional[str] = None) -> Response | str:
+    """Endpoint to edit a specified machine."""
+    machine = get_machine_from_id(machine_id)
+    if request.method == "POST":
+        properties = dict(filter(lambda item: bool(item[1]), request.form.items()))
+        with machine.with_lock(
+            lock_type="Write", save_settings=True
+        ) as mutable_machine:
+            mutable_machine.from_dict(properties)
+        flash("Machine saved.", "info")
+        return redirect(url_for("machine", machine_id=machine.id))
+    return render_template(
+        "machine_edit.html", machine=machine, api=session_manager.api
+    )

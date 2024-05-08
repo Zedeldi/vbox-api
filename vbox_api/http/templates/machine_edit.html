@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+{% block title %}Edit - {{ machine.name }}{% endblock %}
+{% block content %}
+<form method="POST">
+  <div class="d-flex">
+    <h3 class="me-auto">{{ machine.name }}</h3>
+    <a class="btn btn-outline-danger me-2" href="{{ url_for('machine', machine_id=machine.id) }}" role="button">Cancel</a>
+    <button type="submit" class="btn btn-primary">Save</button>
+  </div>
+  <hr>
+  <div class="row">
+    <ul class="list-group list-group-flush"></ul>
+      <div class="col">
+        <li class="list-group-item">
+          <section id="general">
+            <h5>General</h5>
+            <div class="input-group mb-3">
+              <span class="input-group-text">Name</span>
+              <input type="text" id="name" name="name" class="form-control" placeholder="{{ machine.name }}">
+            </div>
+            <div class="input-group mb-3">
+              <span class="input-group-text">Group</span>
+              <select id="groups" name="groups" class="form-select">
+                {% for group in api.machine_groups %}
+                <option value="{{ group }}" {{ "selected" if machine.groups[0] == group }}>{{ group }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="input-group">
+              <span class="input-group-text">Description</span>
+              <textarea id="description" name="description" class="form-control" style="height: 200px;" placeholder="{{ machine.description if machine.description else 'Enter machine description...' }}"></textarea>
+            </div>
+          </section>
+        </li>
+      </div>
+      <div class="col">
+        <li class="list-group-item">
+          <section id="system">
+            <h5>System</h5>
+            <div class="input-group mb-3">
+              <span class="input-group-text">Memory</span>
+              <input type="number" id="memory_size" name="memory_size" class="form-control" min="4" max="2097152" placeholder="{{ machine.memory_size }}">
+              <span class="input-group-text">MB</span>
+            </div>
+            <div class="input-group mb-3">
+              <span class="input-group-text">Processors</span>
+              <input type="number" id="cpu_count" name="cpu_count" class="form-control" min="1" max="64" placeholder="{{ machine.cpu_count }}">
+            </div>
+          </section>
+        </li>
+      </div>
+    </ul>
+  </div>
+</form>
+{% endblock %}
