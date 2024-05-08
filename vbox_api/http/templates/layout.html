@@ -8,33 +8,47 @@
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
     {% block head %}{% endblock %}
   </head>
-  <header>
-    <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="/">VirtualBox Web API</a>
+  <body class="d-flex flex-column h-100">
+    <header>
+      <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="/">VirtualBox Web API</a>
+        </div>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            {% if session.get("username") %}
+            <li class="nav-item">
+              <a class="nav-link" href="/logout">Logout</a>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+      </nav>
+    </header>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show position-fixed bottom-0 end-0 me-3 z-3" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <main class="flex-shrink-0" style="padding-top: 80px;">
+      <div class="container">
+        {% block content %}{% endblock %}
       </div>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-          {% if session.get("username") %}
-          <li class="nav-item">
-            <a class="nav-link" href="/logout">Logout</a>
-          </li>
-          {% endif %}
+    </main>
+    <footer class="footer mt-5 py-3">
+      <div class="container d-flex flex-wrap justify-content-between align-items-center pt-3 border-top">
+        <p class="col-md-4 mb-0 text-body-secondary">&copy; 2024 Zack Didcott</p>
+        <p class="col-md-4 d-flex align-items-center justify-content-center mb-3 mb-md-0 me-md-auto text-body-secondary">VirtualBox Web API</p>
+        <ul class="nav col-md-4 justify-content-end">
+          <li class="nav-item"><a href="https://www.virtualbox.org/sdkref/" class="nav-link px-2 text-body-secondary">Documentation</a></li>
+          <li class="nav-item"><a href="https://github.com/Zedeldi/vbox-api/" class="nav-link px-2 text-body-secondary">GitHub</a></li>
         </ul>
       </div>
-    </nav>
-  </header>
-  {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-  {% for category, message in messages %}
-  <div class="alert alert-{{ category }} alert-dismissible fade show position-fixed bottom-0 end-0 me-3 z-3" role="alert">
-    {{ message }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-  </div>
-  {% endfor %}
-  {% endif %}
-  {% endwith %}
-  <body class="container pb-5" style="padding-top: 80px;">
-    {% block content %}{% endblock %}
+    </footer>
   </body>
 </html>
