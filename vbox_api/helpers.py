@@ -2,7 +2,7 @@ from multiprocessing import Process
 
 import websockify
 
-from vbox_api.utils import get_available_port
+from vbox_api.utils import get_available_port, get_fqdn
 
 
 class WebSocketProxyProcess(Process):
@@ -19,15 +19,18 @@ class WebSocketProxyProcess(Process):
         target_host: str,
         target_port: int,
         listen_host: str = "0.0.0.0",
+        listen_port: int = 0,
         *args,
         **kwargs,
     ) -> tuple["WebSocketProxyProcess", str]:
         """
         Return tuple of instance of WebSocketProxyProcess and address where listening.
 
-        Automatically assign port to random available port.
+        If listen_port is 0, automatically assign port to random available port.
         """
-        listen_port = get_available_port(listen_host)
+        listen_port = (
+            get_available_port(listen_host) if listen_port == 0 else listen_port
+        )
         process = cls(
             target_host=target_host,
             target_port=target_port,
@@ -40,5 +43,7 @@ class WebSocketProxyProcess(Process):
             protocol = "https"
         else:
             protocol = "http"
+        if listen_host == "0.0.0.0":
+            listen_host = get_fqdn()
         address = f"{protocol}://{listen_host}:{listen_port}"
         return (process, address)

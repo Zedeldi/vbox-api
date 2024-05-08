@@ -2,8 +2,26 @@ import base64
 import re
 import socket
 from io import BytesIO
+from typing import Optional
 
 from PIL import Image, ImageDraw, ImageFont
+
+
+def get_hostname() -> str:
+    """Return hostname of local system."""
+    return socket.gethostname()
+
+
+def get_fqdn(name: Optional[str] = None) -> str:
+    """Return fully-qualified domain name of host or hostname if not specified."""
+    name = name or get_hostname()
+    return socket.getfqdn(name)
+
+
+def get_host_ip(name: Optional[str] = None) -> str:
+    """Return host IP from name or hostname if not specified."""
+    name = name or get_hostname()
+    return socket.gethostbyname(name)
 
 
 def get_available_port(host: str = "127.0.0.1") -> int:
