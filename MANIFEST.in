@@ -1,0 +1,3 @@
+graft vbox_api/http/static
+graft vbox_api/http/templates
+global-exclude *.pyc

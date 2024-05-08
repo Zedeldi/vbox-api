@@ -29,6 +29,7 @@ Libraries:
 - [Zeep](https://pypi.org/project/zeep/) - SOAP client
 - [Flask](https://pypi.org/project/Flask/) - HTTP interface
 - [Pillow](https://pypi.org/project/pillow/) - image support
+- [websockify](https://pypi.org/project/websockify/) - remote control
 
 ## License
 
