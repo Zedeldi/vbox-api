@@ -17,12 +17,6 @@ class Medium(BaseModel, metaclass=ModelRegister):
         """Get Path instance for medium instance physical location."""
         return Path(self.location)
 
-    def get_base_medium(self) -> "Medium":
-        """Get base medium in case of snapshots."""
-        if self.base.handle == self.handle:
-            return self
-        return self.base
-
     def get_parents(self, include_self: bool = False) -> list["Medium"]:
         """Recursively return parents of medium."""
         parents = [] if not include_self else [self]
