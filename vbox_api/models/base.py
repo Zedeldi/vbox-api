@@ -160,9 +160,26 @@ class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
         return info
 
     def from_dict(self, info: dict[str, Any]) -> None:
-        """Set properties of model from passed dictionary."""
+        """
+        Set properties of model from passed dictionary.
+
+        Attributes of submodels can be modified using nested dictionaries
+        or by specifying a dot-separated path as the key.
+        """
         for property_name, property_value in info.items():
-            self._setters[property_name](property_value)
+            model = self
+            property_path = property_name.split(".")
+            for part in property_path[:-1]:
+                model = model._getters[part]()
+                property_path.pop(0)
+            property_name = property_path.pop()  # Last remaining element
+            if not isinstance(model, BaseModel):
+                raise TypeError("Model must be an instance of 'BaseModel'")
+            if isinstance(property_value, dict):
+                model = model._getters[property_name]()
+                model.from_dict(property_value)
+            else:
+                model._setters[property_name](property_value)
 
     @classmethod
     def from_name(cls, model_name: str) -> Type["BaseModel"]:
