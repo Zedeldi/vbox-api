@@ -1,3 +1,4 @@
+from vbox_api.models.audio import AudioSettings
 from vbox_api.models.machine import Machine
 from vbox_api.models.medium import Medium
 from vbox_api.models.network import NetworkAdapter
@@ -7,6 +8,7 @@ from vbox_api.models.virtualbox import VirtualBox
 from vbox_api.models.vrde import VRDEServer
 
 __all__ = [
+    "AudioSettings",
     "Machine",
     "Medium",
     "NetworkAdapter",
