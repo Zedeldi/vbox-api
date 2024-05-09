@@ -27,6 +27,7 @@ class BaseInterface(ABC):
             .removeprefix("get")
             .removeprefix("set")
             .removeprefix("find")
+            .removeprefix("current")
             .removeprefix("i")
             .removesuffix("byid")
             .removesuffix("byname")
