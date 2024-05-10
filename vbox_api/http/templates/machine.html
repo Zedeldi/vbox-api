@@ -51,7 +51,7 @@
         <section id="general">
           <h5>General</h5>
           <p>
-            <b>State: </b><span class="badge text-bg-{{ ['secondary', 'success', 'warning', 'danger'][machine.get_health()] }}">{{ machine.get_state_name() }}</span><br>
+            <b>State: </b><span class="badge text-bg-{{ ['secondary', 'success', 'warning', 'danger'][machine.get_health()] }}">{{ machine.get_state_name() }}</span> since {{ machine.get_last_state_change_dt().strftime("%a %d %b %Y at %H:%M:%S") }}<br>
             <b>Group: </b>{{ machine.groups[0] }}<br>
             <b>Description: </b>{{ machine.description if machine.description else "No description provided." }}
           </p>

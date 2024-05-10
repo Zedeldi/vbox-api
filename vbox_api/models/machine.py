@@ -3,6 +3,7 @@ import functools
 import io
 from collections.abc import Iterable, Iterator
 from contextlib import contextmanager
+from datetime import datetime
 from enum import IntEnum
 from typing import Any, Callable, Literal, Optional
 
@@ -233,3 +234,7 @@ class Machine(BaseModel, metaclass=ModelRegister):
         """Return description of OS type."""
         os_type = self.ctx.api.get_guest_os_type(self.os_type_id)
         return os_type["description"]
+
+    def get_last_state_change_dt(self) -> datetime:
+        """Return datetime object for last state change."""
+        return datetime.fromtimestamp(self.last_state_change / 1000)
