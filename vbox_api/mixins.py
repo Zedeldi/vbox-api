@@ -49,6 +49,11 @@ class PropertyMixin:
         """Return dict of set methods and their associated property."""
         return self._get_methods_with_prefix("set")
 
+    @property
+    def _creators(self) -> dict[str, Callable]:
+        """Return dict of create methods and their associated property."""
+        return self._get_methods_with_prefix("create")
+
     def _get_methods_with_prefix(self, prefix: str) -> dict[str, Callable]:
         """Return dict of methods with specified prefix."""
         return {

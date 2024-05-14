@@ -1,6 +1,7 @@
 import functools
 import types
 from abc import ABC, ABCMeta
+from collections import defaultdict
 from typing import Any, Callable, Optional, Type
 from weakref import WeakValueDictionary
 
@@ -11,19 +12,21 @@ from vbox_api.mixins import PropertyMixin
 class BaseModelRegister(ABCMeta, type):
     """Metaclass to register model instances on instantiation."""
 
-    _handles: WeakValueDictionary["Handle", "BaseModel"] = WeakValueDictionary()
+    _handles: defaultdict[
+        Type["BaseModel"], WeakValueDictionary["Handle", "BaseModel"]
+    ] = defaultdict(WeakValueDictionary)
 
     def __call__(
         cls, ctx: "Context", handle: Optional["Handle"] = None, *args, **kwargs
     ) -> "BaseModel":
         """Return instance for given handle if exists, else create instance."""
-        instance = cls._handles.get(handle) if handle else None
+        instance = cls._handles[cls].get(handle) if handle else None
         if instance is None:
             instance = super(BaseModelRegister, cls).__call__(
                 ctx, handle, *args, **kwargs
             )
             if instance.handle:
-                cls._handles[instance.handle] = instance
+                cls._handles[cls][instance.handle] = instance
         return instance
 
 
@@ -88,18 +91,22 @@ class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
         return None
 
     def _get_model_for_interface(
-        self, interface_name: str
+        self, interface_name: str, base_model: Optional[Type["BaseModel"]] = None
     ) -> Optional[Type["BaseModel"]]:
         """Return model class if match found, else return None."""
         interface_name = self._get_property_alias(interface_name) or interface_name
         match = self.ctx.interface.match_interface_name(interface_name)
         if not match:
             return None
-        return BaseModel.from_name(match)
+        if not base_model:
+            base_model = BaseModel
+        return base_model.from_name(match)
 
-    def _get_model_from_key_value(self, key: str, value: Any) -> Any:
+    def _get_model_from_key_value(
+        self, key: str, value: Any, base_model: Optional[Type["BaseModel"]] = None
+    ) -> Any:
         """Return model from a key-value pair, or value if not a valid model."""
-        model = self._get_model_for_interface(key)
+        model = self._get_model_for_interface(key, base_model=base_model)
         if not model or not Handle.is_handle(value):
             return value
         return model(self.ctx, self.ctx.get_handle(value))
@@ -129,12 +136,14 @@ class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
 
     def _bind_interface_methods(self) -> None:
         """Bind methods of interface to instance of model, passing handle."""
+        properties = (
+            *self._proxy_interface._getters.values(),
+            *self._proxy_interface._finders.values(),
+            *self._proxy_interface._creators.values(),
+        )
         for method_name, method in self._proxy_interface._methods.items():
             wrapped_method = functools.partial(method, self.handle)
-            if (
-                method in self._proxy_interface._getters.values()
-                or method in self._proxy_interface._finders.values()
-            ):
+            if method in properties:
                 wrapped_method = self._wrap_property(method_name, wrapped_method)
             setattr(self, method_name, wrapped_method)
 

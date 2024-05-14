@@ -28,7 +28,9 @@ class BaseInterface(ABC):
             .removeprefix("set")
             .removeprefix("find")
             .removeprefix("current")
+            .removeprefix("create")
             .removeprefix("i")
+            .removeprefix("on")
             .removesuffix("byid")
             .removesuffix("byname")
             .removesuffix("bygroups")
@@ -39,6 +41,7 @@ class BaseInterface(ABC):
             interface_name.removesuffix("es"),
         }
         matches.update([f"i{match}" for match in matches])
+        matches.update([f"{match}event" for match in matches])
         return matches
 
     def match_interface_name(self, interface_name: str) -> Optional[str]:
