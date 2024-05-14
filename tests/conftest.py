@@ -19,7 +19,7 @@ def api() -> VBoxAPI:
 
 
 @pytest.fixture
-def random_machine(api) -> "Machine":
+def random_machine(api: VBoxAPI) -> "Machine":
     """Return random machine of API."""
     return random.choice(api.machines)
 

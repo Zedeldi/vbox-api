@@ -20,7 +20,7 @@ def requires_session(func: Callable) -> Callable:
     """Ensure session is open before calling wrapped function."""
 
     @functools.wraps(func)
-    def inner(self, *args, **kwargs) -> Any:
+    def inner(self: "Machine", *args, **kwargs) -> Any:
         self.session.open()
         return func(self, *args, **kwargs)
 
