@@ -66,6 +66,10 @@ class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
         )
         self._bind_interface_methods()
 
+    def __str__(self) -> str:
+        """Return handle for string representation of instance if set."""
+        return str(self.handle) if self.handle else repr(self)
+
     def __getattr__(self, name: str) -> Any:
         """Handle getting model attributes at runtime."""
         try:

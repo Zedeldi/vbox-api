@@ -1,4 +1,3 @@
-from vbox_api.api.handle import Handle
 from vbox_api.models.base import BaseModel, ModelRegister
 
 
@@ -21,9 +20,5 @@ class EventSource(BaseModel, metaclass=ModelRegister):
     _PROPERTY_INTERFACE_ALIASES: dict[str, str] = {"Listener": "IEventListener"}
 
 
-class EventListener(BaseModel, Handle, metaclass=ModelRegister):
-    """
-    Class to handle EventListener attributes and methods.
-
-    Subclass of Handle to allow passing directly to EventSource.register_listener.
-    """
+class EventListener(BaseModel, metaclass=ModelRegister):
+    """Class to handle EventListener attributes and methods."""
