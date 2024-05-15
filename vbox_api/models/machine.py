@@ -57,7 +57,7 @@ class Machine(BaseModel, metaclass=ModelRegister):
     def start(self, front_end: Literal["gui", "headless", "sdl"] = "gui") -> Progress:
         """Start virtual machine with specified front_end."""
         handle = self.launch_vm_process(self.session.handle, front_end)
-        return Progress(self.ctx, self.ctx.get_handle(handle))
+        return self.ctx.get_progress(handle)
 
     @requires_session
     def stop(self, save_state: bool = False) -> Progress:
@@ -71,7 +71,7 @@ class Machine(BaseModel, metaclass=ModelRegister):
                 handle = self.session.machine.save_state()
             else:
                 handle = self.session.console.power_down()
-            return Progress(self.ctx, self.ctx.get_handle(handle))
+            return self.ctx.get_progress(handle)
 
     @requires_session
     def discard_state(self, remove_file: bool = True) -> None:
@@ -154,6 +154,23 @@ class Machine(BaseModel, metaclass=ModelRegister):
                 self.session.machine.save_settings()
             if unlock_on_exit:
                 self.unlock()
+
+    def delete(
+        self,
+        cleanup_mode: Literal[
+            "UnregisterOnly",
+            "DetachAllReturnNone",
+            "DetachAllReturnHardDisksOnly",
+            "Full",
+        ] = "DetachAllReturnHardDisksOnly",
+        delete_config: bool = True,
+    ) -> Optional[Progress]:
+        """Delete and unregister machine with specified cleanup mode."""
+        media = self.unregister(cleanup_mode)
+        if not delete_config:
+            return None
+        handle = self.delete_config(media)
+        return self.ctx.get_progress(handle)
 
     def get_mediums(self) -> list[Medium]:
         """Return list of attached mediums."""

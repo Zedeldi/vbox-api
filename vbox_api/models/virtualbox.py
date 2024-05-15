@@ -33,3 +33,16 @@ class VirtualBox(BaseModel, metaclass=ModelRegister):
         """Logoff current session."""
         self.ctx.interface.WebsessionManager.logoff(self.handle)
         self.handle = None
+
+    def create_machine_from_name(
+        self,
+        name: str,
+        groups: str = "/",
+        os_type_id: str = "Other_64",
+        register_machine: bool = True,
+    ) -> "Machine":
+        """Create machine with specified name."""
+        machine = self.create_machine("", name, groups, os_type_id, "", "", "", "")
+        if register_machine:
+            self.register_machine(machine)
+        return machine

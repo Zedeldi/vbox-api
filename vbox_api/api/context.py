@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from vbox_api.api.handle import Handle
+from vbox_api.models.progress import Progress
 from vbox_api.models.session import Session
 
 
@@ -24,3 +25,7 @@ class Context:
     def get_session(self) -> Session:
         """Return Session object for Context instance."""
         return Session(self)
+
+    def get_progress(self, handle: str) -> Progress:
+        """Return Progress object for Context instance."""
+        return Progress(self, self.get_handle(handle))
