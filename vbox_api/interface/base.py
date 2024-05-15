@@ -59,6 +59,17 @@ class BaseInterface(ABC):
             return None
         return self.get_interface(matched_name)
 
+    def get_interface_name_for_handle(self, handle: str) -> Optional[str]:
+        """Return interface name for specified handle."""
+        return self.IManagedObjectRef.getInterfaceName(handle)
+
+    def get_interface_for_handle(self, handle: str) -> Optional["ProxyInterface"]:
+        """Return interface object for specified handle or None."""
+        interface_name = self.get_interface_name_for_handle(handle)
+        if not interface_name:
+            return None
+        return self.get_interface(interface_name)
+
     def get_interface(self, interface_name: str) -> "ProxyInterface":
         """Get interface instance from interface_name."""
         return getattr(self, interface_name)
@@ -84,16 +95,26 @@ class PythonicInterface(BaseInterface):
         If remove_prefix is True, remove leading prefix from interface names.
         """
         self.interface = interface
+        self._remove_prefix = remove_prefix
         for interface_name, interface_obj in self.interface.__dict__.items():
             if not interface_name.startswith("I"):
                 continue
-            if remove_prefix:
-                interface_name = interface_name.lstrip("I")
+            if self._remove_prefix:
+                interface_name = interface_name.removeprefix("I")
             proxy_interface = ProxyInterface()
             self._register_interface(interface_name, proxy_interface)
             for method_name, method_callable in interface_obj.__dict__.items():
                 method_name = self.camel_to_snake(method_name)
                 proxy_interface._register_method(method_name, method_callable)
+
+    def get_interface_name_for_handle(self, handle: str) -> Optional[str]:
+        """Return interface name for specified handle."""
+        if self._remove_prefix:
+            interface_name = self.ManagedObjectRef.get_interface_name(handle)
+            if not interface_name:
+                return None
+            return interface_name.removeprefix("I")
+        return self.IManagedObjectRef.get_interface_name(handle)
 
     @staticmethod
     def camel_to_snake(text: str) -> str:
