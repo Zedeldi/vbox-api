@@ -149,3 +149,15 @@ def machine_edit(machine_id: Optional[str] = None) -> Response | str:
     return render_template(
         "machine_edit.html", machine=machine, api=session_manager.api
     )
+
+
+@app.route("/machine/delete", methods=["GET"])
+@app.route("/machine/<string:machine_id>/delete", methods=["GET"])
+@requires_session(session_manager)
+def machine_delete(machine_id: Optional[str] = None) -> Response | str:
+    """Endpoint to delete a specified machine."""
+    machine = get_machine_from_id(machine_id)
+    progress = machine.delete(delete_config=True)
+    flash("Deleting machine...", "warning")
+    progress.wait_for_completion(app.config["OPERATION_TIMEOUT_MS"])
+    return redirect(url_for("dashboard"))
