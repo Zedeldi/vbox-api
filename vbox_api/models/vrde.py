@@ -6,6 +6,8 @@ from vbox_api.models.base import BaseModel, ModelRegister
 class VRDEServer(BaseModel, metaclass=ModelRegister):
     """Class to handle VRDEServer attributes and methods."""
 
+    KNOWN_EXT_PACKS: set[str] = {"Oracle VM VirtualBox Extension Pack", "VNC"}
+
     def get_port(self) -> Optional[int]:
         """Return port for VRDE server."""
         port = self.get_vrde_property("TCP/Ports")

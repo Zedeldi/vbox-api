@@ -96,9 +96,13 @@
               </div>
               <div class="input-group mb-3">
                 <span class="input-group-text">Extension Pack</span>
-                <input type="text" id="vrde_server.vrde_ext_pack" name="vrde_server.vrde_ext_pack" class="form-control" placeholder="{{ machine.vrde_server.vrde_ext_pack }}">
+                <select id="vrde_server.vrde_ext_pack" name="vrde_server.vrde_ext_pack" class="form-select">
+                  {% for ext_pack in machine.vrde_server.KNOWN_EXT_PACKS %}
+                  <option value="{{ ext_pack }}" {{ "selected" if machine.vrde_server.vrde_ext_pack == ext_pack }}>{{ ext_pack }}</option>
+                  {% endfor %}
+                </select>
               </div>
-              <div class="input-group mb-3">
+              <div class="input-group mb-3" id="vnc-password">
                 <span class="input-group-text">VNC Password</span>
                 <input type="password" id="vrde_server.vnc_password" name="vrde_server.vnc_password" class="form-control" placeholder="Password">
               </div>
@@ -115,14 +119,35 @@
 </form>
 <script>
   function toggleVRDEForm(e) {
-    if (e.target.checked){
-      document.getElementById("vrde-form").removeAttribute("disabled");
+    const vrdeForm = document.getElementById("vrde-form");
+    if (e.target.checked) {
+      vrdeForm.removeAttribute("disabled");
     } else {
-      document.getElementById("vrde-form").setAttribute("disabled", "true");
+      vrdeForm.setAttribute("disabled", "true");
+    }
+  }
+
+  function toggleVNCPassword(e) {
+    const vncPasswordGroup = document.getElementById("vnc-password");
+    const vncPasswordInput = document.getElementById("vrde_server.vnc_password");
+    if (e.target.value.toUpperCase() == "VNC") {
+      vncPasswordGroup.style.display = "";
+      vncPasswordInput.removeAttribute("disabled");
+    } else {
+      vncPasswordGroup.style.display = "none";
+      vncPasswordInput.setAttribute("disabled", "true");
     }
   }
 
   const vrdeCheckbox = document.getElementById("vrde_server.enabled");
   vrdeCheckbox.addEventListener("change", toggleVRDEForm);
+
+  const vrdeExtPack = document.getElementById("vrde_server.vrde_ext_pack");
+  vrdeExtPack.addEventListener("change", toggleVNCPassword);
+
+  if (vrdeExtPack.value.toUpperCase() != "VNC") {
+    document.getElementById("vnc-password").style.display = "none";
+    document.getElementById("vrde_server.vnc_password").setAttribute("disabled", "true");
+  }
 </script>
 {% endblock %}

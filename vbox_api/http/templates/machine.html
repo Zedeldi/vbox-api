@@ -86,7 +86,7 @@
             {% else %}
             <b>Port: </b><span class="font-monospace">{{ machine.vrde_server.get_port() }}</span><br>
             {% endif %}
-            <b>Extension Pack: </b><span class="font-monospace">{{ machine.vrde_server.vrde_ext_pack }}</span><br>
+            <b>Extension Pack: </b>{{ machine.vrde_server.vrde_ext_pack }}<br>
             <b>Multiple Connections: </b>{{ "Allowed" if machine.vrde_server.allow_multi_connection else "Disallowed" }}
             {% endif %}
           </p>
