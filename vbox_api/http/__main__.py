@@ -14,9 +14,9 @@ def main() -> None:
     host, port = DEFAULT_HOST, DEFAULT_PORT
 
     if len(args) == 1:
-        port = args[0]
+        port = int(args[0])
     elif len(args) >= 2:
-        host, port = args[0], args[1]
+        host, port = args[0], int(args[1])
 
     app.run(host, port)
 

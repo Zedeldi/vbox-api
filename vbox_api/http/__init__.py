@@ -137,7 +137,9 @@ def machine_edit(machine_id: Optional[str] = None) -> Response | str:
     machine = get_machine_from_id(machine_id)
     if request.method == "POST":
         checkboxes = ("vrde_server.enabled", "vrde_server.allow_multi_connection")
-        properties = dict(filter(lambda item: bool(item[1]), request.form.items()))
+        properties: dict[str, str | bool] = dict(
+            filter(lambda item: bool(item[1]), request.form.items())
+        )
         for checkbox in checkboxes:
             properties[checkbox] = True if properties.get(checkbox) else False
         with machine.with_lock(
