@@ -50,7 +50,6 @@ class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
     """Base class to handle model attributes and methods."""
 
     _PROPERTY_INTERFACE_ALIASES: dict[str, str] = {}
-    _models: dict[str, Type["BaseModel"]] = {}
 
     def __init__(
         self,
@@ -94,47 +93,68 @@ class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
                 return value
         return None
 
-    def _get_model_for_interface(
-        self, interface_name: str, base_model: Optional[Type["BaseModel"]] = None
+    def _get_model_class_for_value(
+        self, value: str, base_model: Optional[Type["BaseModel"]] = None
     ) -> Optional[Type["BaseModel"]]:
-        """Return model class if match found, else return None."""
-        interface_name = self._get_property_alias(interface_name) or interface_name
-        match = self.ctx.interface.match_interface_name(interface_name)
+        """
+        Return model class for value, else return None.
+
+        If value is not a handle, try to match value to an interface name.
+        """
+        if not Handle.is_handle(value):
+            interface_name = self._get_property_alias(value) or value
+            match = self.ctx.interface.match_interface_name(interface_name)
+        else:
+            match = self.ctx.interface.get_interface_name_for_handle(value)
         if not match:
             return None
         if not base_model:
             base_model = BaseModel
         return base_model.from_name(match)
 
-    def _get_model_from_key_value(
-        self, key: str, value: Any, base_model: Optional[Type["BaseModel"]] = None
+    def _get_model_from_value(
+        self,
+        value: Any,
+        interface_name: Optional[str] = None,
+        base_model: Optional[Type["BaseModel"]] = None,
     ) -> Any:
-        """Return model from a key-value pair, or value if not a valid model."""
-        model = self._get_model_for_interface(key, base_model=base_model)
-        if not model or not Handle.is_handle(value):
+        """
+        Return model instance from value, or value if not a valid handle.
+
+        If interface_name is specified, search by name instead of handle.
+        """
+        if not isinstance(value, str) or not Handle.is_handle(value):
+            return value
+        if interface_name:
+            model = self._get_model_class_for_value(
+                interface_name, base_model=base_model
+            )
+        else:
+            model = self._get_model_class_for_value(value, base_model=base_model)
+        if not model:
             return value
         return model(self.ctx, self.ctx.get_handle(value))
 
-    def _parse_property(self, name: str, value: Any) -> Any:
+    def _parse_property(self, value: Any) -> Any:
         """Parse value of a property and return model instance if possible."""
         if not isinstance(value, list):
-            return self._get_model_from_key_value(name, value)
+            return self._get_model_from_value(value)
         models = []
         for element in value:
             try:
                 # Forcefully test if element is a mapping
                 for key in element:
-                    element[key] = self._get_model_from_key_value(key, element[key])
+                    element[key] = self._get_model_from_value(element[key])
                 models.append(element)
             except TypeError:
-                models.append(self._get_model_from_key_value(name, element))
+                models.append(self._get_model_from_value(element))
         return models
 
-    def _wrap_property(self, name: str, func: Callable) -> Callable:
+    def _wrap_property(self, func: Callable) -> Callable:
         """Wrap a property method to parse results."""
 
         def inner(*args, **kwargs) -> Any:
-            return self._parse_property(name, func(*args, **kwargs))
+            return self._parse_property(func(*args, **kwargs))
 
         return inner
 
@@ -148,7 +168,7 @@ class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
         for method_name, method in self._proxy_interface._methods.items():
             wrapped_method = functools.partial(method, self.handle)
             if method in properties:
-                wrapped_method = self._wrap_property(method_name, wrapped_method)
+                wrapped_method = self._wrap_property(wrapped_method)
             setattr(self, method_name, wrapped_method)
 
     @property

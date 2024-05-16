@@ -11,7 +11,9 @@ class Event(BaseModel, metaclass=ModelRegister):
 
     def get_model(self) -> "Event":
         """Convert Event instance to object of class for type."""
-        return self._get_model_from_key_value(self.type, self.handle, base_model=Event)
+        return self._get_model_from_value(
+            self.handle, interface_name=self.type, base_model=Event
+        )
 
 
 class EventSource(BaseModel, metaclass=ModelRegister):
