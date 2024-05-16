@@ -9,14 +9,17 @@ class PropertyMixin:
     def _bound_methods(self) -> dict[str, Callable]:
         """Return dict of bound methods."""
         methods = {}
-        for name, method in filter(
-            lambda item: callable(item[1]), self.__class__.__dict__.items()
-        ):
-            try:
-                methods[name] = functools.partial(method, getattr(self, name).__self__)
-            except AttributeError:
-                # Function does not have __self__ attribute, i.e. staticmethod
-                methods[name] = method
+        for cls in (self.__class__, *self.__class__.__bases__):
+            for name, method in filter(
+                lambda item: callable(item[1]), cls.__dict__.items()
+            ):
+                try:
+                    methods[name] = functools.partial(
+                        method, getattr(self, name).__self__
+                    )
+                except AttributeError:
+                    # Function does not have __self__ attribute, i.e. staticmethod
+                    methods[name] = method
         return methods
 
     @property
