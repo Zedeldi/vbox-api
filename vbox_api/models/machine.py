@@ -250,7 +250,7 @@ class Machine(BaseModel, metaclass=ModelRegister):
     def get_os_type_description(self) -> str:
         """Return description of OS type."""
         os_type = self.ctx.api.get_guest_os_type(self.os_type_id)
-        return os_type["description"]
+        return os_type.description
 
     def get_last_state_change_dt(self) -> datetime:
         """Return datetime object for last state change."""

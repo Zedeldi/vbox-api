@@ -34,6 +34,10 @@ class VirtualBox(BaseModel, metaclass=ModelRegister):
         self.ctx.interface.WebsessionManager.logoff(self.handle)
         self.handle = None
 
+    def get_guest_os_type_ids(self) -> set[str]:
+        """Return set of guest OS type IDs."""
+        return {os_type.id for os_type in self.guest_os_types}
+
     def create_machine_with_defaults(
         self,
         name: str,
