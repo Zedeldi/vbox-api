@@ -160,15 +160,9 @@ class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
 
     def _bind_interface_methods(self) -> None:
         """Bind methods of interface to instance of model, passing handle."""
-        properties = (
-            *self._proxy_interface._getters.values(),
-            *self._proxy_interface._finders.values(),
-            *self._proxy_interface._creators.values(),
-        )
         for method_name, method in self._proxy_interface._methods.items():
-            wrapped_method = functools.partial(method, self.handle)
-            if method in properties:
-                wrapped_method = self._wrap_property(wrapped_method)
+            bound_method = functools.partial(method, self.handle)
+            wrapped_method = self._wrap_property(bound_method)
             setattr(self, method_name, wrapped_method)
 
     @property
