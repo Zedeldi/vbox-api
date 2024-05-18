@@ -1,7 +1,8 @@
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Optional
 
 from vbox_api.models.base import BaseModel, ModelRegister
+from vbox_api.models.medium import Medium
 
 
 class VirtualBox(BaseModel, metaclass=ModelRegister):
@@ -14,6 +15,7 @@ class VirtualBox(BaseModel, metaclass=ModelRegister):
     _PROPERTY_INTERFACE_ALIASES: dict[str, str] = {
         "DVDImages": "IMedium",
         "HardDisks": "IMedium",
+        "FloppyImages": "IMedium",
     }
 
     def login(self, username: str, password: str, force: bool = False) -> bool:
@@ -55,15 +57,20 @@ class VirtualBox(BaseModel, metaclass=ModelRegister):
             self.register_machine(machine)
         return machine
 
+    def get_mediums(self) -> list[Medium]:
+        """Return list of all mediums, regardless of device type."""
+        return [*self.dvd_images, *self.floppy_images, *self.hard_disks]
+
     def create_medium_with_defaults(
         self,
         location: str | Path,
         logical_size: int,
         format: Optional[str] = None,
-        access_mode: Literal["ReadWrite", "ReadOnly"] = "ReadWrite",
-        device_type: Literal["HardDisk", "DVD", "Floppy"] = "HardDisk",
+        access_mode: Medium.ACCESS_MODES = "ReadWrite",
+        device_type: Medium.DEVICE_TYPES = "HardDisk",
     ) -> "Medium":
         """Create medium with specified location and size, with default settings."""
+        location = Path(location).absolute()
         if format is None:
             format = ""
         medium = self.create_medium(format, location, access_mode, device_type)
