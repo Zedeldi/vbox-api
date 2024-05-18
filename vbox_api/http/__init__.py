@@ -61,6 +61,13 @@ def logout() -> Response:
     return redirect(url_for("dashboard"))
 
 
+@app.route("/mediums", methods=["GET"])
+@requires_session(session_manager)
+def mediums() -> Response | str:
+    """Endpoint to view all mediums."""
+    return render_template("mediums.html", api=session_manager.api)
+
+
 @app.route("/machine", methods=["GET"])
 @app.route("/machine/<string:machine_id>", methods=["GET"])
 @requires_session(session_manager)

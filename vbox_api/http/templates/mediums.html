@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+{% block title %}Mediums{% endblock %}
+{% block content %}
+<ul class="list-group list-group-flush">
+  <li class="list-group-item">
+    <section id="hard-disks">
+      <h5>Hard Disks</h5>
+      <ul class="list-group py-2">
+        {% for medium in api.hard_disks %}
+        <li class="list-group-item">
+          {% if medium.children %}
+          <div class="dropdown-toggle" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#children-{{ medium.id }}">
+          {% else %}
+          <div>
+          {% endif %}
+            <b>Location: </b><span class="font-monospace">{{ medium.base.get_path() }}</span>
+          </div>
+          {% if medium.children %}
+          <ul class="list-group collapse py-2" id="children-{{ medium.id }}">
+          {% for child in medium.children %}
+            <li class="list-group-item font-monospace">{{ child.get_path() }}</li>
+          {% endfor %}
+          </ul>
+          {% endif %}
+          <b>Format: </b>{{ medium.format }}<br>
+          <b>Size: </b>{{ medium.logical_size | filesizeformat(binary=True) }}<br>
+        </li>
+        {% else %}
+        <li class="list-group-item">
+          <p>No hard disks found.</p>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+  </li>
+  <li class="list-group-item">
+    <section id="dvd-images">
+      <h5>DVD Images</h5>
+      <ul class="list-group py-2">
+        {% for medium in api.dvd_images %}
+        <li class="list-group-item">
+          <b>Location: </b><span class="font-monospace">{{ medium.base.get_path() }}</span><br>
+          <b>Format: </b>{{ medium.format }}<br>
+          <b>Size: </b>{{ medium.logical_size | filesizeformat(binary=True) }}<br>
+        </li>
+        {% else %}
+        <li class="list-group-item">
+          <p>No DVD images found.</p>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+  </li>
+  <li class="list-group-item">
+    <section id="floppy-images">
+      <h5>Floppy Images</h5>
+      <ul class="list-group py-2">
+        {% for medium in api.floppy_images %}
+        <li class="list-group-item">
+          <b>Location: </b><span class="font-monospace">{{ medium.base.get_path() }}</span><br>
+          <b>Format: </b>{{ medium.format }}<br>
+          <b>Size: </b>{{ medium.logical_size | filesizeformat(binary=True) }}<br>
+        </li>
+        {% else %}
+        <li class="list-group-item">
+          <p>No floppy images found.</p>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+  </li>
+</ul>
+{% endblock %}
