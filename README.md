@@ -7,8 +7,40 @@ Python bindings to the VirtualBox SOAP API.
 ## Description
 
 Provides a Python SOAP client using `zeep` to the VirtualBox SOAP API, with Pythonic bindings, and models for object-oriented usage.
+Several methods have been added to models to assist with common operations, and simplify many interface methods.
+
+`vbox_api.interface` contains all relevant classes to communicate with the VirtualBox API.
+
+`vbox_api.models` defines classes to use an interface in an object-oriented approach (see [below](#models)).
 
 `vbox_api.http` includes a Flask application to view and manage virtual machines over HTTP.
+
+`vbox_api.helpers` includes a class, `WebSocketProxyProcess`, to wrap `websockify.WebSocketProxy`, allowing remote control of a virtual machine over HTTP, accessible from the web interface.
+`vrde_ext_pack` must be set to `VNC` and [noVNC](https://novnc.com) must be available.
+
+### Models
+
+Models allow properties to be obtained and set in an object-oriented fashion, e.g. `machine.name`, instead of `IMachine_getName(handle)`.
+To do this, `BaseModel` defines both a `__getattr__` and a `__setattr__` method, which call the relevant interface method for the requested attribute to either get or set, respectively.
+Additionally, the `to_dict` and `from_dict` methods allow multiple properties to be handled at once.
+
+Any valid interface name can be used to create a model, using `BaseModel.from_name`.
+The interface is passed via a `Context` object, along with the handle of the model.
+All methods of the interface are bound to this model, using `functools.partial` to implictly pass its handle, then wrapped to return model instances.
+`BaseModel` also implements `__str__`, allowing models to be passed directly to interface methods as a handle.
+
+Models are automatically instantiated from returned results, by obtaining the interface name from the returned handle, using `ManagedObjectRef.get_interface_name`.
+Alternatively, a passed value can be matched by string comparison to an existing interface name.
+
+A metaclass is used to ensure that objects with the same handle and class are not recreated; the same object is returned.
+The instances are stored in a `WeakValueDictionary`, allowing them to be garbage collected when no longer referenced.
+
+For example:
+
+```py
+machine = api.machines[0]
+assert machine is Machine(api.ctx, machine.handle)
+```
 
 ## Installation
 
@@ -30,6 +62,50 @@ Libraries:
 - [Flask](https://pypi.org/project/Flask/) - HTTP interface
 - [Pillow](https://pypi.org/project/pillow/) - image support
 - [websockify](https://pypi.org/project/websockify/) - remote control
+
+## Usage
+
+Get machine information:
+
+```py
+for machine in api.machines:
+    print(machine.to_dict())
+```
+
+Wait for machine to start in headless mode:
+
+```py
+progress = machine.start(front_end="headless")
+progress.wait_for_completion(-1)
+```
+
+Write-lock machine and set machine name:
+
+```py
+with machine.with_lock(save_settings=True) as locked_machine:
+    locked_machine.name = "Machine Name"
+    # or
+    locked_machine.set_name("Machine Name")
+assert machine.name == "Machine Name"
+```
+
+Create machine with default settings for Windows 11:
+```py
+machine = api.create_machine_with_defaults(
+    name="Windows 11",
+    os_type_id="Windows11_64",
+)
+```
+
+Create hard-disk medium:
+
+```py
+medium = api.create_medium_with_defaults(
+    location="/path/to/medium.vdi",
+    logical_size=1024 ** 4,  # 1 TiB
+    format_="VDI",
+)
+```
 
 ## License
 
