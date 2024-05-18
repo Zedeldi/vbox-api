@@ -65,14 +65,14 @@ class VirtualBox(BaseModel, metaclass=ModelRegister):
         self,
         location: str | Path,
         logical_size: int,
-        format: Optional[str] = None,
+        format_: Optional[str] = None,
         access_mode: Medium.ACCESS_MODES = "ReadWrite",
         device_type: Medium.DEVICE_TYPES = "HardDisk",
     ) -> "Medium":
         """Create medium with specified location and size, with default settings."""
         location = Path(location).absolute()
-        if format is None:
-            format = ""
-        medium = self.create_medium(format, location, access_mode, device_type)
+        if format_ is None:
+            format_ = ""
+        medium = self.create_medium(format_, location, access_mode, device_type)
         medium.create_base_storage(logical_size)
         return medium
