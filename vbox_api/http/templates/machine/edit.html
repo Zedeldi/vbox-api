@@ -4,7 +4,7 @@
 <form method="POST">
   <div class="d-flex">
     <h3 class="me-auto">{{ machine.name }}</h3>
-    <a class="btn btn-outline-danger me-2" href="{{ url_for('machine', machine_id=machine.id) }}" role="button">Cancel</a>
+    <a class="btn btn-outline-danger me-2" href="{{ url_for('machine.view', machine_id=machine.id) }}" role="button">Cancel</a>
     <button type="reset" class="btn btn-outline-warning me-2">Reset</button>
     <button type="submit" class="btn btn-primary">Save</button>
   </div>
