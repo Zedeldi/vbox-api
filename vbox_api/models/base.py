@@ -153,6 +153,7 @@ class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
     def _wrap_property(self, func: Callable) -> Callable:
         """Wrap a property method to parse results."""
 
+        @functools.wraps(func)
         def inner(*args, **kwargs) -> Any:
             return self._parse_property(func(*args, **kwargs))
 
@@ -162,6 +163,7 @@ class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
         """Bind methods of interface to instance of model, passing handle."""
         for method_name, method in self._proxy_interface._methods.items():
             bound_method = functools.partial(method, self.handle)
+            bound_method = functools.update_wrapper(bound_method, method)
             wrapped_method = self._wrap_property(bound_method)
             setattr(self, method_name, wrapped_method)
 
