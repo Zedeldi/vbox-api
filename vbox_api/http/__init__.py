@@ -34,7 +34,7 @@ def handle_exception(error: HTTPException) -> tuple[str, int]:
 @requires_session
 def dashboard() -> Response | str:
     """Endpoint for dashboard."""
-    return render_template("dashboard.html", machines=session_manager.api.machines)
+    return render_template("dashboard.html", machines=g.api.machines)
 
 
 @app.route("/login", methods=["GET", "POST"])

@@ -118,7 +118,7 @@ def edit(machine_id: Optional[str] = None) -> Response | str:
             mutable_machine.from_dict(properties)
         flash("Machine saved.", "info")
         return redirect(url_for("machine.view", machine_id=machine.id))
-    return render_template("machine/edit.html", machine=machine, api=g.api)
+    return render_template("machine/edit.html", machine=machine)
 
 
 @machine_blueprint.route("/delete", methods=["GET"])

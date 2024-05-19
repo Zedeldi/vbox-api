@@ -22,7 +22,7 @@
             <div class="input-group mb-3">
               <span class="input-group-text">Group</span>
               <select id="groups" name="groups" class="form-select">
-                {% for group in api.machine_groups %}
+                {% for group in g.api.machine_groups %}
                 <option value="{{ group }}" {{ "selected" if machine.groups[0] == group }}>{{ group }}</option>
                 {% endfor %}
               </select>
@@ -40,17 +40,17 @@
             <h5>System</h5>
             <div class="input-group mb-3">
               <span class="input-group-text">Memory</span>
-              <input type="number" id="memory_size" name="memory_size" class="form-control" min="{{ api.system_properties.min_guest_ram }}" max="{{ api.system_properties.max_guest_ram }}" placeholder="{{ machine.memory_size }}">
+              <input type="number" id="memory_size" name="memory_size" class="form-control" min="{{ g.api.system_properties.min_guest_ram }}" max="{{ g.api.system_properties.max_guest_ram }}" placeholder="{{ machine.memory_size }}">
               <span class="input-group-text">MB</span>
             </div>
             <div class="input-group mb-3">
               <span class="input-group-text">Processors</span>
-              <input type="number" id="cpu_count" name="cpu_count" class="form-control" min="{{ api.system_properties.min_guest_cpu_count }}" max="{{ api.system_properties.max_guest_cpu_count }}" placeholder="{{ machine.cpu_count }}">
+              <input type="number" id="cpu_count" name="cpu_count" class="form-control" min="{{ g.api.system_properties.min_guest_cpu_count }}" max="{{ g.api.system_properties.max_guest_cpu_count }}" placeholder="{{ machine.cpu_count }}">
             </div>
             <div class="input-group mb-3">
               <span class="input-group-text">TPM</span>
               <select id="trusted_platform_module.type" name="trusted_platform_module.type" class="form-select">
-                {% for tpm_type in api.system_properties.supported_tpm_types %}
+                {% for tpm_type in g.api.system_properties.supported_tpm_types %}
                 <option value="{{ tpm_type }}" {{ "selected" if machine.trusted_platform_module.type == tpm_type }}>{{ tpm_type }}</option>
                 {% endfor %}
               </select>
@@ -58,7 +58,7 @@
             <div class="input-group mb-3">
               <span class="input-group-text">Firmware</span>
               <select id="firmware_type" name="firmware_type" class="form-select">
-                {% for firmware_type in api.system_properties.supported_firmware_types %}
+                {% for firmware_type in g.api.system_properties.supported_firmware_types %}
                 <option value="{{ firmware_type }}" {{ "selected" if machine.firmware_type == firmware_type }}>{{ firmware_type }}</option>
                 {% endfor %}
               </select>
@@ -70,13 +70,13 @@
             <h5>Display</h5>
             <div class="input-group mb-3">
               <span class="input-group-text">Video Memory</span>
-              <input type="number" id="graphics_adapter.vram_size" name="graphics_adapter.vram_size" class="form-control" min="{{ api.system_properties.min_guest_vram }}" max="{{ api.system_properties.max_guest_vram }}" placeholder="{{ machine.graphics_adapter.vram_size }}">
+              <input type="number" id="graphics_adapter.vram_size" name="graphics_adapter.vram_size" class="form-control" min="{{ g.api.system_properties.min_guest_vram }}" max="{{ g.api.system_properties.max_guest_vram }}" placeholder="{{ machine.graphics_adapter.vram_size }}">
               <span class="input-group-text">MB</span>
             </div>
             <div class="input-group mb-3">
               <span class="input-group-text">Graphics Controller</span>
               <select id="graphics_adapter.graphics_controller_type" name="graphics_adapter.graphics_controller_type" class="form-select">
-                {% for gc_type in api.system_properties.supported_graphics_controller_types %}
+                {% for gc_type in g.api.system_properties.supported_graphics_controller_types %}
                 <option value="{{ gc_type }}" {{ "selected" if machine.graphics_adapter.graphics_controller_type == gc_type }}>{{ gc_type }}</option>
                 {% endfor %}
               </select>

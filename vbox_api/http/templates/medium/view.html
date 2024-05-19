@@ -6,7 +6,7 @@
     <section id="hard-disks">
       <h5>Hard Disks</h5>
       <ul class="list-group py-2">
-        {% for medium in api.hard_disks %}
+        {% for medium in g.api.hard_disks %}
         <li class="list-group-item">
           {% if medium.children %}
           <div class="dropdown-toggle" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#children-{{ medium.id }}">
@@ -37,7 +37,7 @@
     <section id="dvd-images">
       <h5>DVD Images</h5>
       <ul class="list-group py-2">
-        {% for medium in api.dvd_images %}
+        {% for medium in g.api.dvd_images %}
         <li class="list-group-item">
           <b>Location: </b><span class="font-monospace">{{ medium.base.get_path() }}</span><br>
           <b>Format: </b>{{ medium.format }}<br>
@@ -55,7 +55,7 @@
     <section id="floppy-images">
       <h5>Floppy Images</h5>
       <ul class="list-group py-2">
-        {% for medium in api.floppy_images %}
+        {% for medium in g.api.floppy_images %}
         <li class="list-group-item">
           <b>Location: </b><span class="font-monospace">{{ medium.base.get_path() }}</span><br>
           <b>Format: </b>{{ medium.format }}<br>

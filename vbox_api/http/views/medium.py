@@ -12,4 +12,4 @@ medium_blueprint = Blueprint("medium", __name__)
 @requires_session
 def view() -> Response | str:
     """Endpoint to view all mediums."""
-    return render_template("medium/view.html", api=g.api)
+    return render_template("medium/view.html")

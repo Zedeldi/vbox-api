@@ -16,7 +16,7 @@
         </div>
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav">
-            {% if session.get("username") %}
+            {% if g.api %}
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
             </li>
@@ -49,7 +49,7 @@
     <footer class="footer mt-5 py-3">
       <div class="container d-flex flex-wrap justify-content-between align-items-center pt-3 border-top">
         <p class="col-md-4 mb-0 text-body-secondary">&copy; 2024 Zack Didcott</p>
-        <p class="col-md-4 d-flex align-items-center justify-content-center mb-3 mb-md-0 me-md-auto text-body-secondary">VirtualBox Web API</p>
+        <p class="col-md-4 d-flex align-items-center justify-content-center mb-3 mb-md-0 me-md-auto text-body-secondary">VirtualBox Web API{% if g.api %} | v{{ g.api.version }}{% endif %}</p>
         <ul class="nav col-md-4 justify-content-end">
           <li class="nav-item"><a href="https://www.virtualbox.org/sdkref/" class="nav-link px-2 text-body-secondary">Documentation</a></li>
           <li class="nav-item"><a href="https://github.com/Zedeldi/vbox-api/" class="nav-link px-2 text-body-secondary">GitHub</a></li>
