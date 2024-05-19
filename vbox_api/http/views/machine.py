@@ -16,36 +16,28 @@ from flask import (
 from werkzeug.wrappers.response import Response
 
 from vbox_api.helpers import WebSocketProxyProcess
+from vbox_api.models import Machine
 from vbox_api.http.session import requires_session
+from vbox_api.http.utils import convert_id_to_model
 
 machine_blueprint = Blueprint("machine", __name__)
 
 
-def get_machine_from_id(machine_id: Optional[str]) -> "Machine":
-    """Return Machine instance from machine_id or abort request."""
-    machine_id = machine_id or request.args.get("id")
-    try:
-        machine = g.api.find_machine(machine_id)
-    except Exception:
-        abort(400, "No machine specified." if not machine_id else "Machine not found.")
-    return machine
-
-
 @machine_blueprint.route("/", methods=["GET"])
-@machine_blueprint.route("/<string:machine_id>", methods=["GET"])
+@machine_blueprint.route("/<string:name_or_id>", methods=["GET"])
 @requires_session
-def view(machine_id: Optional[str] = None) -> Response | str:
+@convert_id_to_model("machine")
+def view(machine: Machine) -> Response | str:
     """Endpoint to view and manage a specified machine."""
-    machine = get_machine_from_id(machine_id)
     return render_template("machine/view.html", machine=machine)
 
 
 @machine_blueprint.route("/start", methods=["GET"])
-@machine_blueprint.route("/<string:machine_id>/start", methods=["GET"])
+@machine_blueprint.route("/<string:name_or_id>/start", methods=["GET"])
 @requires_session
-def start(machine_id: Optional[str] = None) -> Response | str:
+@convert_id_to_model("machine")
+def start(machine: Machine) -> Response | str:
     """Endpoint to start a specified machine."""
-    machine = get_machine_from_id(machine_id)
     if request.args.get("resume", False):
         machine.resume()
     else:
@@ -53,15 +45,15 @@ def start(machine_id: Optional[str] = None) -> Response | str:
         progress = machine.start(front_end)
         flash("Starting machine...", "info")
         progress.wait_for_completion(current_app.config["OPERATION_TIMEOUT_MS"])
-    return redirect(url_for("machine.view", machine_id=machine.id))
+    return redirect(url_for("machine.view", name_or_id=machine.id))
 
 
 @machine_blueprint.route("/stop", methods=["GET"])
-@machine_blueprint.route("/<string:machine_id>/stop", methods=["GET"])
+@machine_blueprint.route("/<string:name_or_id>/stop", methods=["GET"])
 @requires_session
-def stop(machine_id: Optional[str] = None) -> Response | str:
+@convert_id_to_model("machine")
+def stop(machine: Machine) -> Response | str:
     """Endpoint to stop a specified machine."""
-    machine = get_machine_from_id(machine_id)
     if request.args.get("pause", False):
         machine.pause()
     elif request.args.get("reset", False):
@@ -73,15 +65,16 @@ def stop(machine_id: Optional[str] = None) -> Response | str:
         progress = machine.stop(save_state=save_state)
         flash("Stopping machine...", "info")
         progress.wait_for_completion(current_app.config["OPERATION_TIMEOUT_MS"])
-    return redirect(url_for("machine.view", machine_id=machine.id))
+    return redirect(url_for("machine.view", name_or_id=machine.id))
 
 
 @machine_blueprint.route("/remote", methods=["GET"])
-@machine_blueprint.route("/<string:machine_id>/remote", methods=["GET"])
+@machine_blueprint.route("/<string:name_or_id>/remote", methods=["GET"])
 @requires_session
-def remote(machine_id: Optional[str] = None) -> Response | str:
+@convert_id_to_model("machine")
+def remote(machine: Machine) -> Response | str:
     """Endpoint to remote control a specified machine."""
-    vrde_server = get_machine_from_id(machine_id).vrde_server
+    vrde_server = machine.vrde_server
     if not vrde_server.address:
         abort(422, "VRDE server does not have host information.")
     if vrde_server.protocol.lower() == "vnc":
@@ -100,11 +93,11 @@ def remote(machine_id: Optional[str] = None) -> Response | str:
 
 
 @machine_blueprint.route("/edit", methods=["GET", "POST"])
-@machine_blueprint.route("/<string:machine_id>/edit", methods=["GET", "POST"])
+@machine_blueprint.route("/<string:name_or_id>/edit", methods=["GET", "POST"])
 @requires_session
-def edit(machine_id: Optional[str] = None) -> Response | str:
+@convert_id_to_model("machine")
+def edit(machine: Machine) -> Response | str:
     """Endpoint to edit a specified machine."""
-    machine = get_machine_from_id(machine_id)
     if request.method == "POST":
         checkboxes = ("vrde_server.enabled", "vrde_server.allow_multi_connection")
         properties: dict[str, str | bool] = dict(
@@ -117,16 +110,16 @@ def edit(machine_id: Optional[str] = None) -> Response | str:
         ) as mutable_machine:
             mutable_machine.from_dict(properties)
         flash("Machine saved.", "info")
-        return redirect(url_for("machine.view", machine_id=machine.id))
+        return redirect(url_for("machine.view", name_or_id=machine.id))
     return render_template("machine/edit.html", machine=machine)
 
 
 @machine_blueprint.route("/delete", methods=["GET"])
-@machine_blueprint.route("/<string:machine_id>/delete", methods=["GET"])
+@machine_blueprint.route("/<string:name_or_id>/delete", methods=["GET"])
 @requires_session
-def delete(machine_id: Optional[str] = None) -> Response | str:
+@convert_id_to_model("machine")
+def delete(machine: Machine) -> Response | str:
     """Endpoint to delete a specified machine."""
-    machine = get_machine_from_id(machine_id)
     progress = machine.delete(delete_config=True)
     flash("Deleting machine...", "warning")
     progress.wait_for_completion(current_app.config["OPERATION_TIMEOUT_MS"])

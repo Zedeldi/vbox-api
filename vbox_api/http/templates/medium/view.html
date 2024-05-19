@@ -13,7 +13,7 @@
           {% else %}
           <div>
           {% endif %}
-            <b>Location: </b><span class="font-monospace">{{ medium.base.get_path() }}</span>
+            <b>Location: </b><a href="{{ url_for('medium.download', id=medium.id) }}"><span class="font-monospace">{{ medium.base.get_path() }}</span></a>
           </div>
           {% if medium.children %}
           <ul class="list-group collapse py-2" id="children-{{ medium.id }}">
@@ -39,7 +39,7 @@
       <ul class="list-group py-2">
         {% for medium in g.api.dvd_images %}
         <li class="list-group-item">
-          <b>Location: </b><span class="font-monospace">{{ medium.base.get_path() }}</span><br>
+          <b>Location: </b><a class="font-monospace" href="{{ url_for('medium.download', id=medium.id) }}">{{ medium.base.get_path() }}</a><br>
           <b>Format: </b>{{ medium.format }}<br>
           <b>Size: </b>{{ medium.logical_size | filesizeformat(binary=True) }}<br>
         </li>
@@ -57,7 +57,7 @@
       <ul class="list-group py-2">
         {% for medium in g.api.floppy_images %}
         <li class="list-group-item">
-          <b>Location: </b><span class="font-monospace">{{ medium.base.get_path() }}</span><br>
+          <b>Location: </b><a class="font-monospace" href="{{ url_for('medium.download', id=medium.id) }}">{{ medium.base.get_path() }}</a><br>
           <b>Format: </b>{{ medium.format }}<br>
           <b>Size: </b>{{ medium.logical_size | filesizeformat(binary=True) }}<br>
         </li>
