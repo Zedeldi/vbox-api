@@ -39,6 +39,24 @@ class VirtualBox(BaseModel, metaclass=ModelRegister):
         self.ctx.interface.WebsessionManager.logoff(self.handle)
         self.handle = None
 
+    def find_model(self, model_name: str, name_or_id: str) -> Optional[BaseModel]:
+        """Call appropriate method to find model_name from name_or_id."""
+        model_name = model_name.replace("_", "")
+        for method_name, method in self._methods.items():
+            method_name = (
+                method_name.split("_by_")[0].replace("_", "").removeprefix("find")
+            )
+            if method_name.casefold() == model_name.casefold():
+                break
+        else:
+            raise ValueError(
+                f"Model name '{model_name}' has no finder method"
+            ) from None
+        try:
+            return method(name_or_id)
+        except Exception:
+            return None
+
     def get_guest_os_type_ids(self) -> set[str]:
         """Return set of guest OS type IDs."""
         return {os_type.id for os_type in self.guest_os_types}
@@ -60,6 +78,13 @@ class VirtualBox(BaseModel, metaclass=ModelRegister):
     def get_mediums(self) -> list[Medium]:
         """Return list of all mediums, regardless of device type."""
         return [*self.dvd_images, *self.floppy_images, *self.hard_disks]
+
+    def find_medium(self, name_or_id: str) -> Optional[Medium]:
+        """Return a Medium object matching the specified name or ID, or None."""
+        for medium in self.get_mediums():
+            if name_or_id in (medium.name, medium.id):
+                return medium
+        return None
 
     def create_medium_with_defaults(
         self,

@@ -18,7 +18,7 @@ class Medium(BaseModel, metaclass=ModelRegister):
 
     def get_path(self) -> Path:
         """Get Path instance for medium instance physical location."""
-        return Path(self.location)
+        return Path(self.location).absolute()
 
     def get_parents(self, include_self: bool = False) -> list["Medium"]:
         """Recursively return parents of medium."""
