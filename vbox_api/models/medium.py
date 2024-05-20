@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Literal
+from typing import Literal, get_args
 
 from vbox_api.models.base import BaseModel, ModelRegister
 from vbox_api.utils import split_pascal_case
@@ -13,15 +13,17 @@ class Medium(BaseModel, metaclass=ModelRegister):
         "Children": "IMedium",
         "Parent": "IMedium",
     }
-    ACCESS_MODES = Literal["ReadWrite", "ReadOnly"]
-    DEVICE_TYPES = Literal["HardDisk", "DVD", "Floppy"]
+    ACCESS_MODES_TYPE = Literal["ReadWrite", "ReadOnly"]
+    ACCESS_MODES = get_args(ACCESS_MODES_TYPE)
+    DEVICE_TYPES_TYPE = Literal["HardDisk", "DVD", "Floppy"]
+    DEVICE_TYPES = get_args(DEVICE_TYPES_TYPE)
 
     def get_path(self) -> Path:
         """Get Path instance for medium instance physical location."""
         return Path(self.location).absolute()
 
     def get_parents(self, include_self: bool = False) -> list["Medium"]:
-        """Iteratively return parents of medium."""
+        """Return parents of medium iteratively."""
         parents = [] if not include_self else [self]
         medium = self
         while parent := medium.parent:
@@ -30,7 +32,7 @@ class Medium(BaseModel, metaclass=ModelRegister):
         return parents
 
     def get_all_children(self) -> list["Medium"]:
-        """Recursively return a flat list of all children of medium."""
+        """Return a flat list of all children of medium recursively."""
         if not self.children:  # Base case
             return [self]
         children = []
