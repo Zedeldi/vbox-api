@@ -1,7 +1,9 @@
 import base64
 import re
 import socket
+from datetime import datetime
 from io import BytesIO
+from pathlib import Path
 from typing import Optional
 
 from PIL import Image, ImageDraw, ImageFont
@@ -34,6 +36,18 @@ def get_available_port(host: str = "127.0.0.1") -> int:
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind((host, 0))
         return sock.getsockname()[1]
+
+
+def get_date_identifier(format_: str = "%Y-%m-%d_%H-%M-%S-%f") -> str:
+    """Return date in the format of a string to be used as an identifier."""
+    return datetime.now().strftime(format_)
+
+
+def append_file_extension(path: str | Path, extension: str) -> Path:
+    path = Path(path)
+    if path.suffix:
+        return path
+    return path.with_suffix(f".{extension}")
 
 
 def image_to_data_uri(image: Image.Image) -> str:

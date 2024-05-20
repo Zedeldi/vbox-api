@@ -1,6 +1,11 @@
 {% extends "layout.html" %}
 {% block title %}Mediums{% endblock %}
 {% block content %}
+<div class="d-flex">
+  <h3 class="me-auto">Mediums</h3>
+  <a class="btn btn-primary me-2" href="{{ url_for('medium.create') }}" role="button">Create</a>
+</div>
+<hr>
 <ul class="list-group list-group-flush">
   <li class="list-group-item">
     <section id="hard-disks">
