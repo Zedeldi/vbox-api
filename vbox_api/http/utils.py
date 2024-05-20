@@ -5,10 +5,12 @@ from typing import Any, Callable, Optional
 
 from flask import abort, g, request
 
+from vbox_api.models.base import BaseModel
+
 
 def get_model_from_name_or_id(
     model_name: str, name_or_id: Optional[str] = None, url_parameter: str = "id"
-) -> "BaseModel":
+) -> BaseModel:
     """Return model instance from name_or_id for model_name or abort request."""
     name_or_id = name_or_id or request.args.get(url_parameter)
     if not name_or_id:

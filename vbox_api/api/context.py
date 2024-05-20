@@ -1,26 +1,26 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from vbox_api.api.handle import Handle
-from vbox_api.models.progress import Progress
-from vbox_api.models.session import Session
+from vbox_api import api
+from vbox_api.interface import PythonicInterface
+from vbox_api.models import Progress, Session
 
 
 @dataclass
 class Context:
     """Dataclass to store context of operations."""
 
-    api: "VBoxAPI"
-    interface: "PythonicInterface"
+    api: "api.VBoxAPI"
+    interface: PythonicInterface
 
     @property
-    def api_handle(self) -> Optional[Handle]:
+    def api_handle(self) -> Optional["api.Handle"]:
         """Return handle of API instance."""
         return self.api.handle
 
-    def get_handle(self, handle: str) -> Handle:
+    def get_handle(self, handle: str) -> "api.Handle":
         """Get Handle instance with current context and specified handle."""
-        return Handle(self, handle)
+        return api.Handle(self, handle)
 
     def get_session(self) -> Session:
         """Return Session object for Context instance."""

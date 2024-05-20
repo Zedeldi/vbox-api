@@ -1,6 +1,7 @@
 from types import TracebackType
 from typing import Optional, Type
 
+from vbox_api import api
 from vbox_api.models.base import BaseModel, ModelRegister
 
 
@@ -28,7 +29,7 @@ class Session(BaseModel, metaclass=ModelRegister):
         self.handle.release()
         self.handle = None
 
-    def __enter__(self) -> "Handle":
+    def __enter__(self) -> "api.Handle":
         """Context manager method to open session and return handle."""
         self.open()
         return self.handle

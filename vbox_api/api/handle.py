@@ -1,12 +1,14 @@
 import re
 
+from vbox_api import api
+
 
 class Handle(str):
     """Class to store and provide methods to release a handle."""
 
     HANDLE_REGEX = re.compile("[0-9a-fA-F]{16}-[0-9a-fA-F]{16}")
 
-    def __new__(cls, ctx: "Context", handle: str) -> "Handle":
+    def __new__(cls, ctx: "api.Context", handle: str) -> "Handle":
         """Return new string object."""
         obj = super().__new__(cls, handle)
         obj.ctx = ctx

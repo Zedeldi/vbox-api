@@ -9,10 +9,12 @@ from typing import Any, Callable, Literal, Optional
 
 from PIL import Image
 
+from vbox_api import api
 from vbox_api.models.base import BaseModel, ModelRegister
 from vbox_api.models.medium import Medium
 from vbox_api.models.network import NetworkAdapter
 from vbox_api.models.progress import Progress
+from vbox_api.models.session import Session
 from vbox_api.utils import image_to_data_uri, split_pascal_case, text_to_image
 
 
@@ -43,9 +45,9 @@ class Machine(BaseModel, metaclass=ModelRegister):
 
     def __init__(
         self,
-        ctx: "Context",
-        handle: Optional["Handle"] = None,
-        session: Optional["Session"] = None,
+        ctx: "api.Context",
+        handle: Optional["api.Handle"] = None,
+        session: Optional[Session] = None,
         *args,
         **kwargs,
     ) -> None:

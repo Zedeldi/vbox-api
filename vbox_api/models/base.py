@@ -5,7 +5,7 @@ from collections import defaultdict
 from typing import Any, Callable, Optional, Type
 from weakref import WeakValueDictionary
 
-from vbox_api.api.handle import Handle
+from vbox_api import api
 from vbox_api.mixins import PropertyMixin
 
 
@@ -13,11 +13,11 @@ class BaseModelRegister(ABCMeta, type):
     """Metaclass to register model instances on instantiation."""
 
     _handles: defaultdict[
-        Type["BaseModel"], WeakValueDictionary["Handle", "BaseModel"]
+        Type["BaseModel"], WeakValueDictionary["api.Handle", "BaseModel"]
     ] = defaultdict(WeakValueDictionary)
 
     def __call__(
-        cls, ctx: "Context", handle: Optional["Handle"] = None, *args, **kwargs
+        cls, ctx: "api.Context", handle: Optional["api.Handle"] = None, *args, **kwargs
     ) -> "BaseModel":
         """Return instance for given handle if exists, else create instance."""
         instance = cls._handles[cls].get(handle) if handle else None
@@ -53,8 +53,8 @@ class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
 
     def __init__(
         self,
-        ctx: "Context",
-        handle: Optional["Handle"] = None,
+        ctx: "api.Context",
+        handle: Optional["api.Handle"] = None,
         model_name: Optional[str] = None,
     ) -> None:
         """Initialise instance of model with information."""
@@ -101,7 +101,7 @@ class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
 
         If value is not a handle, try to match value to an interface name.
         """
-        if not Handle.is_handle(value):
+        if not api.Handle.is_handle(value):
             interface_name = self._get_property_alias(value) or value
             match = self.ctx.interface.match_interface_name(interface_name)
         else:
@@ -123,7 +123,7 @@ class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
 
         If interface_name is specified, search by name instead of handle.
         """
-        if not isinstance(value, str) or not Handle.is_handle(value):
+        if not isinstance(value, str) or not api.Handle.is_handle(value):
             return value
         if interface_name:
             model = self._get_model_class_for_value(
@@ -168,12 +168,12 @@ class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
             setattr(self, method_name, wrapped_method)
 
     @property
-    def handle(self) -> Optional["Handle"]:
+    def handle(self) -> Optional["api.Handle"]:
         """Return handle attribute."""
         return self._handle
 
     @handle.setter
-    def handle(self, handle: Optional["Handle"]) -> None:
+    def handle(self, handle: Optional["api.Handle"]) -> None:
         """Set new handle and bind methods."""
         self._handle = handle
         self._bind_interface_methods()

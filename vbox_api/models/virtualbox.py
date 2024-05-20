@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Optional
 
 from vbox_api.models.base import BaseModel, ModelRegister
+from vbox_api.models.machine import Machine
 from vbox_api.models.medium import Medium
 
 
@@ -67,7 +68,7 @@ class VirtualBox(BaseModel, metaclass=ModelRegister):
         groups: str = "/",
         os_type_id: Optional[str] = None,
         register_machine: bool = True,
-    ) -> "Machine":
+    ) -> Machine:
         """Create machine with specified name and default settings for OS type."""
         if os_type_id is None:
             os_type_id = ""
