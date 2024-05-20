@@ -1,3 +1,10 @@
+"""
+Collection of models with additional methods and properties.
+
+Other models will be generated dynamically at runtime by name
+using an interface instance.
+"""
+
 from vbox_api.models.audio import AudioSettings
 from vbox_api.models.event import Event, EventListener, EventSource
 from vbox_api.models.machine import Machine

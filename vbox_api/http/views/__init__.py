@@ -1,3 +1,5 @@
+"""Blueprints for the VirtualBox web interface Flask application."""
+
 from vbox_api.http.views.machine import machine_blueprint
 from vbox_api.http.views.medium import medium_blueprint
 

@@ -44,6 +44,7 @@ def get_date_identifier(format_: str = "%Y-%m-%d_%H-%M-%S-%f") -> str:
 
 
 def append_file_extension(path: str | Path, extension: str) -> Path:
+    """Append extension to path if path does not already have a suffix."""
     path = Path(path)
     if path.suffix:
         return path

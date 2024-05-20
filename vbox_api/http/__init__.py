@@ -19,6 +19,7 @@ session_manager = SessionManager()
 
 @app.before_request
 def load_session() -> None:
+    """Initialise Flask global application context object."""
     g.session_manager = session_manager
     g.api = session_manager.api
     g.username = session_manager.username
