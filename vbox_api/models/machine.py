@@ -177,15 +177,42 @@ class Machine(BaseModel, metaclass=ModelRegister):
         medium: Medium,
         controller_name: str,
         controller_port: Optional[int] = None,
+        controller_device: int = 0,
     ) -> None:
         """Attach medium to controller at next available port, unless specified."""
-        controller_port = controller_port or self._get_next_port_for_storage_controller(
-            controller_name
-        )
+        if controller_port is None:
+            controller_port = self._get_next_port_for_storage_controller(
+                controller_name
+            )
         with self.with_lock(save_settings=True) as locked_machine:
             locked_machine.attach_device(
-                controller_name, controller_port, 0, medium.device_type, medium
+                controller_name,
+                controller_port,
+                controller_device,
+                medium.device_type,
+                medium,
             )
+
+    def detach_medium(self, medium: Medium) -> None:
+        """Find storage controller for medium and detach medium."""
+        storage_controller = self._find_storage_controller_for_medium(medium)
+        if not storage_controller:
+            raise ValueError(f"Cannot find storage controller for medium {medium.id}")
+        with self.with_lock(save_settings=True) as locked_machine:
+            locked_machine.detach_device(*storage_controller)
+
+    def _find_storage_controller_for_medium(
+        self, medium: Medium
+    ) -> Optional[tuple[str, int, int]]:
+        """Return storage controller name, port and device for medium."""
+        for medium_attachment in self.medium_attachments:
+            if medium_attachment.medium == medium:
+                return (
+                    medium_attachment.controller,
+                    medium_attachment.port,
+                    medium_attachment.device,
+                )
+        return None
 
     def _get_available_ports_for_storage_controller(
         self, controller_name: str
