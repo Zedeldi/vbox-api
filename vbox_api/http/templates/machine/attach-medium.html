@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block title %}Attach Medium - {{ machine.name }}{% endblock %}
+{% block content %}
+<div class="d-flex">
+  <h3 class="me-auto">Attach Medium - {{ machine.name }}</h3>
+  <a class="btn btn-outline-danger me-2" href="{{ url_for('machine.view', id=machine.id) }}" role="button">Cancel</a>
+</div>
+<hr>
+<div class="row">
+  <ul class="list-group list-group-flush"></ul>
+    <div class="col">
+      <li class="list-group-item">
+        <section id="attach-medium">
+          <form method="POST">
+            <h5>Attach Medium</h5>
+            <div class="input-group mb-3">
+              <span class="input-group-text">Storage Controller</span>
+              <select id="storage_controller" name="storage_controller" class="form-select">
+                {% for storage_controller in machine.storage_controllers %}
+                <option value="{{ storage_controller.name }}">{{ storage_controller.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="input-group mb-3">
+              <span class="input-group-text">Medium</span>
+              <select id="medium_id" name="medium_id" class="form-select">
+                {% for medium in g.api.mediums %}
+                <option value="{{ medium.id }}">{{ medium.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Attach</button>
+          </form>
+        </section>
+      </li>
+    </div>
+  </ul>
+</div>
+{% endblock %}

@@ -4,6 +4,8 @@
 <form method="POST">
   <div class="d-flex">
     <h3 class="me-auto">{{ machine.name }}</h3>
+    <a class="btn btn-secondary me-2" href="{{ url_for('machine.attach_medium', id=machine.id) }}" role="button">Attach Medium</a>
+    <div class="vr me-2"></div>
     <a class="btn btn-outline-danger me-2" href="{{ url_for('machine.view', id=machine.id) }}" role="button">Cancel</a>
     <button type="reset" class="btn btn-outline-warning me-2">Reset</button>
     <button type="submit" class="btn btn-primary">Save</button>
