@@ -112,26 +112,50 @@ def edit(machine: Machine) -> Response | str:
     return render_template("machine/edit.html", machine=machine)
 
 
-@machine_blueprint.route("/attach-medium", methods=["GET", "POST"])
-@machine_blueprint.route("/<string:name_or_id>/attach-medium", methods=["GET", "POST"])
+@machine_blueprint.route("/medium", methods=["GET"])
+@machine_blueprint.route("/<string:name_or_id>/medium", methods=["GET"])
+@requires_session
+@convert_id_to_model("machine")
+def medium(machine: Machine) -> Response | str:
+    """Endpoint to manage mediums for a specified machine."""
+    return render_template("machine/medium.html", machine=machine)
+
+
+@machine_blueprint.route("/attach-medium", methods=["POST"])
+@machine_blueprint.route("/<string:name_or_id>/attach-medium", methods=["POST"])
 @requires_session
 @convert_id_to_model("machine")
 def attach_medium(machine: Machine) -> Response | str:
     """Endpoint to attach a medium to a specified machine."""
-    if request.method == "POST":
-        storage_controller = request.form.get("storage_controller")
-        if not storage_controller:
-            abort(400, "No storage controller name provided.")
-        medium_id = request.form.get("medium_id")
-        if not medium_id:
-            abort(400, "No medium ID provided.")
-        medium = g.api.find_medium(request.form.get("medium_id"))
-        if not medium:
-            abort(400, f"Medium with ID {medium_id} not found.")
-        machine.attach_medium(medium, storage_controller)
-        flash("Medium attached.", "info")
-        return redirect(url_for("machine.view", id=machine.id))
-    return render_template("machine/attach-medium.html", machine=machine)
+    storage_controller = request.form.get("storage_controller")
+    if not storage_controller:
+        abort(400, "No storage controller name provided.")
+    medium_id = request.form.get("medium_id")
+    if not medium_id:
+        abort(400, "No medium ID provided.")
+    medium = g.api.find_medium(medium_id)
+    if not medium:
+        abort(400, f"Medium with ID {medium_id} not found.")
+    machine.attach_medium(medium, storage_controller)
+    flash("Medium attached.", "info")
+    return redirect(url_for("machine.medium", id=machine.id))
+
+
+@machine_blueprint.route("/detach-medium", methods=["GET"])
+@machine_blueprint.route("/<string:name_or_id>/detach-medium", methods=["GET"])
+@requires_session
+@convert_id_to_model("machine")
+def detach_medium(machine: Machine) -> Response | str:
+    """Endpoint to detach a medium from a specified machine."""
+    medium_id = request.args.get("medium_id")
+    if not medium_id:
+        abort(400, "No medium ID provided.")
+    medium = g.api.find_medium(medium_id)
+    if not medium:
+        abort(400, f"Medium with ID {medium_id} not found.")
+    machine.detach_medium(medium)
+    flash("Medium detached.", "info")
+    return redirect(url_for("machine.medium", id=machine.id))
 
 
 @machine_blueprint.route("/delete", methods=["GET"])
