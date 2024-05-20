@@ -8,16 +8,16 @@
       <ul class="list-group py-2">
         {% for medium in g.api.hard_disks %}
         <li class="list-group-item">
-          {% if medium.children %}
+          {% if medium.all_children %}
           <div class="dropdown-toggle" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#children-{{ medium.id }}">
           {% else %}
           <div>
           {% endif %}
             <b>Location: </b><a href="{{ url_for('medium.download', id=medium.id) }}"><span class="font-monospace">{{ medium.base.get_path() }}</span></a>
           </div>
-          {% if medium.children %}
+          {% if medium.all_children %}
           <ul class="list-group collapse py-2" id="children-{{ medium.id }}">
-          {% for child in medium.children %}
+          {% for child in medium.all_children %}
             <li class="list-group-item font-monospace">{{ child.get_path() }}</li>
           {% endfor %}
           </ul>

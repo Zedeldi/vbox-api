@@ -21,13 +21,22 @@ class Medium(BaseModel, metaclass=ModelRegister):
         return Path(self.location).absolute()
 
     def get_parents(self, include_self: bool = False) -> list["Medium"]:
-        """Recursively return parents of medium."""
+        """Iteratively return parents of medium."""
         parents = [] if not include_self else [self]
         medium = self
         while parent := medium.parent:
             parents.append(parent)
             medium = parent
         return parents
+
+    def get_all_children(self) -> list["Medium"]:
+        """Recursively return a flat list of all children of medium."""
+        if not self.children:  # Base case
+            return [self]
+        children = []
+        for child in self.children:
+            children.extend(child.get_all_children())
+        return children
 
     def get_device_type_name(self) -> str:
         """Return formatted device type name."""
