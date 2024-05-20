@@ -90,3 +90,15 @@ def create() -> Response | str:
 def download(medium: Medium) -> Response | str:
     """Endpoint to download a medium."""
     return send_file(medium.path, as_attachment=True)
+
+
+@medium_blueprint.route("/delete", methods=["GET"])
+@medium_blueprint.route("/<string:name_or_id>/delete", methods=["GET"])
+@requires_session
+@convert_id_to_model("medium")
+def delete(medium: Medium) -> Response | str:
+    """Endpoint to delete a medium."""
+    progress = medium.delete_storage()
+    flash("Deleting medium...", "warning")
+    progress.wait_for_completion(current_app.config["OPERATION_TIMEOUT_MS"])
+    return redirect(url_for("medium.view"))

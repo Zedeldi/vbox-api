@@ -29,6 +29,9 @@
           {% endif %}
           <b>Format: </b>{{ medium.format }}<br>
           <b>Size: </b>{{ medium.logical_size | filesizeformat(binary=True) }}<br>
+          {% if not medium.machine_ids %}
+          <a href="{{ url_for('medium.delete', id=medium.id) }}">Delete</a>
+          {% endif %}
         </li>
         {% else %}
         <li class="list-group-item">
