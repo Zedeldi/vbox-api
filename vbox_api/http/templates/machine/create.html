@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% block title %}Create Machine{% endblock %}
+{% block content %}
+<div class="d-flex">
+  <h3 class="me-auto">Create Machine</h3>
+  <a class="btn btn-outline-danger me-2" href="{{ url_for('dashboard') }}" role="button">Cancel</a>
+</div>
+<hr>
+<div class="row">
+  <ul class="list-group list-group-flush"></ul>
+    <div class="col">
+      <li class="list-group-item">
+        <section id="new">
+          <form method="POST">
+            <div class="input-group mb-3">
+              <span class="input-group-text">Name</span>
+              <input type="text" id="name" name="name" class="form-control" required>
+            </div>
+            <div class="input-group mb-3">
+              <span class="input-group-text">Group</span>
+              <select id="groups" name="groups" class="form-select">
+                {% for group in g.api.machine_groups %}
+                <option value="{{ group }}" {{ "selected" if group == "/" }}>{{ group }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="input-group mb-3">
+              <span class="input-group-text">OS Type</span>
+              <select id="os_type_id" name="os_type_id" class="form-select">
+                {% for os_type_id in g.api.guest_os_type_ids | sort %}
+                <option value="{{ os_type_id }}">{{ os_type_id }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Create</button>
+          </form>
+        </section>
+      </li>
+    </div>
+  </ul>
+</div>
+{% endblock %}

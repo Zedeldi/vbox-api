@@ -5,6 +5,7 @@ from flask import (
     abort,
     current_app,
     flash,
+    g,
     redirect,
     render_template,
     request,
@@ -121,3 +122,16 @@ def delete(machine: Machine) -> Response | str:
     flash("Deleting machine...", "warning")
     progress.wait_for_completion(current_app.config["OPERATION_TIMEOUT_MS"])
     return redirect(url_for("dashboard"))
+
+
+@machine_blueprint.route("/create", methods=["GET", "POST"])
+@requires_session
+def create() -> Response | str:
+    """Endpoint to create a new machine."""
+    if request.method == "POST":
+        name = request.form.get("name")
+        groups = request.form.get("groups", "/")
+        os_type_id = request.form.get("os_type_id", None)
+        machine = g.api.create_machine_with_defaults(name, groups, os_type_id)
+        return redirect(url_for("machine.edit", id=machine.id))
+    return render_template("machine/create.html")

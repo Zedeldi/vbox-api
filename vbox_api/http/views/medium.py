@@ -7,14 +7,14 @@ from flask import (
     current_app,
     flash,
     g,
-    render_template,
     redirect,
+    render_template,
     request,
     send_file,
     url_for,
 )
-from werkzeug.wrappers.response import Response
 from werkzeug.utils import secure_filename
+from werkzeug.wrappers.response import Response
 
 from vbox_api import utils
 from vbox_api.http.session import requires_session
@@ -32,7 +32,7 @@ def get_new_medium_path(name: str | Path) -> Path:
     ).absolute()
 
 
-def create_medium_from_upload() -> "Medium":
+def create_medium_from_upload() -> Medium:
     """Create new medium from uploaded file."""
     device_type = request.form.get("device_type")
     file = request.files["file"]
@@ -45,7 +45,7 @@ def create_medium_from_upload() -> "Medium":
     return medium
 
 
-def create_medium_from_new() -> "Medium":
+def create_medium_from_new() -> Medium:
     """Create new medium from form information."""
     size = int(request.form.get("size") or current_app.config["DEFAULT_MEDIUM_SIZE"])
     format_ = request.form.get("format")

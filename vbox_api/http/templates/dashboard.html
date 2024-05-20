@@ -1,6 +1,11 @@
 {% extends "layout.html" %}
 {% block title %}Dashboard{% endblock %}
 {% block content %}
+<div class="d-flex">
+  <h3 class="me-auto">Dashboard</h3>
+  <a class="btn btn-primary me-2" href="{{ url_for('machine.create') }}" role="button">Create</a>
+</div>
+<hr>
 <div class="row row-cols-1 row-cols-md-4 g-4">
   {% for machine in machines %}
   <div class="col">
