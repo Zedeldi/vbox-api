@@ -98,28 +98,28 @@
           <ul class="list-group list-group-flush">
             {% for storage_controller in machine.storage_controllers %}
             <li class="list-group-item">
-            <b>Controller: </b>{{ storage_controller.name }}<br>
-            {% for medium_attachment in machine.get_medium_attachments_of_controller(storage_controller.name) %}
-            <b>Device: </b>{{ medium_attachment.device }}, <b>Port: </b>{{ medium_attachment.port }}<br>
-            {% if medium_attachment.medium %}
-            {% if medium_attachment.medium.parent %}
-            <div class="dropdown-toggle" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#parents-{{ medium_attachment.medium.id }}">
-            {% else %}
-            <div>
-            {% endif %}
-              <b>{{ medium_attachment.medium.base.get_device_type_name() }}: </b><a href="{{ url_for('medium.download', id=medium_attachment.medium.base.id) }}"><span class="font-monospace">{{ medium_attachment.medium.base.get_path() }}</span></a>
-            </div>
-            {% if medium_attachment.medium.parent %}
-            <ul class="list-group collapse py-2" id="parents-{{ medium_attachment.medium.id }}">
-            {% for parent in medium_attachment.medium.get_parents(include_self=True)[:-1] | reverse %}
-              <li class="list-group-item font-monospace">{{ parent.get_path() }}</li>
-            {% endfor %}
-            </ul>
-            {% endif %}
-            {% else %}
-            <span class="text-muted">No attached mediums.</span><br>
-            {% endif %}
-            {% endfor %}
+              <b>Controller: </b>{{ storage_controller.name }}<br>
+              {% for medium_attachment in machine.get_medium_attachments_of_controller(storage_controller.name) %}
+              <b>Device: </b>{{ medium_attachment.device }}, <b>Port: </b>{{ medium_attachment.port }}<br>
+              {% if medium_attachment.medium %}
+              {% if medium_attachment.medium.parent %}
+              <div class="dropdown-toggle" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#parents-{{ medium_attachment.medium.id }}">
+              {% else %}
+              <div>
+              {% endif %}
+                <b>{{ medium_attachment.medium.base.get_device_type_name() }}: </b><a href="{{ url_for('medium.download', id=medium_attachment.medium.base.id) }}"><span class="font-monospace">{{ medium_attachment.medium.base.get_path() }}</span></a>
+              </div>
+              {% if medium_attachment.medium.parent %}
+              <ul class="list-group collapse py-2" id="parents-{{ medium_attachment.medium.id }}">
+              {% for parent in medium_attachment.medium.get_parents(include_self=True)[:-1] | reverse %}
+                <li class="list-group-item font-monospace">{{ parent.get_path() }}</li>
+              {% endfor %}
+              </ul>
+              {% endif %}
+              {% else %}
+              <span class="text-muted">No attached mediums.</span><br>
+              {% endif %}
+              {% endfor %}
             </li>
             {% endfor %}
           </ul>

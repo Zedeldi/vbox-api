@@ -172,6 +172,36 @@ class Machine(BaseModel, metaclass=ModelRegister):
         handle = self.delete_config(media)
         return self.ctx.get_progress(handle)
 
+    def attach_medium(
+        self,
+        medium: Medium,
+        controller_name: str,
+        controller_port: Optional[int] = None,
+    ) -> None:
+        """Attach medium to controller at next available port, unless specified."""
+        controller_port = controller_port or self._get_next_port_for_storage_controller(
+            controller_name
+        )
+        with self.with_lock(save_settings=True) as locked_machine:
+            locked_machine.attach_device(
+                controller_name, controller_port, 0, medium.device_type, medium
+            )
+
+    def _get_next_port_for_storage_controller(self, controller_name: str) -> int:
+        """Return next available port for storage controller, increasing port_count if necessary."""
+        with self.with_lock(save_settings=True) as locked_machine:
+            storage_controller = locked_machine.get_storage_controller_by_name(
+                controller_name
+            )
+            medium_attachments = locked_machine.get_medium_attachments_of_controller(
+                storage_controller.name
+            )
+            max_port = max(medium_attachments, key=lambda item: item.port).port
+            # port_count is zero-indexed
+            if storage_controller.port_count - 1 < max_port + 1:
+                storage_controller.port_count += 1
+        return max_port + 1
+
     def get_mediums(self) -> list[Medium]:
         """Return list of attached mediums."""
         return [
