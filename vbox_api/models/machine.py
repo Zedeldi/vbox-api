@@ -187,20 +187,31 @@ class Machine(BaseModel, metaclass=ModelRegister):
                 controller_name, controller_port, 0, medium.device_type, medium
             )
 
+    def _get_available_ports_for_storage_controller(
+        self, controller_name: str
+    ) -> set[int]:
+        """Return set of available ports for storage controller."""
+        storage_controller = self.get_storage_controller_by_name(controller_name)
+        medium_attachments = self.get_medium_attachments_of_controller(
+            storage_controller.name
+        )
+        ports_in_use = {attachment.port for attachment in medium_attachments}
+        # Ports are zero-indexed, but port_count starts at one
+        return set(range(0, storage_controller.port_count)) - set(ports_in_use)
+
     def _get_next_port_for_storage_controller(self, controller_name: str) -> int:
         """Return next available port for storage controller, increasing port_count if necessary."""
-        with self.with_lock(save_settings=True) as locked_machine:
-            storage_controller = locked_machine.get_storage_controller_by_name(
+        while not (
+            available_ports := self._get_available_ports_for_storage_controller(
                 controller_name
             )
-            medium_attachments = locked_machine.get_medium_attachments_of_controller(
-                storage_controller.name
-            )
-            max_port = max(medium_attachments, key=lambda item: item.port).port
-            # port_count is zero-indexed
-            if storage_controller.port_count - 1 < max_port + 1:
+        ):
+            with self.with_lock(save_settings=True) as locked_machine:
+                storage_controller = locked_machine.get_storage_controller_by_name(
+                    controller_name
+                )
                 storage_controller.port_count += 1
-        return max_port + 1
+        return min(available_ports)
 
     def get_mediums(self) -> list[Medium]:
         """Return list of attached mediums."""
