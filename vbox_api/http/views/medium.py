@@ -1,11 +1,11 @@
 """Blueprint for medium endpoints."""
 
-from flask import Blueprint, g, render_template, send_file
+from flask import Blueprint, render_template, send_file
 from werkzeug.wrappers.response import Response
 
-from vbox_api.models import Medium
 from vbox_api.http.session import requires_session
 from vbox_api.http.utils import convert_id_to_model
+from vbox_api.models import Medium
 
 medium_blueprint = Blueprint("medium", __name__)
 

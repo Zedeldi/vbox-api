@@ -1,13 +1,10 @@
 """Blueprint for machine endpoints."""
 
-from typing import Optional
-
 from flask import (
     Blueprint,
     abort,
     current_app,
     flash,
-    g,
     redirect,
     render_template,
     request,
@@ -16,9 +13,9 @@ from flask import (
 from werkzeug.wrappers.response import Response
 
 from vbox_api.helpers import WebSocketProxyProcess
-from vbox_api.models import Machine
 from vbox_api.http.session import requires_session
 from vbox_api.http.utils import convert_id_to_model
+from vbox_api.models import Machine
 
 machine_blueprint = Blueprint("machine", __name__)
 
@@ -45,7 +42,7 @@ def start(machine: Machine) -> Response | str:
         progress = machine.start(front_end)
         flash("Starting machine...", "info")
         progress.wait_for_completion(current_app.config["OPERATION_TIMEOUT_MS"])
-    return redirect(url_for("machine.view", name_or_id=machine.id))
+    return redirect(url_for("machine.view", id=machine.id))
 
 
 @machine_blueprint.route("/stop", methods=["GET"])
@@ -65,7 +62,7 @@ def stop(machine: Machine) -> Response | str:
         progress = machine.stop(save_state=save_state)
         flash("Stopping machine...", "info")
         progress.wait_for_completion(current_app.config["OPERATION_TIMEOUT_MS"])
-    return redirect(url_for("machine.view", name_or_id=machine.id))
+    return redirect(url_for("machine.view", id=machine.id))
 
 
 @machine_blueprint.route("/remote", methods=["GET"])
@@ -110,7 +107,7 @@ def edit(machine: Machine) -> Response | str:
         ) as mutable_machine:
             mutable_machine.from_dict(properties)
         flash("Machine saved.", "info")
-        return redirect(url_for("machine.view", name_or_id=machine.id))
+        return redirect(url_for("machine.view", id=machine.id))
     return render_template("machine/edit.html", machine=machine)
 
 
