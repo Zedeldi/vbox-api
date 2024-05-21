@@ -16,6 +16,15 @@
         <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
         <label for="password">Password</label>
       </div>
+      <div class="mb-3">
+        <a class="dropdown-toggle" data-bs-toggle="collapse" href="#advanced-settings">Advanced settings</a>
+        <div class="collapse input-group mt-3" id="advanced-settings">
+          <span class="input-group-text">Host</span>
+          <input type="text" id="host" name="host" class="form-control" placeholder="localhost">
+          <span class="input-group-text">:</span>
+          <input type="number" id="port" name="port" class="form-control" min="1" max="65535" placeholder="18083">
+        </div>
+      </div>
       <button type="submit" class="btn btn-primary w-100">Login</button>
     </div>
   </div>

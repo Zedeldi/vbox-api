@@ -43,7 +43,11 @@ def login() -> Response | str:
     """Endpoint to login to interface."""
     if request.method == "POST":
         username, password = request.form["username"], request.form["password"]
-        if not session_manager.login(username, password):
+        host = (
+            request.form.get("host") or "localhost",
+            request.form.get("port") or 18083,
+        )
+        if not session_manager.login(username, password, host=host):
             flash("Incorrect username or password.", "danger")
         else:
             args = dict(request.args)

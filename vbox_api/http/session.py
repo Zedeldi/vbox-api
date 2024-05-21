@@ -37,9 +37,11 @@ class SessionManager(dict):
             self.logout()
         return api
 
-    def login(self, username: str, password: str) -> bool:
+    def login(
+        self, username: str, password: str, host: Optional[tuple[str, int]] = None
+    ) -> bool:
         """Log in user and return status."""
-        interface = SOAPInterface()
+        interface = SOAPInterface() if not host else SOAPInterface(*host)
         interface.connect()
         api = VBoxAPI(interface)
         if not api.login(username, password):
