@@ -78,15 +78,16 @@ class VirtualBox(BaseModel, metaclass=ModelRegister):
             self.register_machine(machine)
         return machine
 
-    def get_mediums(self, include_children: bool = False) -> set[Medium]:
-        """Return set of all mediums, regardless of device type."""
+    def get_mediums(self, include_children: bool = False) -> list[Medium]:
+        """Return list of all mediums, regardless of device type."""
         mediums = [*self.dvd_images, *self.floppy_images, *self.hard_disks]
         if include_children:
             children = []
             for medium in mediums:
                 children.extend(medium.all_children)
             mediums.extend(children)
-        return set(mediums)
+        # Remove duplicate mediums
+        return list(set(mediums))
 
     def find_medium(self, name_or_id: str) -> Optional[Medium]:
         """Return a Medium object matching the specified name or ID, or None."""
