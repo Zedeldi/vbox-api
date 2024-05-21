@@ -1,3 +1,5 @@
+"""Handle HTTP session and retrieval of associated API instance."""
+
 import functools
 from typing import Callable, Optional
 

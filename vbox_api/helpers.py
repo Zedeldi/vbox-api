@@ -1,3 +1,5 @@
+"""Collection of helpers for external modules for integration with VirtualBox API."""
+
 from multiprocessing import Process
 
 import websockify

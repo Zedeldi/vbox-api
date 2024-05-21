@@ -1,3 +1,5 @@
+"""SOAP interface implementation to VirtualBox API."""
+
 from typing import Optional
 
 import zeep

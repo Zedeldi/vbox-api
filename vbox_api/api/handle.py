@@ -1,3 +1,5 @@
+"""Module to provide methods for handle operations."""
+
 import re
 
 from vbox_api import api

@@ -1,3 +1,5 @@
+"""Entry point of VirtualBox API via an interface and VirtualBox model."""
+
 from typing import Optional
 
 from vbox_api import api

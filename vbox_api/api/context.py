@@ -1,3 +1,5 @@
+"""Module to assist storing current state of operations and models."""
+
 from dataclasses import dataclass
 from typing import Optional
 

@@ -1,3 +1,5 @@
+"""Base interface classes to be used by an interface implementation."""
+
 import re
 from abc import ABC
 from typing import Callable, Optional

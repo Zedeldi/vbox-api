@@ -1,3 +1,12 @@
+"""
+Command-line interface to the VirtualBox API via an InteractiveConsole.
+
+Available objects:
+ - built-ins
+ - api: VBoxAPI
+ - interface: SOAPInterface
+"""
+
 import code
 import readline
 import rlcompleter

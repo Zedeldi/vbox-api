@@ -1,3 +1,5 @@
+"""Class mixins to provide shared functionality across independent classes."""
+
 import functools
 from typing import Callable
 

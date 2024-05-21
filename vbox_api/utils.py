@@ -1,3 +1,5 @@
+"""Collection of miscellaneous functions to use within project."""
+
 import base64
 import re
 import socket
