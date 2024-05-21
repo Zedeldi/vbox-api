@@ -62,9 +62,9 @@ def create_medium_from_new() -> Medium:
 
 @medium_blueprint.route("/", methods=["GET"])
 @requires_session
-def view() -> Response | str:
+def overview() -> Response | str:
     """Endpoint to view all mediums."""
-    return render_template("medium/view.html")
+    return render_template("medium/overview.html")
 
 
 @medium_blueprint.route("/create", methods=["GET", "POST"])
@@ -79,7 +79,7 @@ def create() -> Response | str:
         if medium.state == "NotCreated":
             flash("Could not create medium.", "danger")
             return redirect(request.url)
-        return redirect(url_for("medium.view"))
+        return redirect(url_for("medium.overview"))
     return render_template("medium/create.html", Medium=Medium, utils=utils)
 
 
@@ -101,4 +101,4 @@ def delete(medium: Medium) -> Response | str:
     progress = medium.delete_storage()
     flash("Deleting medium...", "warning")
     progress.wait_for_completion(current_app.config["OPERATION_TIMEOUT_MS"])
-    return redirect(url_for("medium.view"))
+    return redirect(url_for("medium.overview"))

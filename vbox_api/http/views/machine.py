@@ -22,6 +22,13 @@ machine_blueprint = Blueprint("machine", __name__)
 
 
 @machine_blueprint.route("/", methods=["GET"])
+@requires_session
+def overview() -> Response | str:
+    """Endpoint to view all machines."""
+    return render_template("machine/overview.html", machines=g.api.machines)
+
+
+@machine_blueprint.route("/view", methods=["GET"])
 @machine_blueprint.route("/<string:name_or_id>", methods=["GET"])
 @requires_session
 @convert_id_to_model("machine")
@@ -167,7 +174,7 @@ def delete(machine: Machine) -> Response | str:
     progress = machine.delete(delete_config=True)
     flash("Deleting machine...", "warning")
     progress.wait_for_completion(current_app.config["OPERATION_TIMEOUT_MS"])
-    return redirect(url_for("dashboard"))
+    return redirect(url_for("machine.overview"))
 
 
 @machine_blueprint.route("/create", methods=["GET", "POST"])
