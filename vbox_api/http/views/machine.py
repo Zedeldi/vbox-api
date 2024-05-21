@@ -25,7 +25,7 @@ machine_blueprint = Blueprint("machine", __name__)
 @requires_session
 def overview() -> Response | str:
     """Endpoint to view all machines."""
-    return render_template("machine/overview.html", machines=g.api.machines)
+    return render_template("machine/overview.html")
 
 
 @machine_blueprint.route("/view", methods=["GET"])

@@ -47,10 +47,10 @@ def login() -> Response | str:
             flash("Incorrect username or password.", "danger")
         else:
             args = dict(request.args)
-            next = args.pop("next", None)
-            if not next:
+            next_endpoint = args.pop("next", None)
+            if not next_endpoint:
                 return redirect(url_for("dashboard"))
-            return redirect(url_for(next, **args))
+            return redirect(url_for(next_endpoint, **args))
     return render_template("login.html")
 
 

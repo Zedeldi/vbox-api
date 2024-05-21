@@ -3,24 +3,33 @@
 {% block content %}
 <div class="d-flex">
   <h3 class="me-auto">Dashboard</h3>
-  <a class="btn btn-primary me-2" href="{{ url_for('machine.create') }}" role="button">Create</a>
 </div>
 <hr>
-<div class="row row-cols-1 row-cols-md-4 g-4">
-  {% for machine in machines %}
+<div class="row">
   <div class="col">
-    <div class="card h-100">
-      <img src="{{ machine.get_thumbnail(data_uri=True) }}" class="card-img-top" alt="Thumbnail for {{ machine.name }}">
+    <div class="card">
       <div class="card-body">
-        <h5 class="card-title"><a href="{{ url_for('machine.view', id=machine.id) }}">{{ machine.name }}</a></h5>
-        <p class="card-text">
-          <span class="badge text-bg-{{ ['secondary', 'success', 'warning', 'danger'][machine.get_health()] }}">{{ machine.get_state_name() }}</span>
-          <br>
-          Group: {{ machine.groups[0] }}
-        </p>
+        <h5 class="card-title">Machines</h5>
+        <p class="card-text">Count: {{ g.api.machines | length }}</p>
+      </div>
+      <ul class="list-group list-group-flush">
+        {% for health, machines in g.api.machines | groupby("health") %}
+        <li class="list-group-item">{{ health.name | replace("_", " ") | title }}: {{ machines | length }}</li>
+        {% endfor %}
+      </ul>
+      <div class="card-body">
+        <a href="{{ url_for('machine.overview') }}" class="btn btn-primary">View</a>
       </div>
     </div>
   </div>
-  {% endfor %}
+  <div class="col">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Mediums</h5>
+        <p class="card-text">Count: {{ g.api.mediums | length }}</p>
+        <a href="{{ url_for('medium.overview') }}" class="btn btn-primary">View</a>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
