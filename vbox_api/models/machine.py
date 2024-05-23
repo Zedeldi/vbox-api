@@ -177,6 +177,7 @@ class Machine(BaseModel, metaclass=ModelRegister):
     def clone(
         self,
         name: str,
+        groups: list[str] = ["/"],
         mode: Literal[
             "MachineState", "MachineAndChildStates", "AllStates"
         ] = "MachineState",
@@ -192,7 +193,7 @@ class Machine(BaseModel, metaclass=ModelRegister):
     ):
         """Clone machine to new machine with specified name."""
         cloned_machine = self.ctx.api.create_machine_with_defaults(
-            name, apply_defaults=False, register_machine=False
+            name, groups, apply_defaults=False, register_machine=False
         )
         progress = self.clone_to(cloned_machine, mode, options)
         progress.wait_for_completion(-1)

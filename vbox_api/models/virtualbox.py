@@ -65,7 +65,7 @@ class VirtualBox(BaseModel, metaclass=ModelRegister):
     def create_machine_with_defaults(
         self,
         name: str,
-        groups: str = "/",
+        groups: list[str] = ["/"],
         os_type_id: Optional[str] = None,
         apply_defaults: bool = True,
         register_machine: bool = True,
