@@ -2,7 +2,11 @@
 {% block title %}{{ machine.name }}{% endblock %}
 {% block content %}
 <div class="d-flex">
-  <h3 class="me-auto">{{ machine.name }}</h3>
+  <h3>{{ machine.name }}</h3>
+  {% if machine.current_snapshot %}
+  <span class="ms-2 align-self-center text-muted">({{ machine.current_snapshot.name }})</span>
+  {% endif %}
+  <span class="me-auto"></span>
   {% if machine.state in ("PoweredOff", "Saved", "Aborted") %}
   <a class="btn btn-outline-danger me-2" href="{{ url_for('machine.delete', id=machine.id) }}" role="button">Delete</a>
   <div class="vr me-2"></div>
