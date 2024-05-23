@@ -67,13 +67,15 @@ class VirtualBox(BaseModel, metaclass=ModelRegister):
         name: str,
         groups: str = "/",
         os_type_id: Optional[str] = None,
+        apply_defaults: bool = True,
         register_machine: bool = True,
     ) -> Machine:
         """Create machine with specified name and default settings for OS type."""
         if os_type_id is None:
             os_type_id = ""
         machine = self.create_machine("", name, groups, os_type_id, "", "", "", "")
-        machine.apply_defaults("")
+        if apply_defaults:
+            machine.apply_defaults("")
         if register_machine:
             self.register_machine(machine)
         return machine

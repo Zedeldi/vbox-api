@@ -58,8 +58,8 @@ class Machine(BaseModel, metaclass=ModelRegister):
     @requires_session
     def start(self, front_end: Literal["gui", "headless", "sdl"] = "gui") -> Progress:
         """Start virtual machine with specified front_end."""
-        handle = self.launch_vm_process(self.session.handle, front_end)
-        return self.ctx.get_progress(handle)
+        progress = self.launch_vm_process(self.session.handle, front_end)
+        return progress
 
     @requires_session
     def stop(self, save_state: bool = False) -> Progress:
@@ -70,10 +70,10 @@ class Machine(BaseModel, metaclass=ModelRegister):
         """
         with self.with_lock():
             if save_state:
-                handle = self.session.machine.save_state()
+                progress = self.session.machine.save_state()
             else:
-                handle = self.session.console.power_down()
-            return self.ctx.get_progress(handle)
+                progress = self.session.console.power_down()
+            return progress
 
     @requires_session
     def discard_state(self, remove_file: bool = True) -> None:
@@ -171,8 +171,34 @@ class Machine(BaseModel, metaclass=ModelRegister):
         media = self.unregister(cleanup_mode)
         if not delete_config:
             return None
-        handle = self.delete_config(media)
-        return self.ctx.get_progress(handle)
+        progress = self.delete_config(media)
+        return progress
+
+    def clone(
+        self,
+        name: str,
+        mode: Literal[
+            "MachineState", "MachineAndChildStates", "AllStates"
+        ] = "MachineState",
+        options: list[
+            Literal[
+                "Link",
+                "KeepAllMACs",
+                "KeepNATMACs",
+                "KeepDiskNames",
+                "KeepHwUUIDs",
+            ]
+        ] = [],
+    ):
+        """Clone machine to new machine with specified name."""
+        cloned_machine = self.ctx.api.create_machine_with_defaults(
+            name, apply_defaults=False, register_machine=False
+        )
+        progress = self.clone_to(cloned_machine, mode, options)
+        progress.wait_for_completion(-1)
+        cloned_machine.save_settings()
+        self.ctx.api.register_machine(cloned_machine)
+        return cloned_machine
 
     def attach_medium(
         self,
