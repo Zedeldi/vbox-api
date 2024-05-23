@@ -10,6 +10,9 @@ from vbox_api.mixins import PropertyMixin
 class BaseInterface(ABC):
     """Define abstract base class for interface."""
 
+    _INTERFACE_NAME_PREFIXES = ["get", "set", "find", "current", "create", "on", "i"]
+    _INTERFACE_NAME_SUFFIXES = ["byid", "byname", "bygroups"]
+
     def _register_interface(
         self, interface_name: str, proxy_interface: "ProxyInterface"
     ) -> None:
@@ -20,23 +23,14 @@ class BaseInterface(ABC):
             )
         setattr(self, interface_name, proxy_interface)
 
-    @staticmethod
-    def get_matches(interface_name: str) -> set[str]:
+    @classmethod
+    def get_matches(cls, interface_name: str) -> set[str]:
         """Return case-folded set of strings to match interface name."""
-        interface_name = (
-            interface_name.casefold()
-            .replace("_", "")
-            .removeprefix("get")
-            .removeprefix("set")
-            .removeprefix("find")
-            .removeprefix("current")
-            .removeprefix("create")
-            .removeprefix("i")
-            .removeprefix("on")
-            .removesuffix("byid")
-            .removesuffix("byname")
-            .removesuffix("bygroups")
-        )
+        interface_name = interface_name.casefold().replace("_", "")
+        for prefix in cls._INTERFACE_NAME_PREFIXES:
+            interface_name = interface_name.removeprefix(prefix)
+        for suffix in cls._INTERFACE_NAME_SUFFIXES:
+            interface_name = interface_name.removesuffix(suffix)
         matches = {
             interface_name,
             interface_name.removesuffix("s"),
