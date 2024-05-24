@@ -5,6 +5,7 @@ from getpass import getpass, getuser
 import pytest
 
 from vbox_api import SOAPInterface, VBoxAPI
+from vbox_api.models import Machine
 
 interface = SOAPInterface()
 interface.connect()
@@ -19,7 +20,7 @@ def api() -> VBoxAPI:
 
 
 @pytest.fixture
-def random_machine(api: VBoxAPI) -> "Machine":
+def random_machine(api: VBoxAPI) -> Machine:
     """Return random machine of API."""
     return random.choice(api.machines)
 
