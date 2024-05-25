@@ -6,7 +6,13 @@ using an interface instance.
 """
 
 from vbox_api.models.audio import AudioSettings
-from vbox_api.models.event import Event, EventListener, EventSource
+from vbox_api.models.event import (
+    Event,
+    EventListener,
+    EventListenerLoop,
+    EventSource,
+    PassiveEventListener,
+)
 from vbox_api.models.machine import Machine
 from vbox_api.models.medium import Medium
 from vbox_api.models.network import NetworkAdapter
@@ -19,10 +25,12 @@ __all__ = [
     "AudioSettings",
     "Event",
     "EventListener",
+    "EventListenerLoop",
     "EventSource",
     "Machine",
     "Medium",
     "NetworkAdapter",
+    "PassiveEventListener",
     "Progress",
     "Session",
     "VirtualBox",
