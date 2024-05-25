@@ -1,7 +1,7 @@
 """Class mixins to provide shared functionality across independent classes."""
 
 import functools
-from typing import Callable
+from typing import Any, Callable
 
 
 class PropertyMixin:
@@ -10,7 +10,7 @@ class PropertyMixin:
     @property
     def _bound_methods(self) -> dict[str, Callable]:
         """Return dict of bound methods."""
-        methods = {}
+        methods: dict[str, Callable[..., Any]] = {}
         for cls in (self.__class__, *self.__class__.__bases__):
             for name, method in filter(
                 lambda item: callable(item[1]), cls.__dict__.items()

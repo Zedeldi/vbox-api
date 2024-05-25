@@ -29,7 +29,7 @@ class MachinePool(Queue):
         """Clone machine and add to pool."""
         if self.full():
             raise ValueError("Machine pool has reached maximum size")
-        machine_name = uuid4()
+        machine_name = str(uuid4())
         cloned_machine = self.base.clone(machine_name, self.group)
         self.put(cloned_machine)
         return cloned_machine

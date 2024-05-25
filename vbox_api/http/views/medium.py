@@ -32,7 +32,7 @@ def get_new_medium_path(name: str | Path) -> Path:
     ).absolute()
 
 
-def create_medium_from_upload() -> Medium:
+def create_medium_from_upload() -> Medium | Response:
     """Create new medium from uploaded file."""
     device_type = request.form.get("device_type")
     file = request.files["file"]
