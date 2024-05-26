@@ -177,6 +177,17 @@ def delete(machine: Machine) -> Response | str:
     return redirect(url_for("machine.overview"))
 
 
+@machine_blueprint.route("/clone", methods=["GET"])
+@machine_blueprint.route("/<string:name_or_id>/clone", methods=["GET"])
+@requires_session
+@convert_id_to_model("machine")
+def clone(machine: Machine) -> Response | str:
+    """Endpoint to clone a specified machine."""
+    cloned_machine = machine.clone(f"{machine.name} - Clone")
+    flash("Cloned machine.", "info")
+    return redirect(url_for("machine.view", id=cloned_machine.id))
+
+
 @machine_blueprint.route("/create", methods=["GET", "POST"])
 @requires_session
 def create() -> Response | str:

@@ -12,6 +12,7 @@
   <div class="vr me-2"></div>
   <a class="btn btn-secondary me-2" href="{{ url_for('machine.edit', id=machine.id) }}" role="button">Edit</a>
   {% endif %}
+  <a class="btn btn-secondary me-2" href="{{ url_for('machine.clone', id=machine.id) }}" role="button">Clone</a>
   <div class="btn-group">
     {% if machine.state == "Running" and machine.vrde_server.enabled and machine.vrde_server.protocol.lower() == "vnc" %}
     <a class="btn btn-outline-primary" href="{{ url_for('machine.remote', id=machine.id) }}" target="_blank" rel="noopener noreferrer" role="button">Remote Control</a>
