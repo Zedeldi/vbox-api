@@ -1,7 +1,8 @@
 """
 Constants for the VirtualBox API.
 
-Generated from VirtualBox WSDL definitions.
+Generated from VirtualBox WSDL definitions, with added enumerations for those
+not currently specified but used internally, such as MachineFrontend.
 """
 
 from enum import StrEnum
@@ -73,6 +74,15 @@ class MachineState(StrEnum):
     LAST_ONLINE = "LastOnline"
     FIRST_TRANSIENT = "FirstTransient"
     LAST_TRANSIENT = "LastTransient"
+
+
+class MachineFrontend(StrEnum):
+    """Enumeration for MachineFrontend."""
+
+    GUI = "gui"
+    HEADLESS = "headless"
+    SDL = "sdl"
+    EMERGENCY_STOP = "emergencystop"
 
 
 class SessionState(StrEnum):
@@ -1272,6 +1282,14 @@ class MediumType(StrEnum):
     MULTI_ATTACH = "MultiAttach"
 
 
+class MediumDeviceType(StrEnum):
+    """Enumeration for MediumDeviceType."""
+
+    FLOPPY = "Floppy"
+    DVD = "DVD"
+    HARD_DISK = "HardDisk"
+
+
 class MediumVariant(StrEnum):
     """Enumeration for MediumVariant."""
 
@@ -1806,3 +1824,10 @@ class CloudImageState(StrEnum):
     EXPORTING = "Exporting"
     DISABLED = "Disabled"
     DELETED = "Deleted"
+
+
+class VrdeExtPack(StrEnum):
+    """Enumeration for VrdeExtPack."""
+
+    ORACLE_VM_VIRTUALBOX_EXTENSION_PACK = "Oracle VM VirtualBox Extension Pack"
+    VNC = "VNC"

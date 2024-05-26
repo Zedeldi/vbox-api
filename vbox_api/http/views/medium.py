@@ -17,6 +17,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.wrappers.response import Response
 
 from vbox_api import utils
+from vbox_api.constants import AccessMode, MediumState
 from vbox_api.http.session import requires_session
 from vbox_api.http.utils import convert_id_to_model
 from vbox_api.models import Medium
@@ -41,7 +42,7 @@ def create_medium_from_upload() -> Medium | Response:
         return redirect(request.url)
     path = get_new_medium_path(file.filename)
     file.save(path)
-    medium = g.api.open_medium(path, device_type, "ReadWrite", False)
+    medium = g.api.open_medium(path, device_type, AccessMode.READ_WRITE, False)
     return medium
 
 
@@ -55,7 +56,7 @@ def create_medium_from_new() -> Medium:
     )
     path = get_new_medium_path(name)
     medium = g.api.create_medium_with_defaults(
-        path, size, format_, "ReadWrite", device_type
+        path, size, format_, AccessMode.READ_WRITE, device_type
     )
     return medium
 
@@ -76,11 +77,11 @@ def create() -> Response | str:
             medium = create_medium_from_upload()
         else:
             medium = create_medium_from_new()
-        if medium.state == "NotCreated":
+        if medium.state == MediumState.NOT_CREATED:
             flash("Could not create medium.", "danger")
             return redirect(request.url)
         return redirect(url_for("medium.overview"))
-    return render_template("medium/create.html", Medium=Medium, utils=utils)
+    return render_template("medium/create.html", utils=utils)
 
 
 @medium_blueprint.route("/download", methods=["GET"])

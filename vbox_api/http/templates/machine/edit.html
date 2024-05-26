@@ -99,7 +99,7 @@
               <div class="input-group mb-3">
                 <span class="input-group-text">Extension Pack</span>
                 <select id="vrde_server.vrde_ext_pack" name="vrde_server.vrde_ext_pack" class="form-select">
-                  {% for ext_pack in machine.vrde_server.KNOWN_EXT_PACKS %}
+                  {% for ext_pack in g.constants.VrdeExtPack %}
                   <option value="{{ ext_pack }}" {{ "selected" if machine.vrde_server.vrde_ext_pack == ext_pack }}>{{ ext_pack }}</option>
                   {% endfor %}
                 </select>

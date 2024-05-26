@@ -33,8 +33,8 @@
             <div class="input-group mb-3">
               <span class="input-group-text">Device Type</span>
               <select id="device_type-new" name="device_type" class="form-select">
-                {% for device_type in Medium.DEVICE_TYPES %}
-                <option value="{{ device_type }}" {{ "selected" if device_type == "HardDisk" }}>{{ utils.split_pascal_case(device_type) }}</option>
+                {% for device_type in g.constants.MediumDeviceType %}
+                <option value="{{ device_type }}" {{ "selected" if device_type == g.constants.MediumDeviceType.HARD_DISK }}>{{ utils.split_pascal_case(device_type) }}</option>
                 {% endfor %}
               </select>
             </div>
@@ -54,8 +54,8 @@
             <div class="input-group mb-3">
               <span class="input-group-text">Device Type</span>
               <select id="device_type-upload" name="device_type" class="form-select">
-                {% for device_type in Medium.DEVICE_TYPES %}
-                <option value="{{ device_type }}" {{ "selected" if device_type == "HardDisk" }}>{{ utils.split_pascal_case(device_type) }}</option>
+                {% for device_type in g.constants.MediumDeviceType %}
+                <option value="{{ device_type }}" {{ "selected" if device_type == g.constants.MediumDeviceType.HARD_DISK }}>{{ utils.split_pascal_case(device_type) }}</option>
                 {% endfor %}
               </select>
             </div>

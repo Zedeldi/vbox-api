@@ -4,6 +4,7 @@ from flask import Flask, flash, g, redirect, render_template, request, url_for
 from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers.response import Response
 
+from vbox_api import constants
 from vbox_api.http import config
 from vbox_api.http.session import SessionManager, requires_session
 from vbox_api.http.views import blueprints
@@ -23,6 +24,7 @@ def load_session() -> None:
     g.session_manager = session_manager
     g.api = session_manager.api
     g.username = session_manager.username
+    g.constants = constants
 
 
 @app.errorhandler(HTTPException)

@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Literal, get_args
 
 from vbox_api.models.base import BaseModel, ModelRegister
 from vbox_api.utils import split_pascal_case
@@ -13,10 +12,6 @@ class Medium(BaseModel, metaclass=ModelRegister):
         "Children": "IMedium",
         "Parent": "IMedium",
     }
-    ACCESS_MODES_TYPE = Literal["ReadWrite", "ReadOnly"]
-    ACCESS_MODES = get_args(ACCESS_MODES_TYPE)
-    DEVICE_TYPES_TYPE = Literal["HardDisk", "DVD", "Floppy"]
-    DEVICE_TYPES = get_args(DEVICE_TYPES_TYPE)
 
     def get_path(self) -> Path:
         """Get Path instance for medium instance physical location."""

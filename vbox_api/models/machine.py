@@ -5,11 +5,18 @@ from collections.abc import Iterable, Iterator
 from contextlib import contextmanager
 from datetime import datetime
 from enum import IntEnum
-from typing import Any, Callable, Literal, Optional
+from typing import Any, Callable, Optional
 
 from PIL import Image
 
 from vbox_api import api
+from vbox_api.constants import (
+    CleanupMode,
+    CloneMode,
+    CloneOptions,
+    LockType,
+    MachineFrontend,
+)
 from vbox_api.models.base import BaseModel, ModelRegister
 from vbox_api.models.medium import Medium
 from vbox_api.models.network import NetworkAdapter
@@ -56,7 +63,7 @@ class Machine(BaseModel, metaclass=ModelRegister):
         self.session = session or self.ctx.get_session()
 
     @requires_session
-    def start(self, front_end: Literal["gui", "headless", "sdl"] = "gui") -> Progress:
+    def start(self, front_end: MachineFrontend = MachineFrontend.GUI) -> Progress:
         """Start virtual machine with specified front_end."""
         progress = self.launch_vm_process(self.session.handle, front_end)
         return progress
@@ -88,7 +95,7 @@ class Machine(BaseModel, metaclass=ModelRegister):
             self.session.console.reset()
 
     @requires_session
-    def restart(self, front_end: Literal["gui", "headless", "sdl"] = "gui") -> Progress:
+    def restart(self, front_end: MachineFrontend = MachineFrontend.GUI) -> Progress:
         """Stop machine and restart with specified front_end."""
         progress = self.stop()
         progress.wait_for_completion(-1)
@@ -117,7 +124,7 @@ class Machine(BaseModel, metaclass=ModelRegister):
         return self.stop()
 
     @requires_session
-    def lock(self, lock_type: Literal["Write", "Shared"] = "Shared") -> "Machine":
+    def lock(self, lock_type: LockType = LockType.SHARED) -> "Machine":
         """Lock machine and return mutable machine instance."""
         if self.session.state == "Locked":
             return self.session.machine
@@ -137,7 +144,7 @@ class Machine(BaseModel, metaclass=ModelRegister):
     @requires_session
     def with_lock(
         self,
-        lock_type: Literal["Write", "Shared"] = "Shared",
+        lock_type: LockType = LockType.SHARED,
         save_settings: bool = False,
         force_unlock: bool = False,
     ) -> Iterator["Machine"]:
@@ -159,12 +166,7 @@ class Machine(BaseModel, metaclass=ModelRegister):
 
     def delete(
         self,
-        cleanup_mode: Literal[
-            "UnregisterOnly",
-            "DetachAllReturnNone",
-            "DetachAllReturnHardDisksOnly",
-            "Full",
-        ] = "DetachAllReturnHardDisksOnly",
+        cleanup_mode: CleanupMode = CleanupMode.DETACH_ALL_RETURN_HARD_DISKS_ONLY,
         delete_config: bool = True,
     ) -> Optional[Progress]:
         """Delete and unregister machine with specified cleanup mode."""
@@ -178,18 +180,8 @@ class Machine(BaseModel, metaclass=ModelRegister):
         self,
         name: str,
         groups: list[str] = ["/"],
-        mode: Literal[
-            "MachineState", "MachineAndChildStates", "AllStates"
-        ] = "MachineState",
-        options: list[
-            Literal[
-                "Link",
-                "KeepAllMACs",
-                "KeepNATMACs",
-                "KeepDiskNames",
-                "KeepHwUUIDs",
-            ]
-        ] = [],
+        mode: CloneMode = CloneMode.MACHINE_STATE,
+        options: list[CloneOptions] = [],
     ):
         """Clone machine to new machine with specified name."""
         cloned_machine = self.ctx.api.create_machine_with_defaults(

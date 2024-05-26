@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Optional
 
+from vbox_api.constants import AccessMode, MediumDeviceType
 from vbox_api.models.base import BaseModel, ModelRegister
 from vbox_api.models.machine import Machine
 from vbox_api.models.medium import Medium
@@ -103,8 +104,8 @@ class VirtualBox(BaseModel, metaclass=ModelRegister):
         location: str | Path,
         logical_size: int,
         format_: Optional[str] = None,
-        access_mode: Medium.ACCESS_MODES_TYPE = "ReadWrite",
-        device_type: Medium.DEVICE_TYPES_TYPE = "HardDisk",
+        access_mode: AccessMode = AccessMode.READ_WRITE,
+        device_type: MediumDeviceType = MediumDeviceType.HARD_DISK,
     ) -> "Medium":
         """Create medium with specified location and size, with default settings."""
         location = Path(location).absolute()
