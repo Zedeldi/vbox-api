@@ -126,7 +126,7 @@ class Machine(BaseModel, metaclass=ModelRegister):
     @requires_session
     def lock(self, lock_type: LockType = LockType.SHARED) -> "Machine":
         """Lock machine and return mutable machine instance."""
-        if self.session.state == "Locked":
+        if self.session.is_locked:
             return self.session.machine
         self.lock_machine(self.session.handle, lock_type)
         locked_machine = self.session.get_machine()
@@ -155,7 +155,7 @@ class Machine(BaseModel, metaclass=ModelRegister):
         If the machine is already locked, it will not be automatically unlocked,
         unless force_unlock is True.
         """
-        unlock_on_exit = self.session.state != "Locked" or force_unlock
+        unlock_on_exit = (not self.session.is_locked) or force_unlock
         try:
             yield self.lock(lock_type)
         finally:
