@@ -15,6 +15,9 @@ Several methods have been added to models to assist with common operations, and 
 
 `vbox_api.http` includes a Flask application to view and manage virtual machines over HTTP.
 
+`vbox_api.constants` defines many enumerations, mostly generated from the VirtualBox WSDL XML, with added enumerations for those not currently specified but used internally, such as `MachineFrontend`.
+These can be used as a reference for expected values to/from the VirtualBox interface, when type hinting or passing values.
+
 `vbox_api.helpers` includes a class, `WebSocketProxyProcess`, to wrap `websockify.WebSocketProxy`, allowing remote control of a virtual machine over HTTP, accessible from the web interface.
 `vrde_ext_pack` must be set to `VNC` and [noVNC](https://novnc.com) must be available.
 
@@ -65,6 +68,10 @@ Libraries:
 
 ## Usage
 
+In the following examples, `api` refers to a `VBoxAPI` (or `VirtualBox` model) instance.
+
+### Machine
+
 Get machine information:
 
 ```py
@@ -75,7 +82,7 @@ for machine in api.machines:
 Wait for machine to start in headless mode:
 
 ```py
-progress = machine.start(front_end="headless")
+progress = machine.start(front_end="headless")  # or MachineFrontend.HEADLESS
 progress.wait_for_completion(-1)
 ```
 
@@ -90,11 +97,39 @@ assert machine.name == "Machine Name"
 ```
 
 Create machine with default settings for Windows 11:
+
 ```py
 machine = api.create_machine_with_defaults(
     name="Windows 11",
     os_type_id="Windows11_64",
 )
+```
+
+Clone machine:
+
+```py
+cloned_machine = machine.clone(f"{machine.name} - Clone")
+```
+
+Teleport machine to another on the same host, with a password:
+
+```py
+# Configure then start target machine
+target_machine.teleport_listen(port=6000, password="password")
+target_machine.start()
+
+# Start then teleport source machine to target machine
+source_machine.start()
+source_machine.teleport_to(host="localhost", port=6000, password="password")
+```
+
+### Medium
+
+Get medium information:
+
+```py
+for medium in api.mediums:  # or specify dvd_images, floppy_images, hard_disks
+    print(medium.to_dict())
 ```
 
 Create hard-disk medium:
