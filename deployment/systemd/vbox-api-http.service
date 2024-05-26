@@ -1,0 +1,11 @@
+[Unit]
+Description=VirtualBox API Web Interface
+After=network.target
+
+[Service]
+EnvironmentFile=/etc/vbox-api-http.conf
+ExecStart=/usr/bin/gunicorn -b "${HOST}:${PORT}" -w "${WORKERS}" vbox_api.http:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -91,3 +91,18 @@ venv/
 */*.swp
 */*/*.swp
 */*/*/*.swp
+
+# Arch Linux packaging
+*.tar
+*.tar.*
+*.jar
+*.exe
+*.msi
+*.zip
+*.tgz
+*.log
+*.log.*
+*.sig
+
+pkg/
+src/
