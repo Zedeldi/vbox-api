@@ -193,6 +193,43 @@ class Machine(BaseModel, metaclass=ModelRegister):
         self.ctx.api.register_machine(cloned_machine)
         return cloned_machine
 
+    @requires_session
+    def teleport_to(
+        self,
+        host: str,
+        port: int,
+        password: Optional[str] = None,
+        max_downtime_ms: int = 250,
+    ) -> Progress:
+        """
+        Teleport running machine to specified host and port.
+
+        Target host must be listening for incoming teleportation.
+        """
+        if password is None:
+            password = ""
+        self.session.console.teleport(host, port, password, max_downtime_ms)
+
+    def teleport_listen(
+        self,
+        port: int,
+        address: Optional[str] = None,
+        password: Optional[str] = None,
+    ) -> None:
+        """
+        Enable listening for incoming teleportation on next launch.
+
+        If address is not specified, listen on all addresses.
+        """
+        if address is None:
+            address = ""  # Listen on all addresses
+        with self.with_lock(save_settings=True) as locked_machine:
+            locked_machine.teleporter_enabled = True
+            locked_machine.teleporter_port = port
+            locked_machine.teleporter_address = address
+            if password:
+                locked_machine.teleporter_password = password
+
     def attach_medium(
         self,
         medium: Medium,
