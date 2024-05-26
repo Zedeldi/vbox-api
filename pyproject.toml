@@ -34,3 +34,6 @@ vbox-api-http = "vbox_api.http.__main__:main"
 
 [tool.isort]
 profile = "black"
+
+[tool.setuptools.packages.find]
+include = ["vbox_api*"]
