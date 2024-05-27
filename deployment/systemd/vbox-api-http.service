@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 EnvironmentFile=/etc/vbox-api-http.conf
-ExecStart=/usr/bin/gunicorn -b "${HOST}:${PORT}" -w "${WORKERS}" vbox_api.http:app
+ExecStart=/usr/bin/gunicorn -b "${HOST}:${PORT}" -w "${WORKERS}" --threads "${THREADS}" vbox_api.http:app
 Restart=always
 
 [Install]
