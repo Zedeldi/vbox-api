@@ -12,6 +12,7 @@ optdepends=("novnc: remote control support")
 makedepends=("python-build" "python-installer" "python-setuptools" "python-wheel")
 provides=("vbox-api")
 conflicts=("vbox-api")
+backup=("etc/vbox-api-http.conf")
 source=("${pkgname}::git+https://github.com/Zedeldi/vbox-api.git")
 b2sums=("SKIP")
 
