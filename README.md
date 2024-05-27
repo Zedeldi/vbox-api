@@ -66,7 +66,18 @@ Libraries:
 - [Pillow](https://pypi.org/project/pillow/) - image support
 - [websockify](https://pypi.org/project/websockify/) - remote control
 
+### PKGBUILD
+
+1. Build and install the package: `makepkg -si`
+2. Run: `vbox-api-cli` (CLI) or `vbox-api-http` (HTTP)
+   - The HTTP interface can also be started using a systemd unit: `systemctl start vbox-api-http`
+
+Note: if the optional dependency `novnc` is installed from the AUR, HTTP remote control will be available out of the box.
+
 ## Usage
+
+Ensure that `vboxwebsrv` is running as the intended user.
+The `virtualbox` package also provides a systemd unit for this: `systemctl start vboxweb`.
 
 In the following examples, `api` refers to a `VBoxAPI` (or `VirtualBox` model) instance.
 
