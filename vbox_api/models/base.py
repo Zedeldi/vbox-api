@@ -69,6 +69,10 @@ class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
         """Return handle for string representation of instance if set."""
         return str(self.handle) if self.handle else repr(self)
 
+    def __bool__(self) -> bool:
+        """Return whether handle is valid."""
+        return bool(self.handle)
+
     def __getattr__(self, name: str) -> Any:
         """Handle getting model attributes at runtime."""
         try:
