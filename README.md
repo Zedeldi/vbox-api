@@ -57,13 +57,14 @@ After cloning the repository with: `git clone https://github.com/Zedeldi/vbox-ap
 ### Development
 
 1. Install dependencies: `pip install -r requirements.txt`
-2. Run: `python -m vbox_api` (CLI) or `python -m vbox_api.http` (HTTP)
+2. Run: `python -m vbox_api.cli` (CLI) or `python -m vbox_api.http` (HTTP)
 
 Libraries:
 
 - [Zeep](https://pypi.org/project/zeep/) - SOAP client
 - [Flask](https://pypi.org/project/Flask/) - HTTP interface
 - [Pillow](https://pypi.org/project/pillow/) - image support
+- [psutil](https://pypi.org/project/psutil/) - process information
 - [websockify](https://pypi.org/project/websockify/) - remote control
 
 ### PKGBUILD

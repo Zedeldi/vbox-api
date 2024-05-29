@@ -18,6 +18,7 @@ dependencies = [
   "Flask",
   "pillow",
   "zeep",
+  "psutil",
   "websockify"
 ]
 requires-python = ">= 3.10"
@@ -29,7 +30,7 @@ tests = ["pytest"]
 Homepage = "https://github.com/Zedeldi/vbox-api"
 
 [project.scripts]
-vbox-api-cli = "vbox_api.__main__:main"
+vbox-api-cli = "vbox_api.cli.__main__:main"
 vbox-api-http = "vbox_api.http.__main__:main"
 
 [tool.isort]

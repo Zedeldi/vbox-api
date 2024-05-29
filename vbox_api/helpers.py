@@ -1,17 +1,36 @@
 """Collection of helpers for external modules for integration with VirtualBox API."""
 
+import os
 import subprocess
 from multiprocessing import Process
+from typing import Optional
 
+import psutil
 import websockify
 
 from vbox_api.utils import get_available_port, get_fqdn
 
 
-def start_vboxwebsrv(*args, **kwargs) -> subprocess.Popen:
+def get_vboxwebsrv_process(*args, **kwargs) -> Optional[psutil.Process]:
+    """Return process for vboxwebsrv, if running."""
+    for proc in psutil.process_iter():
+        if "vboxwebsrv" == proc.name().lower():
+            return proc
+    return None
+
+
+def start_vboxwebsrv(*args, **kwargs) -> Optional[subprocess.Popen]:
     """Start vboxwebsrv with specified arguments."""
+    if get_vboxwebsrv_process():
+        return None
+
+    vboxwebsrv = (
+        r"C:\Program Files\Oracle\VirtualBox\VBoxWebSrv.exe"
+        if os.name == "nt"
+        else "/usr/bin/vboxwebsrv"
+    )
     return subprocess.Popen(
-        ["/usr/bin/vboxwebsrv", *args],
+        [vboxwebsrv, *args],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.STDOUT,
         **kwargs,
