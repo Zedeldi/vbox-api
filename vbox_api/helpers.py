@@ -1,10 +1,21 @@
 """Collection of helpers for external modules for integration with VirtualBox API."""
 
+import subprocess
 from multiprocessing import Process
 
 import websockify
 
 from vbox_api.utils import get_available_port, get_fqdn
+
+
+def start_vboxwebsrv(*args, **kwargs) -> subprocess.Popen:
+    """Start vboxwebsrv with specified arguments."""
+    return subprocess.Popen(
+        ["/usr/bin/vboxwebsrv", *args],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.STDOUT,
+        **kwargs,
+    )
 
 
 class WebSocketProxyProcess(Process):
