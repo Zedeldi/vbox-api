@@ -14,12 +14,6 @@ class VirtualBox(BaseModel, metaclass=ModelRegister):
     This model is the main entry-point of the API.
     """
 
-    _PROPERTY_INTERFACE_ALIASES: dict[str, str] = {
-        "DVDImages": "IMedium",
-        "HardDisks": "IMedium",
-        "FloppyImages": "IMedium",
-    }
-
     def login(self, username: str, password: str, force: bool = False) -> bool:
         """
         Login with specified username and password.

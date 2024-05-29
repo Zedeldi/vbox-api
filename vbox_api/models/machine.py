@@ -48,8 +48,6 @@ class MachineHealth(IntEnum):
 class Machine(BaseModel, metaclass=ModelRegister):
     """Class to handle machine attributes and methods."""
 
-    _PROPERTY_INTERFACE_ALIASES: dict[str, str] = {"NonVolatileStore": "INvramStore"}
-
     def __init__(
         self,
         ctx: "api.Context",

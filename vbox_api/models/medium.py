@@ -7,12 +7,6 @@ from vbox_api.utils import split_pascal_case
 class Medium(BaseModel, metaclass=ModelRegister):
     """Class to handle medium attributes and methods."""
 
-    _PROPERTY_INTERFACE_ALIASES: dict[str, str] = {
-        "Base": "IMedium",
-        "Children": "IMedium",
-        "Parent": "IMedium",
-    }
-
     def get_path(self) -> Path:
         """Get Path instance for medium instance physical location."""
         return Path(self.location).absolute()

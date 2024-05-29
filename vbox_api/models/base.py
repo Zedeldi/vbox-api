@@ -49,8 +49,6 @@ class ModelRegister(BaseModelRegister):
 class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
     """Base class to handle model attributes and methods."""
 
-    _PROPERTY_INTERFACE_ALIASES: dict[str, str] = {}
-
     def __init__(
         self,
         ctx: "api.Context",
@@ -89,14 +87,6 @@ class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
         except KeyError:
             super().__setattr__(name, value)
 
-    def _get_property_alias(self, interface_name: str) -> Optional[str]:
-        """Return alias of interface_name, if any."""
-        matches = self.ctx.interface.get_matches(interface_name)
-        for key, value in self._PROPERTY_INTERFACE_ALIASES.items():
-            if key.casefold() in matches:
-                return value
-        return None
-
     def _get_model_class_for_value(
         self, value: str, base_model: Optional[Type["BaseModel"]] = None
     ) -> Optional[Type["BaseModel"]]:
@@ -106,8 +96,7 @@ class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
         If value is not a handle, try to match value to an interface name.
         """
         if not api.Handle.is_handle(value):
-            interface_name = self._get_property_alias(value) or value
-            match = self.ctx.interface.match_interface_name(interface_name)
+            match = self.ctx.interface.match_interface_name(value)
         else:
             match = self.ctx.interface.get_interface_name_for_handle(value)
         if not match:
