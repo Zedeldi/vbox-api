@@ -2,6 +2,7 @@ from threading import Thread
 from typing import NoReturn
 
 from vbox_api import api
+from vbox_api.constants import VBoxEventType
 from vbox_api.models.base import BaseModel, ModelRegister
 
 
@@ -37,9 +38,20 @@ class PassiveEventListener(EventListener):
         """Return event from event source."""
         return self.source.get_event(self, timeout_ms)
 
+    def wait_for(self, event_types: list[VBoxEventType]) -> Event:
+        """
+        Block until event of specified type is received.
+
+        All events will be consumed until event_type is found.
+        """
+        event = None
+        while not event or event.type not in event_types:
+            event = self.get_event(-1)
+        return event
+
     @classmethod
     def from_source(
-        cls, source: EventSource, event_types: str | int = "Any"
+        cls, source: EventSource, event_types: list[VBoxEventType] = VBoxEventType.ANY
     ) -> "PassiveEventListener":
         """Return instance of passive event listener from source."""
         listener = source.create_listener()
@@ -48,7 +60,7 @@ class PassiveEventListener(EventListener):
 
     @classmethod
     def from_ctx(
-        cls, ctx: "api.Context", event_types: str | int = "Any"
+        cls, ctx: "api.Context", event_types: list[VBoxEventType] = VBoxEventType.ANY
     ) -> "PassiveEventListener":
         """Return instance of passive event listener from context."""
         source = ctx.api.get_event_source()
@@ -64,7 +76,7 @@ class EventListenerLoop(Thread):
         super().__init__(target=self.event_loop, daemon=daemon)
 
     @staticmethod
-    def handle_event(event) -> None:
+    def handle_event(event: Event) -> None:
         """Handle processing a passed event from event loop."""
         ...
 
