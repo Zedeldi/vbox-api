@@ -1,5 +1,6 @@
 """Flask application for VirtualBox API web interface."""
 
+import requests.exceptions
 from flask import Flask, flash, g, redirect, render_template, request, url_for
 from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers.response import Response
@@ -49,14 +50,17 @@ def login() -> Response | str:
             request.form.get("host") or "localhost",
             request.form.get("port") or 18083,
         )
-        if not session_manager.login(username, password, host=host):
-            flash("Incorrect username or password.", "danger")
-        else:
-            args = dict(request.args)
-            next_endpoint = args.pop("next", None)
-            if not next_endpoint:
-                return redirect(url_for("dashboard"))
-            return redirect(url_for(next_endpoint, **args))
+        try:
+            if not session_manager.login(username, password, host=host):
+                flash("Incorrect username or password.", "danger")
+            else:
+                args = dict(request.args)
+                next_endpoint = args.pop("next", None)
+                if not next_endpoint:
+                    return redirect(url_for("dashboard"))
+                return redirect(url_for(next_endpoint, **args))
+        except requests.exceptions.ConnectionError:
+            flash("Could not connect to server.", "danger")
     return render_template("login.html")
 
 
