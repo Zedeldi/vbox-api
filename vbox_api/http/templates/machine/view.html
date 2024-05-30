@@ -69,7 +69,7 @@
           <h5>System</h5>
           <p>
             <b>Operating System: </b>{{ machine.get_os_type_description() }}<br>
-            <b>Memory: </b><span class="font-monospace">{{ machine.memory_size }}MB</span><br>
+            <b>Memory: </b><span class="font-monospace">{{ machine.memory_size }} MB</span><br>
             <b>Processors: </b><span class="font-monospace">{{ machine.cpu_count }}</span><br>
             <b>TPM: </b><span class="font-monospace">{{ machine.trusted_platform_module.type.replace("_", ".") }}</span><br>
             <b>Firmware: </b>{{ machine.firmware_type }}
@@ -80,7 +80,7 @@
         <section id="display">
           <h5>Display</h5>
           <p>
-            <b>Video Memory: </b><span class="font-monospace">{{ machine.graphics_adapter.vram_size }}MB</span><br>
+            <b>Video Memory: </b><span class="font-monospace">{{ machine.graphics_adapter.vram_size }} MB</span><br>
             <b>Graphics Controller: </b><span class="font-monospace">{{ machine.graphics_adapter.graphics_controller_type }}</span><br>
             <b>Remote Desktop: </b>{{ "Enabled" if machine.vrde_server.enabled else "Disabled" }}<br>
             {% if machine.vrde_server.enabled %}

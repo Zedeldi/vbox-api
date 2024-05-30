@@ -5,31 +5,85 @@
   <h3 class="me-auto">Dashboard</h3>
 </div>
 <hr>
-<div class="row">
-  <div class="col">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Machines</h5>
-        <p class="card-text">Count: {{ g.api.machines | length }}</p>
+<section id="guest">
+  <h5>Guest Information</h5>
+  <hr>
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Machines</h5>
+          <p class="card-text">Count: {{ g.api.machines | length }}</p>
+        </div>
+        <ul class="list-group list-group-flush">
+          {% for health, machines in g.api.machines | groupby("health") %}
+          <li class="list-group-item">{{ health.name | replace("_", " ") | title }}: {{ machines | length }}</li>
+          {% endfor %}
+        </ul>
+        <div class="card-body">
+          <a href="{{ url_for('machine.overview') }}" class="btn btn-primary">View</a>
+        </div>
       </div>
+    </div>
+    <div class="col">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Mediums</h5>
+          <p class="card-text">Count: {{ g.api.mediums | length }}</p>
+          <a href="{{ url_for('medium.overview') }}" class="btn btn-primary">View</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="pt-3" id="host">
+  <h5>Host Information</h5>
+  <hr>
+  <div class="row">
+    <div class="col">
       <ul class="list-group list-group-flush">
-        {% for health, machines in g.api.machines | groupby("health") %}
-        <li class="list-group-item">{{ health.name | replace("_", " ") | title }}: {{ machines | length }}</li>
-        {% endfor %}
+        <li class="list-group-item">
+          <section id="system">
+            <h5>System</h5>
+            <p>
+              <b>Operating System: </b>{{ g.api.host.operating_system }} {{ g.api.host.os_version }}<br>
+              <b>Memory: </b><span class="font-monospace">{{ g.api.host.memory_available }}/{{ g.api.host.memory_size }} MB</span><br>
+              <b>Processors: </b><span class="font-monospace">{{ g.api.host.processor_count }} ({{ g.api.host.processor_core_count }} physical)</span><br>
+            </p>
+          </section>
+        </li>
+        <li class="list-group-item">
+          <section id="drives">
+            <h5>Drives</h5>
+            <p>
+              {% for drive in g.api.host.host_drives %}
+              <b>Path: </b><span class="font-monospace">{{ drive.drive_path }}</span><br>
+              <b>Model: </b><span class="font-monospace">{{ drive.model }}</span><br>
+              <br>
+              {% endfor %}
+            </p>
+          </section>
+        </li>
       </ul>
-      <div class="card-body">
-        <a href="{{ url_for('machine.overview') }}" class="btn btn-primary">View</a>
-      </div>
+    </div>
+    <div class="col">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          <section id="network">
+            <h5>Network</h5>
+            <p>
+              {% for network in g.api.host.network_interfaces %}
+              <b>{{ network.name }}: </b>{{ utils.split_pascal_case(network.interface_type) }}<br>
+              <b>IP Address: </b><span class="font-monospace">{{ network.ip_address }}</span><br>
+              <b>MAC Address: </b><span class="font-monospace">{{ network.hardware_address }}</span><br>
+              <b>Wireless: </b>{{ network.wireless }}<br>
+              <br>
+              {% endfor %}
+            </p>
+          </section>
+        </li>
+      </ul>
     </div>
   </div>
-  <div class="col">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Mediums</h5>
-        <p class="card-text">Count: {{ g.api.mediums | length }}</p>
-        <a href="{{ url_for('medium.overview') }}" class="btn btn-primary">View</a>
-      </div>
-    </div>
-  </div>
-</div>
+</section>
 {% endblock %}
