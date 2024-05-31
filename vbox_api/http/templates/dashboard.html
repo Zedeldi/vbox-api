@@ -64,7 +64,7 @@
           <section id="drives">
             <h5>Drives</h5>
             <p>
-              {% for drive in g.api.host.host_drives %}
+              {% for drive in g.api.host.host_drives | sort(attribute="drive_path") %}
               <b>Path: </b><span class="font-monospace">{{ drive.drive_path }}</span><br>
               <b>Model: </b><span class="font-monospace">{{ drive.model }}</span><br>
               <br>
