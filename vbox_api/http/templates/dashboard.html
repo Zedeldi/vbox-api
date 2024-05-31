@@ -30,6 +30,13 @@
         <div class="card-body">
           <h5 class="card-title">Mediums</h5>
           <p class="card-text">Count: {{ g.api.mediums | length }}</p>
+        </div>
+        <ul class="list-group list-group-flush">
+          {% for device_type, mediums in g.api.mediums | groupby("device_type_name") %}
+          <li class="list-group-item">{{ device_type }}: {{ mediums | length }}</li>
+          {% endfor %}
+        </ul>
+        <div class="card-body">
           <a href="{{ url_for('medium.overview') }}" class="btn btn-primary">View</a>
         </div>
       </div>
@@ -48,7 +55,8 @@
             <p>
               <b>Operating System: </b>{{ g.api.host.operating_system }} {{ g.api.host.os_version }}<br>
               <b>Memory: </b><span class="font-monospace">{{ g.api.host.memory_available }}/{{ g.api.host.memory_size }} MB</span><br>
-              <b>Processors: </b><span class="font-monospace">{{ g.api.host.processor_count }} ({{ g.api.host.processor_core_count }} physical)</span><br>
+              <b>Processors: </b>{{ g.api.host.processor_count }} logical ({{ g.api.host.processor_core_count }} physical) @ {{ g.api.host.get_processor_speed(0) }} MHz<br>
+              <b>3D Acceleration: </b>{{ g.api.host.acceleration_3d_available }}<br>
             </p>
           </section>
         </li>
@@ -79,6 +87,7 @@
               <b>Wireless: </b>{{ network.wireless }}<br>
               <br>
               {% endfor %}
+              <b>DNS Servers: </b><span class="font-monospace">{{ ', '.join(g.api.host.name_servers) }}</span>
             </p>
           </section>
         </li>
