@@ -51,7 +51,7 @@ class PassiveEventListener(EventListener):
 
     @classmethod
     def from_source(
-        cls, source: EventSource, event_types: list[VBoxEventType] = VBoxEventType.ANY
+        cls, source: EventSource, event_types: list[VBoxEventType] = [VBoxEventType.ANY]
     ) -> "PassiveEventListener":
         """Return instance of passive event listener from source."""
         listener = source.create_listener()
@@ -60,7 +60,7 @@ class PassiveEventListener(EventListener):
 
     @classmethod
     def from_ctx(
-        cls, ctx: "api.Context", event_types: list[VBoxEventType] = VBoxEventType.ANY
+        cls, ctx: "api.Context", event_types: list[VBoxEventType] = [VBoxEventType.ANY]
     ) -> "PassiveEventListener":
         """Return instance of passive event listener from context."""
         source = ctx.api.get_event_source()

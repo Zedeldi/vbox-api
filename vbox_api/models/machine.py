@@ -18,6 +18,7 @@ from vbox_api.constants import (
     CloneOptions,
     LockType,
     MachineFrontend,
+    MachineState,
 )
 from vbox_api.models.base import BaseModel, ModelRegister
 from vbox_api.models.medium import Medium
@@ -329,11 +330,11 @@ class Machine(BaseModel, metaclass=ModelRegister):
     def get_health(self) -> MachineHealth:
         """Return tuple for health of machine in format (state, status_code)."""
         match self.state:
-            case "PoweredOff" | "Saved":
+            case MachineState.POWERED_OFF | MachineState.SAVED:
                 health = MachineHealth.POWERED_OFF
-            case "Running":
+            case MachineState.RUNNING:
                 health = MachineHealth.RUNNING
-            case "Aborted":
+            case MachineState.ABORTED:
                 health = MachineHealth.ERROR
             case _:
                 health = MachineHealth.WARNING
