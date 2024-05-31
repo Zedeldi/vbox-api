@@ -3,6 +3,7 @@ import functools
 import io
 from collections.abc import Iterable, Iterator
 from contextlib import contextmanager
+from dataclasses import dataclass
 from datetime import datetime
 from enum import IntEnum
 from typing import Any, Callable, Optional
@@ -11,6 +12,7 @@ from PIL import Image
 
 from vbox_api import api
 from vbox_api.constants import (
+    AdditionsRunLevelType,
     CleanupMode,
     CloneMode,
     CloneOptions,
@@ -43,6 +45,16 @@ class MachineHealth(IntEnum):
     RUNNING = 1
     WARNING = 2
     ERROR = 3
+
+
+@dataclass
+class GuestProperty:
+    """Dataclass to store attributes of a guest property."""
+
+    name: str
+    value: Any
+    timestamp: int
+    flags: Optional[str]
 
 
 class Machine(BaseModel, metaclass=ModelRegister):
@@ -206,7 +218,8 @@ class Machine(BaseModel, metaclass=ModelRegister):
         """
         if password is None:
             password = ""
-        self.session.console.teleport(host, port, password, max_downtime_ms)
+        progress = self.session.console.teleport(host, port, password, max_downtime_ms)
+        return progress
 
     def teleport_listen(
         self,
@@ -325,6 +338,27 @@ class Machine(BaseModel, metaclass=ModelRegister):
             case _:
                 health = MachineHealth.WARNING
         return health
+
+    @requires_session
+    def get_guest_additions_status(self) -> AdditionsRunLevelType:
+        """Return run level of guest additions or None."""
+        with self.with_lock():
+            if not self.session.console:
+                raise TypeError(
+                    f"Machine has no available console interface (state is {self.state})"
+                )
+            status = AdditionsRunLevelType(
+                self.session.console.guest.additions_run_level
+            )
+        return status
+
+    def enumerate_guest_properties_as_dataclass(
+        self, pattern: str = "*"
+    ) -> list[GuestProperty]:
+        """Return all guest properties as a list of GuestProperty dataclasses."""
+        properties = self.enumerate_guest_properties(pattern)
+        values = (properties[key] for key in properties)
+        return list(GuestProperty(*property_) for property_ in zip(*values))
 
     def get_state_name(self) -> str:
         """Return formatted machine state."""
