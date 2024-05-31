@@ -115,5 +115,5 @@ class PythonicInterface(BaseInterface):
     @staticmethod
     def camel_to_snake(text: str) -> str:
         """Convert camelCase to snake_case."""
-        pattern = re.compile("((DnD)|(?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))")
+        pattern = re.compile("((DnD|2D|3D)|(?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))")
         return pattern.sub(r"_\1", text).lower()
