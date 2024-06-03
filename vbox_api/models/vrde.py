@@ -1,5 +1,6 @@
 from typing import Optional
 
+from vbox_api.constants import VrdeExtPack
 from vbox_api.models.base import BaseModel, ModelRegister
 
 
@@ -35,7 +36,7 @@ class VRDEServer(BaseModel, metaclass=ModelRegister):
 
     def get_protocol(self) -> str:
         """Get procotol for VRDE server."""
-        if self.vrde_ext_pack and self.vrde_ext_pack.upper() == "VNC":
+        if self.vrde_ext_pack and self.vrde_ext_pack.upper() == VrdeExtPack.VNC:
             protocol = "VNC"
         else:
             protocol = "RDP"
