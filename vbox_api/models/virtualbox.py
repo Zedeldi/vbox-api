@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from vbox_api.constants import AccessMode, MediumDeviceType
 from vbox_api.models.base import BaseModel, ModelRegister
@@ -73,6 +73,26 @@ class VirtualBox(BaseModel, metaclass=ModelRegister):
             machine.apply_defaults("")
         if register_machine:
             self.register_machine(machine)
+        return machine
+
+    def create_machine_from_iso(
+        self,
+        iso_path: str | Path,
+        name: Optional[str] = None,
+        unattended_options: dict[str, Any] = {},
+    ) -> Machine:
+        """Create machine from specified ISO, ready for unattended installation."""
+        if not isinstance(iso_path, Path):
+            iso_path = Path(iso_path)
+        unattended = self.ctx.api.create_unattended_installer()
+        unattended.from_dict(unattended_options)
+        unattended.iso_path = iso_path
+        unattended.detect_iso_os()
+        machine = self.create_machine_with_defaults(
+            name=name or iso_path.stem, os_type_id=unattended.detected_os_type_id
+        )
+        unattended.machine = machine
+        unattended.configure()
         return machine
 
     def get_mediums(self, include_children: bool = False) -> list[Medium]:

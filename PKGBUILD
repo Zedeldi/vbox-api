@@ -1,7 +1,7 @@
 # Maintainer: Zack Didcott
 
 pkgname=vbox-api-git
-pkgver=0.11.0
+pkgver=0.12.0
 pkgrel=1
 pkgdesc="Python bindings to the VirtualBox SOAP API."
 arch=("any")

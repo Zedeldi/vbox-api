@@ -117,6 +117,22 @@ machine = api.create_machine_with_defaults(
 )
 ```
 
+Create machine from Windows 11 ISO and start unattended installation:
+
+```py
+machine = api.create_machine_from_iso(
+    iso_path="Win11_23H2_EnglishInternational_x64.iso",
+    name="Windows 11",
+    unattended_options={
+        "user": "username",
+        "password": "password",
+        "install_guest_additions": True,
+    },
+)
+machine.attach_medium(hard_disk)  # See Medium examples
+machine.start()
+```
+
 Clone machine:
 
 ```py
