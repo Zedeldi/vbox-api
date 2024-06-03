@@ -4,6 +4,26 @@
 
 Python bindings to the VirtualBox SOAP API.
 
+## Table of Contents
+
+- [Description](#description)
+  - [Models](#models)
+- [Installation](#installation)
+  - [Build](#build)
+  - [Development](#development)
+  - [PKGBUILD](#pkgbuild)
+- [Usage](#usage)
+  - [Machine](#machine)
+  - [Medium](#medium)
+- [Testing](#testing)
+- [Contributing](#contributing)
+- [Credits](#credits)
+  - [Contributors](#contributors)
+  - [Resources](#resources)
+  - [Other Projects](#other-projects)
+- [License](#license)
+- [Donate](#donate)
+
 ## Description
 
 Provides a Python SOAP client using `zeep` to the VirtualBox SOAP API, with Pythonic bindings, and models for object-oriented usage.
@@ -59,7 +79,7 @@ After cloning the repository with: `git clone https://github.com/Zedeldi/vbox-ap
 1. Install dependencies: `pip install -r requirements.txt`
 2. Run: `python -m vbox_api.cli` (CLI) or `python -m vbox_api.http` (HTTP)
 
-Libraries:
+#### Libraries:
 
 - [Zeep](https://pypi.org/project/zeep/) - SOAP client
 - [Flask](https://pypi.org/project/Flask/) - HTTP interface
@@ -169,6 +189,41 @@ medium = api.create_medium_with_defaults(
     format_="VDI",
 )
 ```
+
+## Testing
+
+`vbox-api` has been tested successfully on Arch Linux and Windows 10.
+
+Unit tests can be run using [pytest](https://pypi.org/project/pytest/), though tests require authentication for the VirtualBox interface: `python -m pytest`
+
+## Contributing
+
+Please contribute by raising an [issue](https://github.com/Zedeldi/vbox-api/issues) or submitting a [pull request](https://github.com/Zedeldi/vbox-api/pulls), whether for code or documentation.
+
+Source code is formatted using [black](https://pypi.org/project/black/), and type hints should be added where possible.
+
+If there are any questions, please do not hesitate to ask.
+All contributions are welcome!
+
+## Credits
+
+### Contributors
+
+ - [@Zedeldi](https://github.com/Zedeldi) - creator
+
+### Resources
+
+ - [VirtualBox](https://www.virtualbox.org/) - well, duh.
+   - [API Documentation](https://www.virtualbox.org/sdkref/) - reference for interface methods and properties
+ - [Bootstrap](https://getbootstrap.com/) - used for HTTP interface
+ - [noVNC](https://novnc.com)/[websockify](https://github.com/novnc/websockify) - support for HTTP remote control
+ - See [libraries](#libraries) for list of dependencies
+
+### Other Projects
+
+ - [vboxwebber](https://github.com/larshson/vboxwebber/) - VirtualBox SOAP API client for Python
+ - [phpVirtualBox](https://github.com/phpvirtualbox/phpvirtualbox) - web interface to manage and access Virtualbox machines
+ - [RemoteBox](https://remotebox.knobgoblin.org.uk/) - VirtualBox GUI (GTK3) client
 
 ## License
 
