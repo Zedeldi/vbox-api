@@ -26,12 +26,18 @@ Python bindings to the VirtualBox SOAP API.
 
 ## Description
 
+<p align="center">
+  <img src="docs/vbox-api-cli.gif?raw=true" alt="Demonstration of vbox-api-cli."/>
+</p>
+
 Provides a Python SOAP client using `zeep` to the VirtualBox SOAP API, with Pythonic bindings, and models for object-oriented usage.
 Several methods have been added to models to assist with common operations, and simplify many interface methods.
 
 `vbox_api.interface` contains all relevant classes to communicate with the VirtualBox API.
 
 `vbox_api.models` defines classes to use an interface in an object-oriented approach (see [below](#models)).
+
+`vbox_api.cli` contains an entry point for an interactive command-line interface and functions to parse arguments.
 
 `vbox_api.http` includes a Flask application to view and manage virtual machines over HTTP.
 
