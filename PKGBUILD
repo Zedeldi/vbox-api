@@ -2,14 +2,17 @@
 
 pkgname=vbox-api-git
 pkgver=1.1.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Python bindings to the VirtualBox SOAP API."
 arch=("any")
 url="https://github.com/Zedeldi/vbox-api"
 license=("MIT")
 depends=("python" "python-zeep" "python-pillow" "python-psutil" "python-flask" "gunicorn")
-optdepends=("novnc: remote control support")
-makedepends=("python-build" "python-installer" "python-setuptools" "python-wheel")
+optdepends=(
+    "novnc: remote control support"
+    "virtualbox: local VirtualBox instance"
+)
+makedepends=("git" "python-build" "python-installer" "python-setuptools" "python-wheel")
 provides=("vbox-api")
 conflicts=("vbox-api")
 backup=("etc/vbox-api-http.conf")
