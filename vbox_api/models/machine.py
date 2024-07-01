@@ -1,6 +1,7 @@
 import base64
 import functools
 import io
+import time
 from collections.abc import Iterable, Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -174,6 +175,20 @@ class Machine(BaseModel, metaclass=ModelRegister):
                 self.session.machine.save_settings()
             if unlock_on_exit:
                 self.unlock()
+
+    @contextmanager
+    def start_stop(self, delete: bool = False) -> Iterator["Machine"]:
+        """Start machine in a context manager and stop on closing."""
+        try:
+            self.start().wait_for_completion(-1)
+            yield self
+        finally:
+            self.stop().wait_for_completion(-1)
+            if delete:
+                while self.session.is_locked:
+                    # Wait for session to close before deleting machine.
+                    time.sleep(0.5)
+                self.delete()
 
     def delete(
         self,
