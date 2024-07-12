@@ -88,3 +88,9 @@ def split_pascal_case(text: str, separator: str = " ") -> str:
     return separator.join(
         re.sub("([A-Z][a-z]+)", r" \1", re.sub("([A-Z]+)", r" \1", text)).split()
     )
+
+
+def strip_ansi(text: str) -> str:
+    """Strip ANSI escape codes from text."""
+    pattern = re.compile(r"(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]")
+    return pattern.sub("", text)

@@ -1,7 +1,9 @@
 """Flask application for VirtualBox API web interface."""
 
+import logging
+
 import requests.exceptions
-from flask import Flask, flash, g, redirect, render_template, request, url_for
+from flask import Flask, abort, flash, g, redirect, render_template, request, url_for
 from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers.response import Response
 
@@ -9,6 +11,19 @@ from vbox_api import constants, utils
 from vbox_api.http import config
 from vbox_api.http.session import SessionManager, requires_session
 from vbox_api.http.views import blueprints
+
+logger = logging.getLogger(__name__)
+file_handler = logging.FileHandler(config.LOG_FILE, encoding="utf-8")
+api_filter = logging.Filter("vbox_api")
+file_handler.addFilter(api_filter)
+logging.basicConfig(
+    format="%(asctime)s | [%(levelname)s] %(message)s",
+    level=config.LOG_LEVEL,
+    handlers=[
+        file_handler,
+        logging.StreamHandler(),
+    ],
+)
 
 app = Flask(__name__)
 app.config.from_object(config)
@@ -52,8 +67,10 @@ def login() -> Response | str:
         )
         try:
             if not session_manager.login(username, password, host=host):
+                logger.error(f"Authentication failed for user '{username}'")
                 flash("Incorrect username or password.", "danger")
             else:
+                logger.info(f"User '{username}' has logged in")
                 args = dict(request.args)
                 next_endpoint = args.pop("next", None)
                 if not next_endpoint:
@@ -67,5 +84,20 @@ def login() -> Response | str:
 @app.route("/logout", methods=["GET"])
 def logout() -> Response:
     """Endpoint to log out current session."""
+    logger.info(f"User '{session_manager.username}' has logged out")
     session_manager.logout()
     return redirect(url_for("dashboard"))
+
+
+@app.route("/events", methods=["GET"])
+@requires_session
+def events() -> Response:
+    """Endpoint to display events."""
+    try:
+        with open(config.LOG_FILE, "r") as fd:
+            data = fd.read()
+    except FileNotFoundError:
+        abort(404, "Log file not found.")
+    # Strip ANSI escape codes in case log includes console output
+    events = list(filter(bool, map(utils.strip_ansi, reversed(data.split("\n")))))
+    return render_template("events.html", events=events)

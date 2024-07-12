@@ -1,5 +1,6 @@
 """Blueprint for medium endpoints."""
 
+import logging
 from pathlib import Path
 
 from flask import (
@@ -22,6 +23,7 @@ from vbox_api.http.session import requires_session
 from vbox_api.http.utils import convert_id_to_model
 from vbox_api.models import Medium
 
+logger = logging.getLogger(__name__)
 medium_blueprint = Blueprint("medium", __name__)
 
 
@@ -99,6 +101,7 @@ def download(medium: Medium) -> Response | str:
 @convert_id_to_model("medium")
 def delete(medium: Medium) -> Response | str:
     """Endpoint to delete a medium."""
+    logger.warning(f"Deleting medium '{medium.name}'")
     progress = medium.delete_storage()
     flash("Deleting medium...", "warning")
     progress.wait_for_completion(current_app.config["OPERATION_TIMEOUT_MS"])

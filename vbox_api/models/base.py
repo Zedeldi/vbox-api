@@ -1,4 +1,5 @@
 import functools
+import logging
 import types
 from abc import ABC, ABCMeta
 from collections import defaultdict
@@ -7,6 +8,8 @@ from weakref import WeakValueDictionary
 
 from vbox_api import api
 from vbox_api.mixins import PropertyMixin
+
+logger = logging.getLogger(__name__)
 
 
 class BaseModelRegister(ABCMeta, type):
@@ -26,6 +29,9 @@ class BaseModelRegister(ABCMeta, type):
                 ctx, handle, *args, **kwargs
             )
             if instance.handle:
+                logger.debug(
+                    f"Instantiating model '{cls.__name__}' for handle '{handle}'"
+                )
                 cls._handles[cls][instance.handle] = instance
         return instance
 
@@ -41,6 +47,7 @@ class ModelRegister(BaseModelRegister):
         """Return class for given name if exists, else create class."""
         model = cls._models.get(name)
         if model is None:
+            logger.debug(f"Dynamically creating model '{name}'")
             model = super().__new__(cls, name, bases, namespace)
             cls._models[name] = model
         return model
@@ -168,6 +175,8 @@ class BaseModel(ABC, PropertyMixin, metaclass=BaseModelRegister):
     @handle.setter
     def handle(self, handle: Optional["api.Handle"]) -> None:
         """Set new handle and bind methods."""
+        if handle:
+            logger.debug(f"Setting handle of '{self.__class__.__name__}' to '{handle}'")
         self._handle = handle
         self._bind_interface_methods()
 

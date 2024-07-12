@@ -1,6 +1,7 @@
 import base64
 import functools
 import io
+import logging
 import time
 from collections.abc import Iterable, Iterator
 from contextlib import contextmanager
@@ -27,6 +28,8 @@ from vbox_api.models.network import NetworkAdapter
 from vbox_api.models.progress import Progress
 from vbox_api.models.session import Session
 from vbox_api.utils import image_to_data_uri, split_pascal_case, text_to_image
+
+logger = logging.getLogger(__name__)
 
 
 def requires_session(func: Callable) -> Callable:
@@ -77,6 +80,7 @@ class Machine(BaseModel, metaclass=ModelRegister):
     @requires_session
     def start(self, front_end: MachineFrontend = MachineFrontend.GUI) -> Progress:
         """Start virtual machine with specified front_end."""
+        logger.info(f"Starting machine '{self.name}'")
         progress = self.launch_vm_process(self.session.handle, front_end)
         return progress
 
@@ -87,6 +91,7 @@ class Machine(BaseModel, metaclass=ModelRegister):
 
         If save_state is True, save machine state and power down.
         """
+        logger.info(f"Stopping machine '{self.name}'")
         with self.with_lock():
             if save_state:
                 progress = self.session.machine.save_state()
@@ -116,12 +121,14 @@ class Machine(BaseModel, metaclass=ModelRegister):
     @requires_session
     def pause(self) -> None:
         """Pause machine execution state."""
+        logger.info(f"Pausing machine '{self.name}'")
         with self.with_lock():
             self.session.console.pause()
 
     @requires_session
     def resume(self) -> None:
         """Resume machine execution state."""
+        logger.info(f"Resuming machine '{self.name}'")
         with self.with_lock():
             self.session.console.resume()
 
@@ -196,6 +203,7 @@ class Machine(BaseModel, metaclass=ModelRegister):
         delete_config: bool = True,
     ) -> Optional[Progress]:
         """Delete and unregister machine with specified cleanup mode."""
+        logger.warning(f"Deleting machine '{self.name}'")
         media = self.unregister(cleanup_mode)
         if not delete_config:
             return None
@@ -210,6 +218,7 @@ class Machine(BaseModel, metaclass=ModelRegister):
         options: list[CloneOptions] = [],
     ) -> "Machine":
         """Clone machine to new machine with specified name."""
+        logger.info(f"Cloning machine '{self.name}' to '{name}'")
         cloned_machine = self.ctx.api.create_machine_with_defaults(
             name, groups, apply_defaults=False, register_machine=False
         )

@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block title %}Events{% endblock %}
+{% block content %}
+<pre><code>
+  {% for event in events %}
+  {{ event }}
+  {% else %}
+  No events logged.
+  {% endfor %}
+</code></pre>
+{% endblock %}

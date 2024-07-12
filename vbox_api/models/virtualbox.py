@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 from typing import Any, Optional
 
@@ -5,6 +6,8 @@ from vbox_api.constants import AccessMode, MediumDeviceType
 from vbox_api.models.base import BaseModel, ModelRegister
 from vbox_api.models.machine import Machine
 from vbox_api.models.medium import Medium
+
+logger = logging.getLogger(__name__)
 
 
 class VirtualBox(BaseModel, metaclass=ModelRegister):
@@ -66,6 +69,7 @@ class VirtualBox(BaseModel, metaclass=ModelRegister):
         register_machine: bool = True,
     ) -> Machine:
         """Create machine with specified name and default settings for OS type."""
+        logger.info(f"Creating machine '{name}' with OS type ID '{os_type_id}'")
         if os_type_id is None:
             os_type_id = ""
         machine = self.create_machine("", name, groups, os_type_id, "", "", "", "")
@@ -123,6 +127,7 @@ class VirtualBox(BaseModel, metaclass=ModelRegister):
     ) -> "Medium":
         """Create medium with specified location and size, with default settings."""
         location = Path(location).absolute()
+        logger.info(f"Creating medium '{location.name}' of size '{logical_size}' bytes")
         if format_ is None:
             format_ = ""
         medium = self.create_medium(format_, location, access_mode, device_type)
