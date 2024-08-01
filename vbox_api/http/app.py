@@ -8,6 +8,7 @@ from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers.response import Response
 
 from vbox_api import constants, utils
+from vbox_api.helpers import start_vboxwebsrv
 from vbox_api.http import config
 from vbox_api.http.session import SessionManager, requires_session
 from vbox_api.http.views import blueprints
@@ -101,3 +102,14 @@ def events() -> Response:
     # Strip ANSI escape codes in case log includes console output
     events = list(filter(bool, map(utils.strip_ansi, reversed(data.split("\n")))))
     return render_template("events.html", events=events)
+
+
+@app.route("/vboxwebsrv", methods=["GET"])
+def vboxwebsrv() -> Response:
+    """Endpoint to start vboxwebsrv on host."""
+    if not app.config["ALLOW_STARTING_VBOXWEBSRV"]:
+        abort(403, "Starting vboxwebsrv is not allowed by the server.")
+    logger.info("Starting 'vboxwebsrv' with default arguments")
+    flash("Starting Oracle VM VirtualBox web service...", "info")
+    start_vboxwebsrv()
+    return redirect(request.referrer)

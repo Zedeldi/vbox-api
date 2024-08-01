@@ -9,6 +9,8 @@ LOG_FILE = "/tmp/vbox-api.log"
 # Setting log level to logging.DEBUG will include handles
 LOG_LEVEL = logging.INFO
 
+ALLOW_STARTING_VBOXWEBSRV = True
+
 DEFAULT_MEDIUM_SIZE = 32 * 1024 * 1024 * 1024
 
 WEBSOCKET_PROXY_LISTEN_HOST = "0.0.0.0"
