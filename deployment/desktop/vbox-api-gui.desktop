@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=VirtualBox API GUI
+Comment=Start and Open VirtualBox Web API
+Icon=vbox-api-gui
+Exec=vbox-api-gui
