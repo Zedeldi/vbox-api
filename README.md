@@ -13,6 +13,7 @@ Python bindings to the VirtualBox SOAP API.
 - [Installation](#installation)
   - [Build](#build)
   - [Development](#development)
+  - [PyInstaller](#pyinstaller)
   - [PKGBUILD](#pkgbuild)
 - [Usage](#usage)
   - [Machine](#machine)
@@ -107,6 +108,20 @@ After cloning the repository with: `git clone https://github.com/Zedeldi/vbox-ap
 - [Pillow](https://pypi.org/project/pillow/) - image support
 - [psutil](https://pypi.org/project/psutil/) - process information
 - [websockify](https://pypi.org/project/websockify/) - remote control
+
+### PyInstaller
+
+The server application can be bundled with PyInstaller, by adding the required static files and templates for Flask to the bundle.
+Additionally, `vbox_api.http.gui` provides a simple wrapper using [flaskwebgui](https://github.com/ClimenteA/flaskwebgui), to serve and open the Flask application in a browser window.
+
+```sh
+pyinstaller \
+    --name "vbox-api-gui" \
+    --add-data "vbox_api/http/static:vbox_api/http/static" \
+    --add-data "vbox_api/http/templates:vbox_api/http/templates" \
+    --onefile \
+    vbox_api/http/gui.py
+```
 
 ### PKGBUILD
 
