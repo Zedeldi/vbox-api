@@ -1,10 +1,13 @@
 """Base interface classes to be used by an interface implementation."""
 
-import re
+import logging
 from abc import ABC
 from typing import Callable, Optional
 
 from vbox_api.mixins import PropertyMixin
+from vbox_api.utils import camel_to_snake
+
+logger = logging.getLogger(__name__)
 
 
 class BaseInterface(ABC):
@@ -21,6 +24,7 @@ class BaseInterface(ABC):
             raise TypeError(
                 "Passed interface object is not an instance of 'ProxyInterface'"
             )
+        logger.debug(f"Registering proxy interface '{interface_name}'")
         setattr(self, interface_name, proxy_interface)
 
     @classmethod
@@ -78,11 +82,14 @@ class ProxyInterface(PropertyMixin):
         """Register method to proxy interface instance."""
         if not callable(method):
             raise TypeError("Passed method is not callable")
+        logger.debug(f"Registering interface method '{method_name}'")
         setattr(self, method_name, method)
 
 
 class PythonicInterface(BaseInterface):
     """Wrapper to convert methods to Python naming conventions."""
+
+    METHOD_NAME_EXCLUSIONS = ["2D", "3D", "DnD", "IPv4", "IPv6", "LEDs"]
 
     def __init__(self, interface: BaseInterface, remove_prefix: bool = True) -> None:
         """
@@ -100,7 +107,9 @@ class PythonicInterface(BaseInterface):
             proxy_interface = ProxyInterface()
             self._register_interface(interface_name, proxy_interface)
             for method_name, method_callable in interface_obj.__dict__.items():
-                method_name = self.camel_to_snake(method_name)
+                method_name = camel_to_snake(
+                    method_name, exclusions=self.METHOD_NAME_EXCLUSIONS
+                )
                 proxy_interface._register_method(method_name, method_callable)
 
     def get_interface_name_for_handle(self, handle: str) -> Optional[str]:
@@ -111,9 +120,3 @@ class PythonicInterface(BaseInterface):
                 return None
             return interface_name.removeprefix("I")
         return self.IManagedObjectRef.get_interface_name(handle)
-
-    @staticmethod
-    def camel_to_snake(text: str) -> str:
-        """Convert camelCase to snake_case."""
-        pattern = re.compile("((DnD|2D|3D)|(?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))")
-        return pattern.sub(r"_\1", text).lower()

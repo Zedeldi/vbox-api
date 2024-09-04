@@ -83,6 +83,13 @@ def text_to_image(
     return image
 
 
+def camel_to_snake(text: str, exclusions: Optional[list[str]] = None) -> str:
+    """Convert camelCase to snake_case."""
+    prefix = f"({'|'.join(exclusions)})|" if exclusions else ""
+    pattern = re.compile(f"({prefix}(?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))")
+    return pattern.sub(r"_\1", text).lower()
+
+
 def split_pascal_case(text: str, separator: str = " ") -> str:
     """Split PascalCase string and join with spaces."""
     return separator.join(
