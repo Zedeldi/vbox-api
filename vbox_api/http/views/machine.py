@@ -128,16 +128,18 @@ def medium(machine: Machine) -> Response | str:
     return render_template("machine/medium.html", machine=machine)
 
 
-@machine_blueprint.route("/attach-medium", methods=["POST"])
-@machine_blueprint.route("/<string:name_or_id>/attach-medium", methods=["POST"])
+@machine_blueprint.route("/attach-medium", methods=["GET", "POST"])
+@machine_blueprint.route("/<string:name_or_id>/attach-medium", methods=["GET", "POST"])
 @requires_session
 @convert_id_to_model("machine")
 def attach_medium(machine: Machine) -> Response | str:
     """Endpoint to attach a medium to a specified machine."""
-    storage_controller = request.form.get("storage_controller")
+    storage_controller = request.args.get("storage_controller") or request.form.get(
+        "storage_controller"
+    )
     if not storage_controller:
         abort(400, "No storage controller name provided.")
-    medium_id = request.form.get("medium_id")
+    medium_id = request.args.get("medium_id") or request.form.get("medium_id")
     if not medium_id:
         abort(400, "No medium ID provided.")
     medium = g.api.find_medium(medium_id)

@@ -11,8 +11,8 @@
     <div class="col">
       <li class="list-group-item">
         <section id="attach-medium">
+          <h5 class="mb-3">Attach Medium</h5>
           <form action="{{ url_for('machine.attach_medium', id=machine.id) }}" method="POST">
-            <h5>Attach Medium</h5>
             <div class="input-group mb-3">
               <span class="input-group-text">Storage Controller</span>
               <select id="storage_controller" name="storage_controller" class="form-select">
@@ -52,6 +52,29 @@
           </ul>
         </section>
       </li>
+      {% set guest_additions_medium = g.api.get_guest_additions_medium() %}
+      {% if guest_additions_medium %}
+      <li class="list-group-item">
+        <section id="guest-additions">
+          <h5 class="mb-3">Guest Additions</h5>
+          {% if guest_additions_medium in machine.mediums %}
+            <a class="btn btn-outline-danger me-2" href="{{ url_for('machine.detach_medium', id=machine.id, medium_id=guest_additions_medium.id) }}" role="button">Detach Guest Additions CD Image</a>
+          {% else %}
+            <form action="{{ url_for('machine.attach_medium', id=machine.id, medium_id=guest_additions_medium.id) }}" method="POST">
+              <div class="input-group mb-3">
+                <span class="input-group-text">Storage Controller</span>
+                <select id="storage_controller" name="storage_controller" class="form-select">
+                  {% for storage_controller in machine.storage_controllers | sort(attribute="name") %}
+                  <option value="{{ storage_controller.name }}">{{ storage_controller.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary">Attach Guest Additions CD Image</button>
+            </form>
+          {% endif %}
+        </section>
+      </li>
+      {% endif %}
     </div>
   </ul>
 </div>

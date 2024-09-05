@@ -124,7 +124,7 @@ class VirtualBox(BaseModel, metaclass=ModelRegister):
         format_: Optional[str] = None,
         access_mode: AccessMode = AccessMode.READ_WRITE,
         device_type: MediumDeviceType = MediumDeviceType.HARD_DISK,
-    ) -> "Medium":
+    ) -> Medium:
         """Create medium with specified location and size, with default settings."""
         location = Path(location).absolute()
         logger.info(f"Creating medium '{location.name}' of size '{logical_size}' bytes")
@@ -133,3 +133,17 @@ class VirtualBox(BaseModel, metaclass=ModelRegister):
         medium = self.create_medium(format_, location, access_mode, device_type)
         medium.create_base_storage(logical_size)
         return medium
+
+    def get_guest_additions_medium(
+        self, iso_path: Optional[str | Path] = None
+    ) -> Optional[Medium]:
+        """Return Medium object for specified guest additions ISO or default path."""
+        if not iso_path:
+            if not (iso_path := self.system_properties.default_additions_iso):
+                return None
+        for dvd_image in self.dvd_images:
+            if dvd_image.path == iso_path:
+                return dvd_image
+        return self.open_medium(
+            iso_path, MediumDeviceType.DVD, AccessMode.READ_ONLY, False
+        )
