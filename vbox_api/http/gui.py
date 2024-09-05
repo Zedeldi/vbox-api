@@ -4,7 +4,9 @@ from flaskwebgui import FlaskUI
 
 from vbox_api.http import app
 
-ui = FlaskUI(app=app, server="flask")
+ui = FlaskUI(
+    app=app, server="flask", extra_flags=["--guest"], profile_dir_prefix="vbox_api-"
+)
 
 
 def main() -> None:
