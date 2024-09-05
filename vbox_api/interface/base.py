@@ -89,7 +89,7 @@ class ProxyInterface(PropertyMixin):
 class PythonicInterface(BaseInterface):
     """Wrapper to convert methods to Python naming conventions."""
 
-    METHOD_NAME_EXCLUSIONS = ["2D", "3D", "DnD", "IPv4", "IPv6", "LEDs"]
+    _METHOD_NAME_EXCLUSIONS = ["2D", "3D", "DnD", "IPv4", "IPv6", "LEDs"]
 
     def __init__(self, interface: BaseInterface, remove_prefix: bool = True) -> None:
         """
@@ -108,7 +108,7 @@ class PythonicInterface(BaseInterface):
             self._register_interface(interface_name, proxy_interface)
             for method_name, method_callable in interface_obj.__dict__.items():
                 method_name = camel_to_snake(
-                    method_name, exclusions=self.METHOD_NAME_EXCLUSIONS
+                    method_name, exclusions=self._METHOD_NAME_EXCLUSIONS
                 )
                 proxy_interface._register_method(method_name, method_callable)
 
