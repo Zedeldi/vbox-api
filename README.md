@@ -15,6 +15,7 @@ Python bindings to the VirtualBox SOAP API.
   - [Development](#development)
   - [PyInstaller](#pyinstaller)
   - [PKGBUILD](#pkgbuild)
+  - [Docker](#docker)
 - [Usage](#usage)
   - [Machine](#machine)
   - [Medium](#medium)
@@ -130,6 +131,39 @@ pyinstaller \
    - The HTTP interface can also be started using a systemd unit: `systemctl start vbox-api-http`
 
 Note: if the optional dependency `novnc` is installed from the AUR, HTTP remote control will be available out of the box.
+
+### Docker
+
+Dockerfiles are supplied in `docker/`, to run both `vbox-api-http` and `vboxwebsrv` in a container.
+
+If you already have VirtualBox installed to your machine, you can build and start `vbox-api-http` in a Docker container easily.
+The VirtualBox container requires the host kernel modules to be installed for `/dev/vboxdrv` to be available.
+
+#### Build:
+
+Build vbox-api image, passing current directory as the build context:
+```sh
+docker build -t "vbox-api" -f docker/api/Dockerfile .
+```
+
+Build VirtualBox image, optionally passing additional build arguments:
+```sh
+docker build -t "virtualbox" -f docker/virtualbox/Dockerfile .
+docker build -t "virtualbox" --build-arg USER="user" --build-arg PASS="password" -f docker/virtualbox/Dockerfile .
+docker build -t "virtualbox" --build-arg PACMAN_ARGS="--disable-download-timeout" -f docker/virtualbox/Dockerfile .
+```
+
+#### Run:
+
+Run `vbox-api-http` in a container interactively, with host network:
+```sh
+docker run -it --rm --network=host "vbox-api"
+```
+
+Run `vboxwebsrv` in a container interactively, with host network (note: VirtualBox host kernel modules must be installed):
+```sh
+docker run -it --rm --network=host --device /dev/vboxdrv:/dev/vboxdrv -e DISPLAY=unix:0 "virtualbox"
+```
 
 ## Usage
 
