@@ -229,6 +229,17 @@ Clone machine:
 cloned_machine = machine.clone(f"{machine.name} - Clone")
 ```
 
+Interact with guest OS of machine:
+
+```py
+with machine.with_lock() as locked_machine:
+    guest = locked_machine.session.console.guest
+    session = guest.create_session("username", "password", "domain", "session_name")
+    # Wait for session.status to be GuestSessionStatus.STARTED
+    progress = session.copy_from_guest(r"C:\path\to\copy", [], FileCopyFlag.NONE, "/path/to/destination/")
+    process = session.process_create(r"C:\path\to\file.exe", ["argument"], ["var=1"], ProcessCreateFlag.NONE, 0)
+```
+
 Teleport machine to another on the same host, with a password:
 
 ```py
