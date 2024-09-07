@@ -10,7 +10,9 @@ from werkzeug.wrappers.response import Response
 from vbox_api import constants, utils
 from vbox_api.helpers import start_vboxwebsrv
 from vbox_api.http import config
+from vbox_api.http.constants import UserPermission
 from vbox_api.http.session import SessionManager, requires_session
+from vbox_api.http.utils import is_allowed
 from vbox_api.http.views import blueprints
 
 logger = logging.getLogger(__name__)
@@ -42,6 +44,8 @@ def load_session() -> None:
     g.api = session_manager.api
     g.username = session_manager.username
     g.constants = constants
+    g.permissions = UserPermission
+    g.is_allowed = is_allowed
 
 
 @app.errorhandler(HTTPException)
@@ -94,6 +98,8 @@ def logout() -> Response:
 @requires_session
 def events() -> Response:
     """Endpoint to display events."""
+    if not is_allowed(UserPermission.READ_EVENTS):
+        abort(403, "Reading events is not allowed by the server.")
     try:
         with open(config.LOG_FILE, "r") as fd:
             data = fd.read()
@@ -107,7 +113,7 @@ def events() -> Response:
 @app.route("/vboxwebsrv", methods=["GET"])
 def vboxwebsrv() -> Response:
     """Endpoint to start vboxwebsrv on host."""
-    if not app.config["ALLOW_STARTING_VBOXWEBSRV"]:
+    if not is_allowed(UserPermission.START_VBOXWEBSRV):
         abort(403, "Starting vboxwebsrv is not allowed by the server.")
     logger.info("Starting 'vboxwebsrv' with default arguments")
     flash("Starting Oracle VM VirtualBox web service...", "info")

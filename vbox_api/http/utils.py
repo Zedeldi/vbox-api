@@ -3,9 +3,19 @@
 import functools
 from typing import Any, Callable, Optional
 
-from flask import abort, g, request
+from flask import abort, current_app, g, request
 
+from vbox_api.http.constants import UserPermission
 from vbox_api.models.base import BaseModel
+
+
+def is_allowed(permission: UserPermission) -> bool:
+    """
+    Return whether permission is allowed by current configuration.
+
+    See https://stackoverflow.com/q/28582830 for whether to return a 403 or 404.
+    """
+    return permission in current_app.config["USER_PERMISSIONS"]
 
 
 def get_model_from_name_or_id(

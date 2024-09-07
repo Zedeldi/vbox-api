@@ -2,6 +2,8 @@
 
 import logging
 
+from vbox_api.http.constants import UserPermission
+
 SECRET_KEY = "development"
 OPERATION_TIMEOUT_MS = 1000
 
@@ -9,7 +11,7 @@ LOG_FILE = "/tmp/vbox-api.log"
 # Setting log level to logging.DEBUG will include handles
 LOG_LEVEL = logging.INFO
 
-ALLOW_STARTING_VBOXWEBSRV = True
+USER_PERMISSIONS = UserPermission.START_VBOXWEBSRV | UserPermission.READ_EVENTS
 
 DEFAULT_MEDIUM_SIZE = 32 * 1024 * 1024 * 1024
 

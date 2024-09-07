@@ -25,7 +25,7 @@
             <span class="input-group-text">:</span>
             <input type="number" id="port" name="port" class="form-control" min="1" max="65535" placeholder="18083">
           </div>
-          {% if config.ALLOW_STARTING_VBOXWEBSRV %}
+          {% if g.is_allowed(g.permissions.START_VBOXWEBSRV) %}
           <a class="btn btn-outline-secondary my-2 w-100" href="{{ url_for('vboxwebsrv') }}" role="button">Start VirtualBox Web Service</a>
           {% endif %}
         </div>
