@@ -1,11 +1,15 @@
+import logging
 import threading
 from collections.abc import Callable
-from pprint import pprint
+from dataclasses import dataclass
+from pprint import pformat
 from typing import Optional
 
 from vbox_api import api
 from vbox_api.constants import VBoxEventType
 from vbox_api.models.base import BaseModel, ModelRegister
+
+logger = logging.getLogger(__name__)
 
 
 class Event(BaseModel, metaclass=ModelRegister):
@@ -20,6 +24,28 @@ class Event(BaseModel, metaclass=ModelRegister):
 
 class EventSource(BaseModel, metaclass=ModelRegister):
     """Class to handle EventSource attributes and methods."""
+
+    def __init__(self, *args, **kwargs) -> None:
+        """Intialise parent class and add attributes for event source."""
+        super().__init__(*args, **kwargs)
+        self._debugger: Optional[EventSourceGroup] = None
+
+    @property
+    def debug(self) -> bool:
+        """Return whether debugging is enabled."""
+        return bool(self._debugger)
+
+    @debug.setter
+    def debug(self, state: bool) -> None:
+        """Set debugging state via property."""
+        if self._debugger:
+            self._debugger.teardown()
+            self._debugger = None
+        else:
+            listener = PassiveEventListener.from_source(self)
+            loop = DebugEventListenerLoop(listener)
+            loop.start()
+            self._debugger = EventSourceGroup(source=self, listener=listener, loop=loop)
 
 
 class EventListener(BaseModel, metaclass=ModelRegister):
@@ -133,5 +159,20 @@ class DebugEventListenerLoop(EventListenerLoop):
     @staticmethod
     def display_event(event: Event) -> None:
         """Output event information to standard output."""
-        pprint(event.to_dict())
-        pprint(event.model.to_dict())
+        data = {"event": event.to_dict(), "model": event.model.to_dict()}
+        logger.debug(f"Received event of type '{event.type}':\n{pformat(data)}")
+
+
+@dataclass
+class EventSourceGroup:
+    """Handle group of objects for an event source."""
+
+    source: EventSource
+    listener: EventListener
+    loop: Optional[EventListenerLoop] = None
+
+    def teardown(self) -> None:
+        """Stop and unregister any grouped loops or listeners, respectively."""
+        if self.loop:
+            self.loop.stop()
+        self.source.unregister_listener(self.listener)
