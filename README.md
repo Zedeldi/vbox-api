@@ -312,6 +312,8 @@ All contributions are welcome!
 
 This project is distributed in the hope that it will be useful, but without any warranty.
 
+The VirtualBox logo is licensed under the [GPL-2.0](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html).
+
 ## Donate
 
 If you found this project useful, please consider donating. Any amount is greatly appreciated! Thank you :smiley:
