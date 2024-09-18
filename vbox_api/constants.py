@@ -1829,5 +1829,5 @@ class CloudImageState(StrEnum):
 class VrdeExtPack(StrEnum):
     """Enumeration for VrdeExtPack."""
 
-    ORACLE_VM_VIRTUALBOX_EXTENSION_PACK = "Oracle VM VirtualBox Extension Pack"
+    ORACLE_VIRTUALBOX_EXTENSION_PACK = "Oracle VirtualBox Extension Pack"
     VNC = "VNC"

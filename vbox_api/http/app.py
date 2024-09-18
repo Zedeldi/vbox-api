@@ -116,6 +116,6 @@ def vboxwebsrv() -> Response:
     if not is_allowed(UserPermission.START_VBOXWEBSRV):
         abort(403, "Starting vboxwebsrv is not allowed by the server.")
     logger.info("Starting 'vboxwebsrv' with default arguments")
-    flash("Starting Oracle VM VirtualBox web service...", "info")
+    flash("Starting Oracle VirtualBox web service...", "info")
     start_vboxwebsrv()
     return redirect(request.referrer)
