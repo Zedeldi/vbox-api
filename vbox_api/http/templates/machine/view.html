@@ -96,7 +96,8 @@
             <b>Memory: </b><span class="font-monospace">{{ machine.memory_size }} MB</span><br>
             <b>Processors: </b><span class="font-monospace">{{ machine.cpu_count }}</span><br>
             <b>TPM: </b><span class="font-monospace">{{ machine.trusted_platform_module.type.replace("_", ".") }}</span><br>
-            <b>Firmware: </b>{{ machine.firmware_type }}
+            <b>Firmware: </b>{{ machine.firmware_settings.firmware_type }}<br>
+            <b>Secure Boot: </b>{{ "Enabled" if machine.secure_boot_state else "Disabled" }}
           </p>
         </section>
       </li>

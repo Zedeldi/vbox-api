@@ -16,6 +16,7 @@ from vbox_api.models.event import (
 from vbox_api.models.machine import Machine
 from vbox_api.models.medium import Medium
 from vbox_api.models.network import NetworkAdapter
+from vbox_api.models.platform import PlatformProperties
 from vbox_api.models.progress import Progress
 from vbox_api.models.session import Session
 from vbox_api.models.unattended import Unattended
@@ -32,6 +33,7 @@ __all__ = [
     "Medium",
     "NetworkAdapter",
     "PassiveEventListener",
+    "PlatformProperties",
     "Progress",
     "Session",
     "Unattended",

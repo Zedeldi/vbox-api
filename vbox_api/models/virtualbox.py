@@ -6,6 +6,7 @@ from vbox_api.constants import AccessMode, MediumDeviceType
 from vbox_api.models.base import BaseModel, ModelRegister
 from vbox_api.models.machine import Machine
 from vbox_api.models.medium import Medium
+from vbox_api.models.platform import PlatformProperties
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +73,10 @@ class VirtualBox(BaseModel, metaclass=ModelRegister):
         logger.info(f"Creating machine '{name}' with OS type ID '{os_type_id}'")
         if os_type_id is None:
             os_type_id = ""
-        machine = self.create_machine("", name, groups, os_type_id, "", "", "", "")
+        architecture = self.host.architecture
+        machine = self.create_machine(
+            "", name, architecture, groups, os_type_id, "", "", "", ""
+        )
         if apply_defaults:
             machine.apply_defaults("")
         if register_machine:
@@ -147,3 +151,7 @@ class VirtualBox(BaseModel, metaclass=ModelRegister):
         return self.open_medium(
             iso_path, MediumDeviceType.DVD, AccessMode.READ_ONLY, False
         )
+
+    def get_platform_properties_for_system_architecture(self) -> PlatformProperties:
+        """Return platform properties for current system architecture."""
+        return self.get_platform_properties(self.host.architecture)

@@ -104,7 +104,11 @@ def remote(machine: Machine) -> Response | str:
 def edit(machine: Machine) -> Response | str:
     """Endpoint to edit a specified machine."""
     if request.method == "POST":
-        checkboxes = ("vrde_server.enabled", "vrde_server.allow_multi_connection")
+        checkboxes = (
+            "vrde_server.enabled",
+            "vrde_server.allow_multi_connection",
+            "secure_boot_state",
+        )
         properties: dict[str, str | bool] = dict(
             filter(lambda item: bool(item[1]), request.form.items())
         )
@@ -201,3 +205,14 @@ def create() -> Response | str:
         machine = g.api.create_machine_with_defaults(name, groups, os_type_id)
         return redirect(url_for("machine.edit", id=machine.id))
     return render_template("machine/create.html")
+
+
+@machine_blueprint.route("/secure-boot", methods=["GET"])
+@machine_blueprint.route("/<string:name_or_id>/secure-boot", methods=["GET"])
+@requires_session
+@convert_id_to_model("machine")
+def configure_secure_boot(machine: Machine) -> Response | str:
+    """Endpoint to configure secure boot for a specified machine."""
+    machine.configure_secure_boot()
+    flash("Configured secure boot.", "info")
+    return redirect(url_for("machine.edit", id=machine.id))

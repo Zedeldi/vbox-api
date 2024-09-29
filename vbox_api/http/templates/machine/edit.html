@@ -52,18 +52,25 @@
             <div class="input-group mb-3">
               <span class="input-group-text">TPM</span>
               <select id="trusted_platform_module.type" name="trusted_platform_module.type" class="form-select">
-                {% for tpm_type in g.api.system_properties.supported_tpm_types %}
-                <option value="{{ tpm_type }}" {{ "selected" if machine.trusted_platform_module.type == tpm_type }}>{{ tpm_type }}</option>
+                {% for tpm_type in g.api.platform_properties_for_system_architecture.supported_tpm_types %}
+                <option value="{{ tpm_type }}" {{ "selected" if machine.trusted_platform_module.type == tpm_type }}>{{ tpm_type.replace("_", ".") }}</option>
                 {% endfor %}
               </select>
             </div>
             <div class="input-group mb-3">
               <span class="input-group-text">Firmware</span>
-              <select id="firmware_type" name="firmware_type" class="form-select">
-                {% for firmware_type in g.api.system_properties.supported_firmware_types %}
-                <option value="{{ firmware_type }}" {{ "selected" if machine.firmware_type == firmware_type }}>{{ firmware_type }}</option>
+              <select id="firmware_settings.firmware_type" name="firmware_settings.firmware_type" class="form-select">
+                {% for firmware_type in g.api.platform_properties_for_system_architecture.supported_firmware_types %}
+                <option value="{{ firmware_type }}" {{ "selected" if machine.firmware_settings.firmware_type == firmware_type }}>{{ firmware_type }}</option>
                 {% endfor %}
               </select>
+            </div>
+            <div id="secure-boot">
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" role="switch" id="secure_boot_state" name="secure_boot_state" {{ "checked" if machine.secure_boot_state }}>
+                <label class="form-check-label" for="secure_boot_state">Secure Boot</label>
+              </div>
+              <a class="btn btn-outline-primary mb-3" href="{{ url_for('machine.configure_secure_boot', id=machine.id) }}" role="button">Configure Secure Boot</a>
             </div>
           </section>
         </li>
@@ -78,7 +85,7 @@
             <div class="input-group mb-3">
               <span class="input-group-text">Graphics Controller</span>
               <select id="graphics_adapter.graphics_controller_type" name="graphics_adapter.graphics_controller_type" class="form-select">
-                {% for gc_type in g.api.system_properties.supported_graphics_controller_types %}
+                {% for gc_type in g.api.platform_properties_for_system_architecture.supported_gfx_controller_types %}
                 <option value="{{ gc_type }}" {{ "selected" if machine.graphics_adapter.graphics_controller_type == gc_type }}>{{ gc_type }}</option>
                 {% endfor %}
               </select>
@@ -141,15 +148,31 @@
     }
   }
 
+  function toggleSecureBoot(e) {
+    const secureBootBtn = document.getElementById("secure-boot");
+    if (e.target.value.toUpperCase() == "BIOS") {
+      secureBootBtn.style.display = "none";
+    } else {
+      secureBootBtn.style.display = "";
+    }
+  }
+
   const vrdeCheckbox = document.getElementById("vrde_server.enabled");
   vrdeCheckbox.addEventListener("change", toggleVRDEForm);
 
   const vrdeExtPack = document.getElementById("vrde_server.vrde_ext_pack");
   vrdeExtPack.addEventListener("change", toggleVNCPassword);
 
+  const firmwareType = document.getElementById("firmware_settings.firmware_type");
+  firmwareType.addEventListener("change", toggleSecureBoot);
+
   if (vrdeExtPack.value.toUpperCase() != "VNC") {
     document.getElementById("vnc-password").style.display = "none";
     document.getElementById("vrde_server.vnc_password").setAttribute("disabled", "true");
+  }
+
+  if (firmwareType.value.toUpperCase() == "BIOS") {
+    document.getElementById("secure-boot").style.display = "none";
   }
 </script>
 {% endblock %}
