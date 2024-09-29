@@ -385,6 +385,26 @@ class Machine(BaseModel, metaclass=ModelRegister):
         values = (properties[key] for key in properties)
         return list(GuestProperty(*property_) for property_ in zip(*values))
 
+    def get_secure_boot_state(self) -> bool:
+        """Return whether secure boot is enabled."""
+        with self.with_lock() as locked_machine:
+            uefi_store = locked_machine.non_volatile_store.uefi_variable_store
+            return uefi_store.secure_boot_enabled
+
+    def set_secure_boot_state(self, state: bool) -> None:
+        """Set secure boot state of machine."""
+        with self.with_lock(save_settings=True) as locked_machine:
+            uefi_store = locked_machine.non_volatile_store.uefi_variable_store
+            uefi_store.secure_boot_enabled = state
+
+    def configure_secure_boot(self) -> None:
+        """Enroll Oracle and Microsoft secure boot keys."""
+        with self.with_lock(save_settings=True) as locked_machine:
+            nvram = locked_machine.non_volatile_store
+            nvram.init_uefi_variable_store(0)
+            nvram.uefi_variable_store.enroll_default_ms_signatures()
+            nvram.uefi_variable_store.enroll_oracle_platform_key()
+
     def get_state_name(self) -> str:
         """Return formatted machine state."""
         return split_pascal_case(self.state)
