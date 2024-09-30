@@ -21,6 +21,7 @@ Python bindings to the VirtualBox SOAP API.
   - [Medium](#medium)
 - [Testing](#testing)
 - [Contributing](#contributing)
+- [Changelog](#changelog)
 - [Credits](#credits)
   - [Contributors](#contributors)
   - [Resources](#resources)
