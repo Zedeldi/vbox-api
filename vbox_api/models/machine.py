@@ -8,6 +8,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime
 from enum import IntEnum
+from pathlib import Path
 from typing import Any, Callable, Optional
 
 from PIL import Image
@@ -385,8 +386,14 @@ class Machine(BaseModel, metaclass=ModelRegister):
         values = (properties[key] for key in properties)
         return list(GuestProperty(*property_) for property_ in zip(*values))
 
+    def _is_uefi_variable_store_init(self) -> bool:
+        """Return whether UEFI NVRAM file exists for this machine."""
+        return Path(self.non_volatile_store.non_volatile_storage_file).exists()
+
     def get_secure_boot_state(self) -> bool:
         """Return whether secure boot is enabled."""
+        if not self._is_uefi_variable_store_init():
+            return False
         with self.with_lock() as locked_machine:
             uefi_store = locked_machine.non_volatile_store.uefi_variable_store
             return uefi_store.secure_boot_enabled
@@ -394,14 +401,17 @@ class Machine(BaseModel, metaclass=ModelRegister):
     def set_secure_boot_state(self, state: bool) -> None:
         """Set secure boot state of machine."""
         with self.with_lock(save_settings=True) as locked_machine:
-            uefi_store = locked_machine.non_volatile_store.uefi_variable_store
-            uefi_store.secure_boot_enabled = state
+            nvram = locked_machine.non_volatile_store
+            if not self._is_uefi_variable_store_init():
+                nvram.init_uefi_variable_store(0)
+            nvram.uefi_variable_store.secure_boot_enabled = state
 
     def configure_secure_boot(self) -> None:
         """Enroll Oracle and Microsoft secure boot keys."""
         with self.with_lock(save_settings=True) as locked_machine:
             nvram = locked_machine.non_volatile_store
-            nvram.init_uefi_variable_store(0)
+            if not self._is_uefi_variable_store_init():
+                nvram.init_uefi_variable_store(0)
             nvram.uefi_variable_store.enroll_default_ms_signatures()
             nvram.uefi_variable_store.enroll_oracle_platform_key()
 

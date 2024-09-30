@@ -65,12 +65,12 @@
                 {% endfor %}
               </select>
             </div>
-            <div id="secure-boot">
-              <div class="form-check form-switch mb-3">
-                <input class="form-check-input" type="checkbox" role="switch" id="secure_boot_state" name="secure_boot_state" {{ "checked" if machine.secure_boot_state }}>
-                <label class="form-check-label" for="secure_boot_state">Secure Boot</label>
-              </div>
-              <a class="btn btn-outline-primary mb-3" href="{{ url_for('machine.configure_secure_boot', id=machine.id) }}" role="button">Configure Secure Boot</a>
+            <div class="mb-3" id="secure-boot">
+              {% if not machine.secure_boot_state %}
+              <a class="btn btn-outline-primary" href="{{ url_for('machine.enable_secure_boot', id=machine.id) }}" role="button">Enable Secure Boot</a>
+              {% else %}
+              <a class="btn btn-outline-danger" href="{{ url_for('machine.disable_secure_boot', id=machine.id) }}" role="button">Disable Secure Boot</a>
+              {% endif %}
             </div>
           </section>
         </li>
@@ -148,29 +148,18 @@
     }
   }
 
-  function toggleSecureBoot(e) {
-    const secureBootBtn = document.getElementById("secure-boot");
-    if (e.target.value.toUpperCase() == "BIOS") {
-      secureBootBtn.style.display = "none";
-    } else {
-      secureBootBtn.style.display = "";
-    }
-  }
-
   const vrdeCheckbox = document.getElementById("vrde_server.enabled");
   vrdeCheckbox.addEventListener("change", toggleVRDEForm);
 
   const vrdeExtPack = document.getElementById("vrde_server.vrde_ext_pack");
   vrdeExtPack.addEventListener("change", toggleVNCPassword);
 
-  const firmwareType = document.getElementById("firmware_settings.firmware_type");
-  firmwareType.addEventListener("change", toggleSecureBoot);
-
   if (vrdeExtPack.value.toUpperCase() != "VNC") {
     document.getElementById("vnc-password").style.display = "none";
     document.getElementById("vrde_server.vnc_password").setAttribute("disabled", "true");
   }
 
+  const firmwareType = document.getElementById("firmware_settings.firmware_type");
   if (firmwareType.value.toUpperCase() == "BIOS") {
     document.getElementById("secure-boot").style.display = "none";
   }
