@@ -286,6 +286,15 @@ Source code is formatted using [black](https://pypi.org/project/black/), and typ
 If there are any questions, please do not hesitate to ask.
 All contributions are welcome!
 
+## Changelog
+
+For VirtualBox `v7.1.0` onwards (released 09/09/2024), use `v2.0.0` or above of `vbox-api`.
+`v7.1.0` was a major update, causing some breaking changes with their API, specifically with the introduction of `PlatformProperties`.
+
+For previous versions of VirtualBox, use `v1.5.3` or below.
+
+For more information, see the [VirtualBox Changelog](https://www.virtualbox.org/wiki/Changelog).
+
 ## Credits
 
 ### Contributors
