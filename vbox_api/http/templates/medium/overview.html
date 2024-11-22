@@ -18,7 +18,7 @@
           {% else %}
           <div>
           {% endif %}
-            <b>Location: </b><a href="{{ url_for('medium.download', id=medium.id) }}"><span class="font-monospace">{{ medium.base.get_path() }}</span></a>
+            <b>Name: </b><a href="{{ url_for('medium.download', id=medium.id) }}"><span class="font-monospace">{{ medium.base.get_path().name }}</span></a>
           </div>
           {% if medium.all_children %}
           <ul class="list-group collapse py-2" id="children-{{ medium.id }}">
@@ -27,7 +27,8 @@
           {% endfor %}
           </ul>
           {% endif %}
-          <b>Format: </b>{{ medium.format }}<br>
+          <b>Path: </b><span class="font-monospace">{{ medium.base.get_path().parent }}</span><br>
+          <b>Format: </b>{{ medium.format | upper }}<br>
           <b>Size: </b>{{ medium.logical_size | filesizeformat(binary=True) }}<br>
           {% if not medium.machine_ids %}
           <a href="{{ url_for('medium.delete', id=medium.id) }}">Delete</a>
@@ -47,8 +48,9 @@
       <ul class="list-group py-2">
         {% for medium in g.api.dvd_images %}
         <li class="list-group-item">
-          <b>Location: </b><a class="font-monospace" href="{{ url_for('medium.download', id=medium.id) }}">{{ medium.base.get_path() }}</a><br>
-          <b>Format: </b>{{ medium.format }}<br>
+          <b>Name: </b><a class="font-monospace" href="{{ url_for('medium.download', id=medium.id) }}">{{ medium.base.get_path().name }}</a><br>
+          <b>Path: </b><span class="font-monospace">{{ medium.base.get_path().parent }}</span><br>
+          <b>Format: </b>{{ medium.format | upper }}<br>
           <b>Size: </b>{{ medium.logical_size | filesizeformat(binary=True) }}<br>
           {% if not medium.machine_ids %}
           <a href="{{ url_for('medium.delete', id=medium.id) }}">Delete</a>
@@ -68,8 +70,9 @@
       <ul class="list-group py-2">
         {% for medium in g.api.floppy_images %}
         <li class="list-group-item">
-          <b>Location: </b><a class="font-monospace" href="{{ url_for('medium.download', id=medium.id) }}">{{ medium.base.get_path() }}</a><br>
-          <b>Format: </b>{{ medium.format }}<br>
+          <b>Name: </b><a class="font-monospace" href="{{ url_for('medium.download', id=medium.id) }}">{{ medium.base.get_path().name }}</a><br>
+          <b>Path: </b><span class="font-monospace">{{ medium.base.get_path().parent }}</span><br>
+          <b>Format: </b>{{ medium.format | upper }}<br>
           <b>Size: </b>{{ medium.logical_size | filesizeformat(binary=True) }}<br>
           {% if not medium.machine_ids %}
           <a href="{{ url_for('medium.delete', id=medium.id) }}">Delete</a>
