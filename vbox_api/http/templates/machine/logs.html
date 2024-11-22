@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block title %}Logs - {{ machine.name }}{% endblock %}
+{% block content %}
+<ul class="nav nav-tabs">
+  {% for log_file in machine.log_files | sort(attribute="name") %}
+  <li class="nav-item">
+    <a class="nav-link {{ 'active' if loop.index0 == index }}" href="{{ url_for('machine.logs', id=machine.id, index=loop.index0) }}">
+      {{ log_file.name }}
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+<pre><code>
+{{ machine.read_log_from_file(index) }}
+</code></pre>
+{% endblock %}

@@ -224,3 +224,18 @@ def disable_secure_boot(machine: Machine) -> Response | str:
     machine.secure_boot_state = False
     flash("Disabled secure boot.", "warning")
     return redirect(url_for("machine.edit", id=machine.id))
+
+
+@machine_blueprint.route("/logs", methods=["GET"])
+@machine_blueprint.route("/<string:name_or_id>/logs", methods=["GET"])
+@requires_session
+@convert_id_to_model("machine")
+def logs(machine: Machine) -> Response | str:
+    """Endpoint to view logs for a specified machine."""
+    try:
+        index = int(request.args.get("index", 0))
+        if index not in machine.log_indexes:
+            raise ValueError("Log index does not exist")
+    except ValueError:
+        abort(400, "Invalid log index.")
+    return render_template("machine/logs.html", machine=machine, index=index)

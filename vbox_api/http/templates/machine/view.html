@@ -7,6 +7,8 @@
   <span class="ms-2 align-self-center text-muted">({{ machine.current_snapshot.name }})</span>
   {% endif %}
   <span class="me-auto"></span>
+  <a class="btn btn-secondary me-2" href="{{ url_for('machine.logs', id=machine.id) }}" role="button">Logs</a>
+  <div class="vr me-2"></div>
   {% if machine.state in (g.constants.MachineState.POWERED_OFF, g.constants.MachineState.SAVED, g.constants.MachineState.ABORTED) %}
   <a class="btn btn-outline-danger me-2" href="{{ url_for('machine.delete', id=machine.id) }}" role="button">Delete</a>
   <div class="vr me-2"></div>

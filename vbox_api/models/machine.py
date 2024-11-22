@@ -415,20 +415,21 @@ class Machine(BaseModel, metaclass=ModelRegister):
             nvram.uefi_variable_store.enroll_default_ms_signatures()
             nvram.uefi_variable_store.enroll_oracle_platform_key()
 
-    def get_logs(self) -> list[Path]:
+    def get_log_files(self) -> list[Path]:
         """Return list of paths to log files."""
         return [log for log in Path(self.log_folder).glob("VBox.log*")]
 
     def get_log_indexes(self) -> list[int]:
         """Return list of indexes for log files."""
         return [
-            log.name.removeprefix("VBox.log.") if not log.name == "VBox.log" else 0
-            for log in self.get_logs()
+            int(log.name.removeprefix("VBox.log.")) if not log.name == "VBox.log" else 0
+            for log in self.get_log_files()
         ]
 
     def read_log_from_file(self, index: int = 0) -> str:
         """Read log with specified index and return as string."""
         path = Path(self.query_log_filename(index))
+        logger.info(f"Reading log #{index} '{path.name}' machine '{self.name}'")
         with open(path, "r") as fd:
             return fd.read()
 
