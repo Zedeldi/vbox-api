@@ -1,26 +1,32 @@
 {% extends "layout.html" %}
 {% block title %}Machines{% endblock %}
 {% block content %}
-<div class="d-flex">
-  <h3 class="me-auto">Machines</h3>
-  <a class="btn btn-primary me-2" href="{{ url_for('machine.create') }}" role="button">Create</a>
-</div>
-<hr>
-<div class="row row-cols-1 row-cols-md-4 g-4">
-  {% for machine in g.api.machines %}
-  <div class="col">
-    <div class="card h-100">
-      <img src="{{ machine.get_thumbnail(data_uri=True) }}" class="card-img-top" alt="Thumbnail for {{ machine.name }}">
-      <div class="card-body">
-        <h5 class="card-title"><a href="{{ url_for('machine.view', id=machine.id) }}">{{ machine.name }}</a></h5>
-        <p class="card-text">
-          <span class="badge text-bg-{{ ['secondary', 'success', 'warning', 'danger'][machine.get_health()] }}">{{ machine.get_state_name() }}</span>
-          <br>
-          Group: {{ machine.groups[0] }}
-        </p>
-      </div>
-    </div>
+  <div class="d-flex">
+    <h3 class="me-auto">Machines</h3>
+    <a class="btn btn-primary me-2"
+       href="{{ url_for('machine.create') }}"
+       role="button">Create</a>
   </div>
-  {% endfor %}
-</div>
+  <hr />
+  <div class="row row-cols-1 row-cols-md-4 g-4">
+    {% for machine in g.api.machines %}
+      <div class="col">
+        <div class="card h-100">
+          <img src="{{ machine.get_thumbnail(data_uri=True) }}"
+               class="card-img-top"
+               alt="Thumbnail for {{ machine.name }}" />
+          <div class="card-body">
+            <h5 class="card-title">
+              <a href="{{ url_for('machine.view', id=machine.id) }}">{{ machine.name }}</a>
+            </h5>
+            <p class="card-text">
+              <span class="badge text-bg-{{ ['secondary', 'success', 'warning', 'danger'][machine.get_health() ] }}">{{ machine.get_state_name() }}</span>
+              <br />
+              Group: {{ machine.groups[0] }}
+            </p>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
 {% endblock %}

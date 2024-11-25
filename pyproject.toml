@@ -35,6 +35,11 @@ vbox-api-cli = "vbox_api.cli.__main__:main"
 vbox-api-http = "vbox_api.http.__main__:main"
 vbox-api-gui = "vbox_api.http.gui:main"
 
+[tool.djlint]
+close_void_tags = true
+indent = 2
+profile = "jinja"
+
 [tool.isort]
 profile = "black"
 

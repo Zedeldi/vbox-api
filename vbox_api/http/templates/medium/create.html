@@ -1,13 +1,16 @@
 {% extends "layout.html" %}
 {% block title %}Create Medium{% endblock %}
 {% block content %}
-<div class="d-flex">
-  <h3 class="me-auto">Create Medium</h3>
-  <a class="btn btn-outline-danger me-2" href="{{ url_for('medium.overview') }}" role="button">Cancel</a>
-</div>
-<hr>
-<div class="row">
-  <ul class="list-group list-group-flush"></ul>
+  <div class="d-flex">
+    <h3 class="me-auto">Create Medium</h3>
+    <a class="btn btn-outline-danger me-2"
+       href="{{ url_for('medium.overview') }}"
+       role="button">Cancel</a>
+  </div>
+  <hr />
+  <div class="row">
+    <ul class="list-group list-group-flush">
+    </ul>
     <div class="col">
       <li class="list-group-item">
         <section id="new">
@@ -15,18 +18,25 @@
             <h5>New</h5>
             <div class="input-group mb-3">
               <span class="input-group-text">Name</span>
-              <input type="text" id="name-new" name="name" class="form-control">
+              <input type="text" id="name-new" name="name" class="form-control" />
             </div>
             <div class="input-group mb-3">
               <span class="input-group-text">Size</span>
-              <input type="number" id="size-new" name="size" class="form-control" min="0" step="1048576" placeholder="{{ config.DEFAULT_MEDIUM_SIZE }}">
+              <input type="number"
+                     id="size-new"
+                     name="size"
+                     class="form-control"
+                     min="0"
+                     step="1048576"
+                     placeholder="{{ config.DEFAULT_MEDIUM_SIZE }}" />
               <span class="input-group-text">bytes</span>
             </div>
             <div class="input-group mb-3">
               <span class="input-group-text">Format</span>
               <select id="format-new" name="format" class="form-select">
                 {% for medium_format in g.api.system_properties.medium_formats %}
-                <option value="{{ medium_format.id }}" {{ "selected" if g.api.system_properties.default_hard_disk_format == medium_format.id }}>{{ medium_format.name }}</option>
+                  <option value="{{ medium_format.id }}" {{ "selected" if g.api.system_properties.default_hard_disk_format == medium_format.id }}>{{ medium_format.name }}
+                  </option>
                 {% endfor %}
               </select>
             </div>
@@ -34,7 +44,8 @@
               <span class="input-group-text">Device Type</span>
               <select id="device_type-new" name="device_type" class="form-select">
                 {% for device_type in g.constants.MediumDeviceType %}
-                <option value="{{ device_type }}" {{ "selected" if device_type == g.constants.MediumDeviceType.HARD_DISK }}>{{ utils.split_pascal_case(device_type) }}</option>
+                  <option value="{{ device_type }}" {{ "selected" if device_type == g.constants.MediumDeviceType.HARD_DISK }}>{{ utils.split_pascal_case(device_type) }}
+                  </option>
                 {% endfor %}
               </select>
             </div>
@@ -49,13 +60,14 @@
           <form method="POST" enctype="multipart/form-data">
             <h5>Upload</h5>
             <div class="input-group mb-3">
-              <input type="file" id="file-upload" name="file" class="form-control">
+              <input type="file" id="file-upload" name="file" class="form-control" />
             </div>
             <div class="input-group mb-3">
               <span class="input-group-text">Device Type</span>
               <select id="device_type-upload" name="device_type" class="form-select">
                 {% for device_type in g.constants.MediumDeviceType %}
-                <option value="{{ device_type }}" {{ "selected" if device_type == g.constants.MediumDeviceType.HARD_DISK }}>{{ utils.split_pascal_case(device_type) }}</option>
+                  <option value="{{ device_type }}" {{ "selected" if device_type == g.constants.MediumDeviceType.HARD_DISK }}>{{ utils.split_pascal_case(device_type) }}
+                  </option>
                 {% endfor %}
               </select>
             </div>

@@ -1,90 +1,102 @@
 {% extends "layout.html" %}
 {% block title %}Mediums{% endblock %}
 {% block content %}
-<div class="d-flex">
-  <h3 class="me-auto">Mediums</h3>
-  <a class="btn btn-primary me-2" href="{{ url_for('medium.create') }}" role="button">Create</a>
-</div>
-<hr>
-<ul class="list-group list-group-flush">
-  <li class="list-group-item">
-    <section id="hard-disks">
-      <h5>Hard Disks</h5>
-      <ul class="list-group py-2">
-        {% for medium in g.api.hard_disks %}
-        <li class="list-group-item">
-          {% if medium.all_children %}
-          <div class="dropdown-toggle" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#children-{{ medium.id }}">
-          {% else %}
-          <div>
-          {% endif %}
-            <b>Name: </b><a href="{{ url_for('medium.download', id=medium.id) }}"><span class="font-monospace">{{ medium.base.get_path().name }}</span></a>
-          </div>
-          {% if medium.all_children %}
-          <ul class="list-group collapse py-2" id="children-{{ medium.id }}">
-          {% for child in medium.all_children %}
-            <li class="list-group-item font-monospace">{{ child.get_path() }}</li>
-          {% endfor %}
+  <div class="d-flex">
+    <h3 class="me-auto">Mediums</h3>
+    <a class="btn btn-primary me-2"
+       href="{{ url_for('medium.create') }}"
+       role="button">Create</a>
+  </div>
+  <hr />
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">
+      <section id="hard-disks">
+        <h5>Hard Disks</h5>
+        <ul class="list-group py-2">
+          {% for medium in g.api.hard_disks %}
+            <li class="list-group-item">
+              {% if medium.all_children %}
+                <div class="dropdown-toggle"
+                     style="cursor: pointer"
+                     data-bs-toggle="collapse"
+                     data-bs-target="#children-{{ medium.id }}">
+                {% else %}
+                  <div>
+                  {% endif %}
+                  <b>Name: </b><a href="{{ url_for('medium.download', id=medium.id) }}"><span class="font-monospace">{{ medium.base.get_path().name }}</span></a>
+                </div>
+                {% if medium.all_children %}
+                  <ul class="list-group collapse py-2" id="children-{{ medium.id }}">
+                    {% for child in medium.all_children %}
+                      <li class="list-group-item font-monospace">{{ child.get_path() }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+                <b>Path: </b><span class="font-monospace">{{ medium.base.get_path().parent }}</span>
+                <br />
+                <b>Format: </b>{{ medium.format | upper }}
+                <br />
+                <b>Size: </b>{{ medium.logical_size | filesizeformat(binary=True) }}
+                <br />
+                {% if not medium.machine_ids %}<a href="{{ url_for('medium.delete', id=medium.id) }}">Delete</a>{% endif %}
+              </li>
+            {% else %}
+              <li class="list-group-item">
+                <p>No hard disks found.</p>
+              </li>
+            {% endfor %}
           </ul>
-          {% endif %}
-          <b>Path: </b><span class="font-monospace">{{ medium.base.get_path().parent }}</span><br>
-          <b>Format: </b>{{ medium.format | upper }}<br>
-          <b>Size: </b>{{ medium.logical_size | filesizeformat(binary=True) }}<br>
-          {% if not medium.machine_ids %}
-          <a href="{{ url_for('medium.delete', id=medium.id) }}">Delete</a>
-          {% endif %}
-        </li>
-        {% else %}
-        <li class="list-group-item">
-          <p>No hard disks found.</p>
-        </li>
-        {% endfor %}
-      </ul>
-    </section>
-  </li>
-  <li class="list-group-item">
-    <section id="dvd-images">
-      <h5>DVD Images</h5>
-      <ul class="list-group py-2">
-        {% for medium in g.api.dvd_images %}
-        <li class="list-group-item">
-          <b>Name: </b><a class="font-monospace" href="{{ url_for('medium.download', id=medium.id) }}">{{ medium.base.get_path().name }}</a><br>
-          <b>Path: </b><span class="font-monospace">{{ medium.base.get_path().parent }}</span><br>
-          <b>Format: </b>{{ medium.format | upper }}<br>
-          <b>Size: </b>{{ medium.logical_size | filesizeformat(binary=True) }}<br>
-          {% if not medium.machine_ids %}
-          <a href="{{ url_for('medium.delete', id=medium.id) }}">Delete</a>
-          {% endif %}
-        </li>
-        {% else %}
-        <li class="list-group-item">
-          <p>No DVD images found.</p>
-        </li>
-        {% endfor %}
-      </ul>
-    </section>
-  </li>
-  <li class="list-group-item">
-    <section id="floppy-images">
-      <h5>Floppy Images</h5>
-      <ul class="list-group py-2">
-        {% for medium in g.api.floppy_images %}
-        <li class="list-group-item">
-          <b>Name: </b><a class="font-monospace" href="{{ url_for('medium.download', id=medium.id) }}">{{ medium.base.get_path().name }}</a><br>
-          <b>Path: </b><span class="font-monospace">{{ medium.base.get_path().parent }}</span><br>
-          <b>Format: </b>{{ medium.format | upper }}<br>
-          <b>Size: </b>{{ medium.logical_size | filesizeformat(binary=True) }}<br>
-          {% if not medium.machine_ids %}
-          <a href="{{ url_for('medium.delete', id=medium.id) }}">Delete</a>
-          {% endif %}
-        </li>
-        {% else %}
-        <li class="list-group-item">
-          <p>No floppy images found.</p>
-        </li>
-        {% endfor %}
-      </ul>
-    </section>
-  </li>
-</ul>
-{% endblock %}
+        </section>
+      </li>
+      <li class="list-group-item">
+        <section id="dvd-images">
+          <h5>DVD Images</h5>
+          <ul class="list-group py-2">
+            {% for medium in g.api.dvd_images %}
+              <li class="list-group-item">
+                <b>Name: </b><a class="font-monospace"
+   href="{{ url_for('medium.download', id=medium.id) }}">{{ medium.base.get_path().name }}</a>
+                <br />
+                <b>Path: </b><span class="font-monospace">{{ medium.base.get_path().parent }}</span>
+                <br />
+                <b>Format: </b>{{ medium.format | upper }}
+                <br />
+                <b>Size: </b>{{ medium.logical_size | filesizeformat(binary=True) }}
+                <br />
+                {% if not medium.machine_ids %}<a href="{{ url_for('medium.delete', id=medium.id) }}">Delete</a>{% endif %}
+              </li>
+            {% else %}
+              <li class="list-group-item">
+                <p>No DVD images found.</p>
+              </li>
+            {% endfor %}
+          </ul>
+        </section>
+      </li>
+      <li class="list-group-item">
+        <section id="floppy-images">
+          <h5>Floppy Images</h5>
+          <ul class="list-group py-2">
+            {% for medium in g.api.floppy_images %}
+              <li class="list-group-item">
+                <b>Name: </b><a class="font-monospace"
+   href="{{ url_for('medium.download', id=medium.id) }}">{{ medium.base.get_path().name }}</a>
+                <br />
+                <b>Path: </b><span class="font-monospace">{{ medium.base.get_path().parent }}</span>
+                <br />
+                <b>Format: </b>{{ medium.format | upper }}
+                <br />
+                <b>Size: </b>{{ medium.logical_size | filesizeformat(binary=True) }}
+                <br />
+                {% if not medium.machine_ids %}<a href="{{ url_for('medium.delete', id=medium.id) }}">Delete</a>{% endif %}
+              </li>
+            {% else %}
+              <li class="list-group-item">
+                <p>No floppy images found.</p>
+              </li>
+            {% endfor %}
+          </ul>
+        </section>
+      </li>
+    </ul>
+  {% endblock %}

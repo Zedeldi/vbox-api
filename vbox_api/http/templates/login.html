@@ -1,37 +1,63 @@
 {% extends "layout.html" %}
 {% block title %}Login{% endblock %}
 {% block content %}
-<form method="POST">
-  <div class="position-absolute top-50 start-50 translate-middle card p-1" style="width: 20rem;">
-    <div class="text-center">
-      <img src="{{ url_for('static', filename='images/logo.svg') }}" class="card-img-top w-50">
-    </div>
-    <div class="card-body">
-      <h6 class="card-subtitle mb-3 text-body-secondary">Please enter your username and password.</h6>
-      <div class="form-floating mb-3">
-        <input type="text" id="username" name="username" class="form-control" placeholder="Username" required>
-        <label for="username">Username</label>
+  <form method="POST">
+    <div class="position-absolute top-50 start-50 translate-middle card p-1"
+         style="width: 20rem">
+      <div class="text-center">
+        <img src="{{ url_for('static', filename='images/logo.svg') }}"
+             class="card-img-top w-50" />
       </div>
-      <div class="form-floating mb-3">
-        <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
-        <label for="password">Password</label>
-      </div>
-      <div class="mb-3">
-        <a class="dropdown-toggle" data-bs-toggle="collapse" href="#advanced-settings">Advanced settings</a>
-        <div class="collapse mt-3" id="advanced-settings">
-          <div class="input-group">
-            <span class="input-group-text">Host</span>
-            <input type="text" id="host" name="host" class="form-control" placeholder="localhost">
-            <span class="input-group-text">:</span>
-            <input type="number" id="port" name="port" class="form-control" min="1" max="65535" placeholder="18083">
-          </div>
-          {% if g.is_allowed(g.permissions.START_VBOXWEBSRV) %}
-          <a class="btn btn-outline-secondary my-2 w-100" href="{{ url_for('vboxwebsrv') }}" role="button">Start VirtualBox Web Service</a>
-          {% endif %}
+      <div class="card-body">
+        <h6 class="card-subtitle mb-3 text-body-secondary">Please enter your username and password.</h6>
+        <div class="form-floating mb-3">
+          <input type="text"
+                 id="username"
+                 name="username"
+                 class="form-control"
+                 placeholder="Username"
+                 required />
+          <label for="username">Username</label>
         </div>
+        <div class="form-floating mb-3">
+          <input type="password"
+                 id="password"
+                 name="password"
+                 class="form-control"
+                 placeholder="Password"
+                 required />
+          <label for="password">Password</label>
+        </div>
+        <div class="mb-3">
+          <a class="dropdown-toggle"
+             data-bs-toggle="collapse"
+             href="#advanced-settings">Advanced settings</a>
+          <div class="collapse mt-3" id="advanced-settings">
+            <div class="input-group">
+              <span class="input-group-text">Host</span>
+              <input type="text"
+                     id="host"
+                     name="host"
+                     class="form-control"
+                     placeholder="localhost" />
+              <span class="input-group-text">:</span>
+              <input type="number"
+                     id="port"
+                     name="port"
+                     class="form-control"
+                     min="1"
+                     max="65535"
+                     placeholder="18083" />
+            </div>
+            {% if g.is_allowed(g.permissions.START_VBOXWEBSRV) %}
+              <a class="btn btn-outline-secondary my-2 w-100"
+                 href="{{ url_for('vboxwebsrv') }}"
+                 role="button">Start VirtualBox Web Service</a>
+            {% endif %}
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Login</button>
       </div>
-      <button type="submit" class="btn btn-primary w-100">Login</button>
     </div>
-  </div>
-</form>
+  </form>
 {% endblock %}

@@ -1,182 +1,247 @@
 {% extends "layout.html" %}
 {% block title %}{{ machine.name }}{% endblock %}
 {% block content %}
-<div class="d-flex">
-  <h3>{{ machine.name }}</h3>
-  {% if machine.current_snapshot %}
-  <span class="ms-2 align-self-center text-muted">({{ machine.current_snapshot.name }})</span>
-  {% endif %}
-  <span class="me-auto"></span>
-  <a class="btn btn-secondary me-2" href="{{ url_for('machine.logs', id=machine.id) }}" role="button">Logs</a>
-  <div class="vr me-2"></div>
-  {% if machine.state in (g.constants.MachineState.POWERED_OFF, g.constants.MachineState.SAVED, g.constants.MachineState.ABORTED) %}
-  <a class="btn btn-outline-danger me-2" href="{{ url_for('machine.delete', id=machine.id) }}" role="button">Delete</a>
-  <div class="vr me-2"></div>
-  <a class="btn btn-secondary me-2" href="{{ url_for('machine.edit', id=machine.id) }}" role="button">Edit</a>
-  {% endif %}
-  <a class="btn btn-secondary me-2" href="{{ url_for('machine.clone', id=machine.id) }}" role="button">Clone</a>
-  <div class="btn-group">
-    {% if machine.state == g.constants.MachineState.RUNNING and machine.vrde_server.enabled and machine.vrde_server.protocol.lower() == "vnc" %}
-    <a class="btn btn-outline-primary" href="{{ url_for('machine.remote', id=machine.id) }}" target="_blank" rel="noopener noreferrer" role="button">Remote Control</a>
-    {% elif machine.state == g.constants.MachineState.PAUSED %}
-    <a class="btn btn-outline-primary" href="{{ url_for('machine.start', id=machine.id, resume=True) }}" role="button">Resume</a>
-    {% elif machine.state == g.constants.MachineState.SAVED %}
-    <a class="btn btn-outline-primary" href="{{ url_for('machine.stop', id=machine.id, discard_state=True) }}" role="button">Discard</a>
+  <div class="d-flex">
+    <h3>{{ machine.name }}</h3>
+    {% if machine.current_snapshot %}
+      <span class="ms-2 align-self-center text-muted">({{ machine.current_snapshot.name }})</span>
     {% endif %}
+    <span class="me-auto"></span>
+    <a class="btn btn-secondary me-2"
+       href="{{ url_for('machine.logs', id=machine.id) }}"
+       role="button">Logs</a>
+    <div class="vr me-2"></div>
     {% if machine.state in (g.constants.MachineState.POWERED_OFF, g.constants.MachineState.SAVED, g.constants.MachineState.ABORTED) %}
-    <a class="btn btn-primary" href="{{ url_for('machine.start', id=machine.id, front_end='headless') }}" role="button">Start</a>
-    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">
-      <span class="visually-hidden"></span>
-    </button>
-    <ul class="dropdown-menu">
-      <li><a class="dropdown-item" href="{{ url_for('machine.start', id=machine.id, front_end='gui') }}">GUI</a></li>
-    </ul>
-    {% else %}
-    <a class="btn btn-primary" href="{{ url_for('machine.stop', id=machine.id, save_state=True) }}" role="button">Save</a>
-    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">
-      <span class="visually-hidden"></span>
-    </button>
-    <ul class="dropdown-menu">
-      {% if machine.state != g.constants.MachineState.PAUSED %}
-      <li><a class="dropdown-item" href="{{ url_for('machine.stop', id=machine.id, pause=True) }}">Pause</a></li>
-      {% endif %}
-      <li><a class="dropdown-item" href="{{ url_for('machine.stop', id=machine.id) }}">Stop</a></li>
-      {% if machine.state != g.constants.MachineState.PAUSED %}
-      <li><hr class="dropdown-divider"></li>
-      <li><a class="dropdown-item" href="{{ url_for('machine.stop', id=machine.id, reset=True) }}">Reset</a></li>
-      {% endif %}
-    </ul>
+      <a class="btn btn-outline-danger me-2"
+         href="{{ url_for('machine.delete', id=machine.id) }}"
+         role="button">Delete</a>
+      <div class="vr me-2"></div>
+      <a class="btn btn-secondary me-2"
+         href="{{ url_for('machine.edit', id=machine.id) }}"
+         role="button">Edit</a>
     {% endif %}
-  </div>
-</div>
-<hr>
-<div class="row">
-  <div class="col">
-    <ul class="list-group list-group-flush">
-      <li class="list-group-item">
-        <section id="thumbnail">
-         <img src="{{ machine.get_thumbnail(data_uri=True) }}" class="img-thumbnail" alt="Thumbnail for {{ machine.name }}">
-        </section>
-      </li>
-      <li class="list-group-item">
-        <section id="guest">
-          <h5>Guest Information</h5>
-          <div>
-            {% if machine.state == g.constants.MachineState.RUNNING %}
-            <b>Guest Additions: </b>{{ machine.get_guest_additions_status() }}
-            {% endif %}
-            <div class="dropdown-toggle" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#guest-properties">
-              <b>Guest Properties</b>
-            </div>
-            <div class="collapse" id="guest-properties">
-              {% for guest_property in machine.enumerate_guest_properties_as_dataclass() | sort(attribute="name") %}
-              <b>{{ guest_property.name }}: </b><span class="font-monospace">{{ guest_property.value }}</span><br>
-              {% endfor %}
-            </div>
-          </div>
-        </section>
-      </li>
-    </ul>
-  </div>
-  <div class="col">
-    <ul class="list-group list-group-flush">
-      <li class="list-group-item">
-        <section id="general">
-          <h5>General</h5>
-          <p>
-            <b>State: </b><span class="badge text-bg-{{ ['secondary', 'success', 'warning', 'danger'][machine.get_health()] }}">{{ machine.get_state_name() }}</span> since {{ machine.get_last_state_change_dt().strftime("%a %d %b %Y at %H:%M:%S") }}<br>
-            <b>Group: </b>{{ machine.groups[0] }}<br>
-            <b>Description: </b>{{ machine.description if machine.description else "No description provided." }}
-          </p>
-        </section>
-      </li>
-      <li class="list-group-item">
-        <section id="system">
-          <h5>System</h5>
-          <p>
-            <b>Operating System: </b>{{ machine.get_os_type_description() }}<br>
-            <b>Memory: </b><span class="font-monospace">{{ machine.memory_size }} MB</span><br>
-            <b>Processors: </b><span class="font-monospace">{{ machine.cpu_count }}</span><br>
-            <b>TPM: </b><span class="font-monospace">{{ machine.trusted_platform_module.type.replace("_", ".") }}</span><br>
-            <b>Firmware: </b>{{ machine.firmware_settings.firmware_type }}<br>
-            {% if machine.firmware_settings.firmware_type == "BIOS" %}
-            <b>Secure Boot: </b>n/a
-            {% else %}
-            <b>Secure Boot: </b>{{ "Enabled" if machine.secure_boot_state else "Disabled" }}
-            {% endif %}
-          </p>
-        </section>
-      </li>
-      <li class="list-group-item">
-        <section id="display">
-          <h5>Display</h5>
-          <p>
-            <b>Video Memory: </b><span class="font-monospace">{{ machine.graphics_adapter.vram_size }} MB</span><br>
-            <b>Graphics Controller: </b><span class="font-monospace">{{ machine.graphics_adapter.graphics_controller_type }}</span><br>
-            <b>Remote Desktop: </b>{{ "Enabled" if machine.vrde_server.enabled else "Disabled" }}<br>
-            {% if machine.vrde_server.enabled %}
-            {% if machine.vrde_server.get_url() %}
-            <b>URL: </b><a href="{{ machine.vrde_server.get_url() }}">{{ machine.vrde_server.get_url() }}</a><br>
-            {% elif machine.vrde_server.get_address() %}
-            <b>Address: </b><span class="font-monospace">{{ machine.vrde_server.get_address() }}:{{ machine.vrde_server.get_port() }}</span><br>
-            {% else %}
-            <b>Port: </b><span class="font-monospace">{{ machine.vrde_server.get_port() }}</span><br>
-            {% endif %}
-            <b>Extension Pack: </b>{{ machine.vrde_server.vrde_ext_pack }}<br>
-            <b>Multiple Connections: </b>{{ "Allowed" if machine.vrde_server.allow_multi_connection else "Disallowed" }}
-            {% endif %}
-          </p>
-        </section>
-      </li>
-      <li class="list-group-item">
-        <section id="storage">
-          <h5>Storage</h5>
-          <ul class="list-group list-group-flush">
-            {% for storage_controller in machine.storage_controllers %}
-            <li class="list-group-item">
-              <b>Controller: </b>{{ storage_controller.name }}<br>
-              {% for medium_attachment in machine.get_medium_attachments_of_controller(storage_controller.name) %}
-              <b>Device: </b>{{ medium_attachment.device }}, <b>Port: </b>{{ medium_attachment.port }}<br>
-              {% if medium_attachment.medium %}
-              {% if medium_attachment.medium.parent %}
-              <div class="dropdown-toggle" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#parents-{{ medium_attachment.medium.id }}">
-              {% else %}
-              <div>
-              {% endif %}
-                <b>{{ medium_attachment.medium.base.get_device_type_name() }}: </b><a href="{{ url_for('medium.download', id=medium_attachment.medium.base.id) }}"><span class="font-monospace">{{ medium_attachment.medium.base.get_path() }}</span></a>
-              </div>
-              {% if medium_attachment.medium.parent %}
-              <ul class="list-group collapse py-2" id="parents-{{ medium_attachment.medium.id }}">
-              {% for parent in medium_attachment.medium.get_parents(include_self=True)[:-1] | reverse %}
-                <li class="list-group-item font-monospace">{{ parent.get_path() }}</li>
-              {% endfor %}
-              </ul>
-              {% endif %}
-              {% else %}
-              <span class="text-muted">No attached mediums.</span><br>
-              {% endif %}
-              {% endfor %}
+    <a class="btn btn-secondary me-2"
+       href="{{ url_for('machine.clone', id=machine.id) }}"
+       role="button">Clone</a>
+    <div class="btn-group">
+      {% if machine.state == g.constants.MachineState.RUNNING and machine.vrde_server.enabled and machine.vrde_server.protocol.lower() == "vnc" %}
+        <a class="btn btn-outline-primary"
+           href="{{ url_for('machine.remote', id=machine.id) }}"
+           target="_blank"
+           rel="noopener noreferrer"
+           role="button">Remote Control</a>
+      {% elif machine.state == g.constants.MachineState.PAUSED %}
+        <a class="btn btn-outline-primary"
+           href="{{ url_for('machine.start', id=machine.id, resume=True) }}"
+           role="button">Resume</a>
+      {% elif machine.state == g.constants.MachineState.SAVED %}
+        <a class="btn btn-outline-primary"
+           href="{{ url_for('machine.stop', id=machine.id, discard_state=True) }}"
+           role="button">Discard</a>
+      {% endif %}
+      {% if machine.state in (g.constants.MachineState.POWERED_OFF, g.constants.MachineState.SAVED, g.constants.MachineState.ABORTED) %}
+        <a class="btn btn-primary"
+           href="{{ url_for('machine.start', id=machine.id, front_end='headless') }}"
+           role="button">Start</a>
+        <button type="button"
+                class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+                data-bs-toggle="dropdown">
+          <span class="visually-hidden"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li>
+            <a class="dropdown-item"
+               href="{{ url_for('machine.start', id=machine.id, front_end='gui') }}">GUI</a>
+          </li>
+        </ul>
+      {% else %}
+        <a class="btn btn-primary"
+           href="{{ url_for('machine.stop', id=machine.id, save_state=True) }}"
+           role="button">Save</a>
+        <button type="button"
+                class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+                data-bs-toggle="dropdown">
+          <span class="visually-hidden"></span>
+        </button>
+        <ul class="dropdown-menu">
+          {% if machine.state != g.constants.MachineState.PAUSED %}
+            <li>
+              <a class="dropdown-item"
+                 href="{{ url_for('machine.stop', id=machine.id, pause=True) }}">Pause</a>
             </li>
-            {% endfor %}
-          </ul>
-        </section>
-      </li>
-      <li class="list-group-item">
-        <section id="network">
-          <h5>Network</h5>
-          <p>
-            {% for network in machine.get_network_adapters() %}
-            <b>Adapter {{ loop.index }}: </b>{{ network.get_attachment_type_name() }}
-            {%- if network.get_interface_name() %}
-            (<span class="font-monospace">{{ network.get_interface_name() }}</span>)
-            {%- endif -%},
-            MAC Address: <span class="font-monospace">{{ network.mac_address }}</span>
-            <br>
-            {% endfor %}
-          </p>
-        </section>
-      </li>
-    </ul>
+          {% endif %}
+          <li>
+            <a class="dropdown-item"
+               href="{{ url_for('machine.stop', id=machine.id) }}">Stop</a>
+          </li>
+          {% if machine.state != g.constants.MachineState.PAUSED %}
+            <li>
+              <hr class="dropdown-divider" />
+            </li>
+            <li>
+              <a class="dropdown-item"
+                 href="{{ url_for('machine.stop', id=machine.id, reset=True) }}">Reset</a>
+            </li>
+          {% endif %}
+        </ul>
+      {% endif %}
+    </div>
   </div>
-</div>
-{% endblock %}
+  <hr />
+  <div class="row">
+    <div class="col">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          <section id="thumbnail">
+            <img src="{{ machine.get_thumbnail(data_uri=True) }}"
+                 class="img-thumbnail"
+                 alt="Thumbnail for {{ machine.name }}" />
+          </section>
+        </li>
+        <li class="list-group-item">
+          <section id="guest">
+            <h5>Guest Information</h5>
+            <div>
+              {% if machine.state == g.constants.MachineState.RUNNING %}
+                <b>Guest Additions: </b>{{ machine.get_guest_additions_status() }}
+              {% endif %}
+              <div class="dropdown-toggle"
+                   style="cursor: pointer"
+                   data-bs-toggle="collapse"
+                   data-bs-target="#guest-properties">
+                <b>Guest Properties</b>
+              </div>
+              <div class="collapse" id="guest-properties">
+                {% for guest_property in machine.enumerate_guest_properties_as_dataclass() | sort(attribute="name") %}
+                  <b>{{ guest_property.name }}: </b><span class="font-monospace">{{ guest_property.value }}</span>
+                  <br />
+                {% endfor %}
+              </div>
+            </div>
+          </section>
+        </li>
+      </ul>
+    </div>
+    <div class="col">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          <section id="general">
+            <h5>General</h5>
+            <p>
+              <b>State: </b><span class="badge text-bg-{{ ['secondary', 'success', 'warning', 'danger'][machine.get_health() ] }}">{{ machine.get_state_name() }}</span> since {{ machine.get_last_state_change_dt().strftime("%a %d %b %Y at %H:%M:%S") }}
+              <br />
+              <b>Group: </b>{{ machine.groups[0] }}
+              <br />
+              <b>Description: </b>{{ machine.description if machine.description else "No description provided." }}
+            </p>
+          </section>
+        </li>
+        <li class="list-group-item">
+          <section id="system">
+            <h5>System</h5>
+            <p>
+              <b>Operating System: </b>{{ machine.get_os_type_description() }}
+              <br />
+              <b>Memory: </b><span class="font-monospace">{{ machine.memory_size }} MB</span>
+              <br />
+              <b>Processors: </b><span class="font-monospace">{{ machine.cpu_count }}</span>
+              <br />
+              <b>TPM: </b><span class="font-monospace">{{ machine.trusted_platform_module.type.replace('_', '.') }}</span>
+              <br />
+              <b>Firmware: </b>{{ machine.firmware_settings.firmware_type }}
+              <br />
+              {% if machine.firmware_settings.firmware_type == "BIOS" %}
+                <b>Secure Boot: </b>n/a
+              {% else %}
+                <b>Secure Boot: </b>{{ "Enabled" if machine.secure_boot_state else "Disabled" }}
+              {% endif %}
+            </p>
+          </section>
+        </li>
+        <li class="list-group-item">
+          <section id="display">
+            <h5>Display</h5>
+            <p>
+              <b>Video Memory: </b><span class="font-monospace">{{ machine.graphics_adapter.vram_size }} MB</span>
+              <br />
+              <b>Graphics Controller: </b><span class="font-monospace">{{ machine.graphics_adapter.graphics_controller_type }}</span>
+              <br />
+              <b>Remote Desktop: </b>{{ "Enabled" if machine.vrde_server.enabled else "Disabled" }}
+              <br />
+              {% if machine.vrde_server.enabled %}
+                {% if machine.vrde_server.get_url() %}
+                  <b>URL: </b><a href="{{ machine.vrde_server.get_url() }}">{{ machine.vrde_server.get_url() }}</a>
+                  <br />
+                {% elif machine.vrde_server.get_address() %}
+                  <b>Address: </b><span class="font-monospace">{{ machine.vrde_server.get_address() }}:{{ machine.vrde_server.get_port() }}</span>
+                  <br />
+                {% else %}
+                  <b>Port: </b><span class="font-monospace">{{ machine.vrde_server.get_port() }}</span>
+                  <br />
+                {% endif %}
+                <b>Extension Pack: </b>{{ machine.vrde_server.vrde_ext_pack }}
+                <br />
+                <b>Multiple Connections: </b>{{ "Allowed" if machine.vrde_server.allow_multi_connection else "Disallowed" }}
+              {% endif %}
+            </p>
+          </section>
+        </li>
+        <li class="list-group-item">
+          <section id="storage">
+            <h5>Storage</h5>
+            <ul class="list-group list-group-flush">
+              {% for storage_controller in machine.storage_controllers %}
+                <li class="list-group-item">
+                  <b>Controller: </b>{{ storage_controller.name }}
+                  <br />
+                  {% for medium_attachment in machine.get_medium_attachments_of_controller(storage_controller.name) %}
+                    <b>Device: </b>{{ medium_attachment.device }}, <b>Port: </b>{{ medium_attachment.port }}
+                    <br />
+                    {% if medium_attachment.medium %}
+                      {% if medium_attachment.medium.parent %}
+                        <div class="dropdown-toggle"
+                             style="cursor: pointer"
+                             data-bs-toggle="collapse"
+                             data-bs-target="#parents-{{ medium_attachment.medium.id }}">
+                        {% else %}
+                          <div>
+                          {% endif %}
+                          <b>{{ medium_attachment.medium.base.get_device_type_name() }}: </b><a href="{{ url_for('medium.download', id=medium_attachment.medium.base.id) }}"><span class="font-monospace">{{ medium_attachment.medium.base.get_path() }}</span></a>
+                        </div>
+                        {% if medium_attachment.medium.parent %}
+                          <ul class="list-group collapse py-2"
+                              id="parents-{{ medium_attachment.medium.id }}">
+                            {% for parent in medium_attachment.medium.get_parents(include_self=True)[:-1] | reverse %}
+                              <li class="list-group-item font-monospace">{{ parent.get_path() }}</li>
+                            {% endfor %}
+                          </ul>
+                        {% endif %}
+                      {% else %}
+                        <span class="text-muted">No attached mediums.</span>
+                        <br />
+                      {% endif %}
+                    {% endfor %}
+                  </li>
+                {% endfor %}
+              </ul>
+            </section>
+          </li>
+          <li class="list-group-item">
+            <section id="network">
+              <h5>Network</h5>
+              <p>
+                {% for network in machine.get_network_adapters() %}
+                  <b>Adapter {{ loop.index }}: </b>{{ network.get_attachment_type_name() }}
+                  {%- if network.get_interface_name() %}
+                    (<span class="font-monospace">{{ network.get_interface_name() }}</span>)
+                  {%- endif -%},
+                  MAC Address: <span class="font-monospace">{{ network.mac_address }}</span>
+                  <br />
+                {% endfor %}
+              </p>
+            </section>
+          </li>
+        </ul>
+      </div>
+    </div>
+  {% endblock %}

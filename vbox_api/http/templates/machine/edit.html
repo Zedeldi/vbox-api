@@ -1,37 +1,51 @@
 {% extends "layout.html" %}
 {% block title %}Edit - {{ machine.name }}{% endblock %}
 {% block content %}
-<form method="POST">
-  <div class="d-flex">
-    <h3 class="me-auto">{{ machine.name }}</h3>
-    <a class="btn btn-secondary me-2" href="{{ url_for('machine.medium', id=machine.id) }}" role="button">Mediums</a>
-    <div class="vr me-2"></div>
-    <a class="btn btn-outline-danger me-2" href="{{ url_for('machine.view', id=machine.id) }}" role="button">Cancel</a>
-    <button type="reset" class="btn btn-outline-warning me-2">Reset</button>
-    <button type="submit" class="btn btn-primary">Save</button>
-  </div>
-  <hr>
-  <div class="row">
-    <ul class="list-group list-group-flush"></ul>
+  <form method="POST">
+    <div class="d-flex">
+      <h3 class="me-auto">{{ machine.name }}</h3>
+      <a class="btn btn-secondary me-2"
+         href="{{ url_for('machine.medium', id=machine.id) }}"
+         role="button">Mediums</a>
+      <div class="vr me-2"></div>
+      <a class="btn btn-outline-danger me-2"
+         href="{{ url_for('machine.view', id=machine.id) }}"
+         role="button">Cancel</a>
+      <button type="reset" class="btn btn-outline-warning me-2">Reset</button>
+      <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+    <hr />
+    <div class="row">
+      <ul class="list-group list-group-flush">
+      </ul>
       <div class="col">
         <li class="list-group-item">
           <section id="general">
             <h5>General</h5>
             <div class="input-group mb-3">
               <span class="input-group-text">Name</span>
-              <input type="text" id="name" name="name" class="form-control" placeholder="{{ machine.name }}">
+              <input type="text"
+                     id="name"
+                     name="name"
+                     class="form-control"
+                     placeholder="{{ machine.name }}" />
             </div>
             <div class="input-group mb-3">
               <span class="input-group-text">Group</span>
               <select id="groups" name="groups" class="form-select">
                 {% for group in g.api.machine_groups %}
-                <option value="{{ group }}" {{ "selected" if machine.groups[0] == group }}>{{ group }}</option>
+                  <option value="{{ group }}" {{ "selected" if machine.groups[0] == group }}>{{ group }}
+                  </option>
                 {% endfor %}
               </select>
             </div>
             <div class="input-group">
               <span class="input-group-text">Description</span>
-              <textarea id="description" name="description" class="form-control" style="height: 200px;" placeholder="{{ machine.description if machine.description else 'Enter machine description...' }}"></textarea>
+              <textarea id="description"
+                        name="description"
+                        class="form-control"
+                        style="height: 200px"
+                        placeholder="{{ machine.description if machine.description else 'Enter machine description...' }}"></textarea>
             </div>
           </section>
         </li>
@@ -42,34 +56,56 @@
             <h5>System</h5>
             <div class="input-group mb-3">
               <span class="input-group-text">Memory</span>
-              <input type="number" id="memory_size" name="memory_size" class="form-control" min="{{ g.api.system_properties.min_guest_ram }}" max="{{ g.api.system_properties.max_guest_ram }}" placeholder="{{ machine.memory_size }}">
+              <input type="number"
+                     id="memory_size"
+                     name="memory_size"
+                     class="form-control"
+                     min="{{ g.api.system_properties.min_guest_ram }}"
+                     max="{{ g.api.system_properties.max_guest_ram }}"
+                     placeholder="{{ machine.memory_size }}" />
               <span class="input-group-text">MB</span>
             </div>
             <div class="input-group mb-3">
               <span class="input-group-text">Processors</span>
-              <input type="number" id="cpu_count" name="cpu_count" class="form-control" min="{{ g.api.system_properties.min_guest_cpu_count }}" max="{{ g.api.system_properties.max_guest_cpu_count }}" placeholder="{{ machine.cpu_count }}">
+              <input type="number"
+                     id="cpu_count"
+                     name="cpu_count"
+                     class="form-control"
+                     min="{{ g.api.system_properties.min_guest_cpu_count }}"
+                     max="{{ g.api.system_properties.max_guest_cpu_count }}"
+                     placeholder="{{ machine.cpu_count }}" />
             </div>
             <div class="input-group mb-3">
               <span class="input-group-text">TPM</span>
-              <select id="trusted_platform_module.type" name="trusted_platform_module.type" class="form-select">
+              <select id="trusted_platform_module.type"
+                      name="trusted_platform_module.type"
+                      class="form-select">
                 {% for tpm_type in g.api.platform_properties_for_system_architecture.supported_tpm_types %}
-                <option value="{{ tpm_type }}" {{ "selected" if machine.trusted_platform_module.type == tpm_type }}>{{ tpm_type.replace("_", ".") }}</option>
+                  <option value="{{ tpm_type }}" {{ "selected" if machine.trusted_platform_module.type == tpm_type }}>{{ tpm_type.replace('_', '.') }}
+                  </option>
                 {% endfor %}
               </select>
             </div>
             <div class="input-group mb-3">
               <span class="input-group-text">Firmware</span>
-              <select id="firmware_settings.firmware_type" name="firmware_settings.firmware_type" class="form-select">
+              <select id="firmware_settings.firmware_type"
+                      name="firmware_settings.firmware_type"
+                      class="form-select">
                 {% for firmware_type in g.api.platform_properties_for_system_architecture.supported_firmware_types %}
-                <option value="{{ firmware_type }}" {{ "selected" if machine.firmware_settings.firmware_type == firmware_type }}>{{ firmware_type }}</option>
+                  <option value="{{ firmware_type }}" {{ "selected" if machine.firmware_settings.firmware_type == firmware_type }}>{{ firmware_type }}
+                  </option>
                 {% endfor %}
               </select>
             </div>
             <div class="mb-3" id="secure-boot">
               {% if not machine.secure_boot_state %}
-              <a class="btn btn-outline-primary" href="{{ url_for('machine.enable_secure_boot', id=machine.id) }}" role="button">Enable Secure Boot</a>
+                <a class="btn btn-outline-primary"
+                   href="{{ url_for('machine.enable_secure_boot', id=machine.id) }}"
+                   role="button">Enable Secure Boot</a>
               {% else %}
-              <a class="btn btn-outline-danger" href="{{ url_for('machine.disable_secure_boot', id=machine.id) }}" role="button">Disable Secure Boot</a>
+                <a class="btn btn-outline-danger"
+                   href="{{ url_for('machine.disable_secure_boot', id=machine.id) }}"
+                   role="button">Disable Secure Boot</a>
               {% endif %}
             </div>
           </section>
@@ -79,44 +115,70 @@
             <h5>Display</h5>
             <div class="input-group mb-3">
               <span class="input-group-text">Video Memory</span>
-              <input type="number" id="graphics_adapter.vram_size" name="graphics_adapter.vram_size" class="form-control" min="{{ g.api.system_properties.min_guest_vram }}" max="{{ g.api.system_properties.max_guest_vram }}" placeholder="{{ machine.graphics_adapter.vram_size }}">
+              <input type="number"
+                     id="graphics_adapter.vram_size"
+                     name="graphics_adapter.vram_size"
+                     class="form-control"
+                     min="{{ g.api.system_properties.min_guest_vram }}"
+                     max="{{ g.api.system_properties.max_guest_vram }}"
+                     placeholder="{{ machine.graphics_adapter.vram_size }}" />
               <span class="input-group-text">MB</span>
             </div>
             <div class="input-group mb-3">
               <span class="input-group-text">Graphics Controller</span>
-              <select id="graphics_adapter.graphics_controller_type" name="graphics_adapter.graphics_controller_type" class="form-select">
+              <select id="graphics_adapter.graphics_controller_type"
+                      name="graphics_adapter.graphics_controller_type"
+                      class="form-select">
                 {% for gc_type in g.api.platform_properties_for_system_architecture.supported_gfx_controller_types %}
-                <option value="{{ gc_type }}" {{ "selected" if machine.graphics_adapter.graphics_controller_type == gc_type }}>{{ gc_type }}</option>
+                  <option value="{{ gc_type }}" {{ "selected" if machine.graphics_adapter.graphics_controller_type == gc_type }}>{{ gc_type }}
+                  </option>
                 {% endfor %}
               </select>
             </div>
             <div class="form-check form-switch mb-3">
-              <input class="form-check-input" type="checkbox" role="switch" id="vrde_server.enabled" name="vrde_server.enabled" {{ "checked" if machine.vrde_server.enabled }}>
+              <input class="form-check-input" type="checkbox" role="switch" id="vrde_server.enabled" name="vrde_server.enabled" {{ "checked" if machine.vrde_server.enabled }} />
               <label class="form-check-label" for="vrde_server.enabled">Remote Desktop</label>
             </div>
             <fieldset id="vrde-form" {{ "disabled" if not machine.vrde_server.enabled }}>
               <div class="input-group mb-3">
                 <span class="input-group-text">Address</span>
-                <input type="text" id="vrde_server.address" name="vrde_server.address" class="form-control" placeholder="{{ machine.vrde_server.address }}">
+                <input type="text"
+                       id="vrde_server.address"
+                       name="vrde_server.address"
+                       class="form-control"
+                       placeholder="{{ machine.vrde_server.address }}" />
               </div>
               <div class="input-group mb-3">
                 <span class="input-group-text">Port</span>
-                <input type="number" id="vrde_server.port" name="vrde_server.port" class="form-control" min="1024" max="65535" placeholder="{{ machine.vrde_server.port }}">
+                <input type="number"
+                       id="vrde_server.port"
+                       name="vrde_server.port"
+                       class="form-control"
+                       min="1024"
+                       max="65535"
+                       placeholder="{{ machine.vrde_server.port }}" />
               </div>
               <div class="input-group mb-3">
                 <span class="input-group-text">Extension Pack</span>
-                <select id="vrde_server.vrde_ext_pack" name="vrde_server.vrde_ext_pack" class="form-select">
+                <select id="vrde_server.vrde_ext_pack"
+                        name="vrde_server.vrde_ext_pack"
+                        class="form-select">
                   {% for ext_pack in g.constants.VrdeExtPack %}
-                  <option value="{{ ext_pack }}" {{ "selected" if machine.vrde_server.vrde_ext_pack == ext_pack }}>{{ ext_pack }}</option>
+                    <option value="{{ ext_pack }}" {{ "selected" if machine.vrde_server.vrde_ext_pack == ext_pack }}>{{ ext_pack }}
+                    </option>
                   {% endfor %}
                 </select>
               </div>
               <div class="input-group mb-3" id="vnc-password">
                 <span class="input-group-text">VNC Password</span>
-                <input type="password" id="vrde_server.vnc_password" name="vrde_server.vnc_password" class="form-control" placeholder="Password">
+                <input type="password"
+                       id="vrde_server.vnc_password"
+                       name="vrde_server.vnc_password"
+                       class="form-control"
+                       placeholder="Password" />
               </div>
               <div class="form-check form-switch mb-3">
-                <input class="form-check-input" type="checkbox" role="switch" id="vrde_server.allow_multi_connection" name="vrde_server.allow_multi_connection" {{ "checked" if machine.vrde_server.allow_multi_connection }}>
+                <input class="form-check-input" type="checkbox" role="switch" id="vrde_server.allow_multi_connection" name="vrde_server.allow_multi_connection" {{ "checked" if machine.vrde_server.allow_multi_connection }} />
                 <label class="form-check-label" for="vrde_server.allow_multi_connection">Multiple Connections</label>
               </div>
             </fieldset>
