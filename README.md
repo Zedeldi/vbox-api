@@ -11,14 +11,15 @@ Python bindings to the VirtualBox SOAP API.
   - [Components](#components)
   - [Models](#models)
 - [Installation](#installation)
-  - [Build](#build)
-  - [Development](#development)
+  - [PyPI](#pypi)
+  - [Source](#source)
   - [PyInstaller](#pyinstaller)
   - [PKGBUILD](#pkgbuild)
   - [Docker](#docker)
 - [Usage](#usage)
   - [Machine](#machine)
   - [Medium](#medium)
+- [Libraries](#libraries)
 - [Testing](#testing)
 - [Contributing](#contributing)
 - [Changelog](#changelog)
@@ -91,25 +92,28 @@ assert machine is Machine(api.ctx, machine.handle)
 
 ## Installation
 
-After cloning the repository with: `git clone https://github.com/Zedeldi/vbox-api.git`
+### PyPI
 
-### Build
+1. Install project: `pip install vbox-api-soap`
+2. Run: `vbox-api-cli` (CLI) or `vbox-api-http` (HTTP)
+
+As the name `vbox-api` conflicts with official `vboxapi` on PyPI,
+`vbox-api-soap` is used as the package name.
+
+### Source
+
+Alternativelty, after cloning the repository with:
+`git clone https://github.com/Zedeldi/vbox-api.git`
+
+#### Build
 
 1. Install project: `pip install .`
 2. Run: `vbox-api-cli` (CLI) or `vbox-api-http` (HTTP)
 
-### Development
+#### Development
 
 1. Install dependencies: `pip install -r requirements.txt`
 2. Run: `python -m vbox_api.cli` (CLI) or `python -m vbox_api.http` (HTTP)
-
-#### Libraries:
-
-- [Zeep](https://pypi.org/project/zeep/) - SOAP client
-- [Flask](https://pypi.org/project/Flask/) - HTTP interface
-- [Pillow](https://pypi.org/project/pillow/) - image support
-- [psutil](https://pypi.org/project/psutil/) - process information
-- [websockify](https://pypi.org/project/websockify/) - remote control
 
 ### PyInstaller
 
@@ -140,7 +144,7 @@ Dockerfiles are supplied in `docker/`, to run both `vbox-api-http` and `vboxwebs
 If you already have VirtualBox installed to your machine, you can build and start `vbox-api-http` in a Docker container easily.
 The VirtualBox container requires the host kernel modules to be installed for `/dev/vboxdrv` to be available.
 
-#### Build:
+#### Build
 
 Build vbox-api image, passing current directory as the build context:
 ```sh
@@ -154,7 +158,7 @@ docker build -t "virtualbox" --build-arg USER="user" --build-arg PASS="password"
 docker build -t "virtualbox" --build-arg PACMAN_ARGS="--disable-download-timeout" -f docker/virtualbox/Dockerfile .
 ```
 
-#### Run:
+#### Run
 
 Run `vbox-api-http` in a container interactively, with host network:
 ```sh
@@ -272,6 +276,14 @@ medium = api.create_medium_with_defaults(
 )
 ```
 
+## Libraries
+
+- [Zeep](https://pypi.org/project/zeep/) - SOAP client
+- [Flask](https://pypi.org/project/Flask/) - HTTP interface
+- [Pillow](https://pypi.org/project/pillow/) - image support
+- [psutil](https://pypi.org/project/psutil/) - process information
+- [websockify](https://pypi.org/project/websockify/) - remote control
+
 ## Testing
 
 `vbox-api` has been tested successfully on Arch Linux and Windows 10.
@@ -300,7 +312,7 @@ For more information, see the [VirtualBox Changelog](https://www.virtualbox.org/
 
 ### Contributors
 
- - [@Zedeldi](https://github.com/Zedeldi) - creator
+ - [@Zedeldi](https://github.com/Zedeldi) - creator & maintainer
 
 ### Resources
 
