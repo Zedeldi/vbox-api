@@ -22,6 +22,12 @@ dependencies = [
   "websockify"
 ]
 requires-python = ">= 3.10"
+keywords = ["virtualbox", "api", "soap", "zeep", "flask"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent"
+]
 
 [project.optional-dependencies]
 tests = ["pytest"]
@@ -29,6 +35,8 @@ gui = ["flaskwebgui"]
 
 [project.urls]
 Homepage = "https://github.com/Zedeldi/vbox-api"
+Repository = "https://github.com/Zedeldi/vbox-api.git"
+Issues = "https://github.com/Zedeldi/vbox-api/issues"
 
 [project.scripts]
 vbox-api-cli = "vbox_api.cli.__main__:main"
