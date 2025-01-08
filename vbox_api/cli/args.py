@@ -8,7 +8,7 @@ def get_parser() -> ArgumentParser:
     parser = ArgumentParser(
         prog="vbox_api",
         description="Python command-line interface for VirtualBox API",
-        epilog="Copyright (C) 2024 Zack Didcott",
+        epilog="Copyright (C) 2025 Zack Didcott",
     )
 
     parser.add_argument(
