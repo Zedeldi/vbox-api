@@ -34,8 +34,8 @@ class VirtualBox(BaseModel, metaclass=ModelRegister):
         except Exception:
             return False
 
-    def logoff(self) -> None:
-        """Logoff current session."""
+    def logout(self) -> None:
+        """Logout current session."""
         self.ctx.interface.WebsessionManager.logoff(self.handle)
         self.handle = None
 
