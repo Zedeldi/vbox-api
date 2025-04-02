@@ -7,7 +7,7 @@ name = "vbox-api-soap"
 description = "Python bindings to the VirtualBox SOAP API."
 version = "2.1.1"
 readme = "README.md"
-license = {file = "LICENSE"}
+license = "MIT"
 authors = [
   {name = "Zack Didcott"}
 ]
@@ -25,7 +25,6 @@ requires-python = ">= 3.10"
 keywords = ["virtualbox", "api", "soap", "zeep", "flask"]
 classifiers = [
   "Programming Language :: Python :: 3",
-  "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent"
 ]
 
