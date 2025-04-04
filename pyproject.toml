@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "vbox-api-soap"
 description = "Python bindings to the VirtualBox SOAP API."
-version = "2.1.1"
+version = "2.1.2"
 readme = "README.md"
 license = "MIT"
 authors = [
