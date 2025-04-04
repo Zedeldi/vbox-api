@@ -1,6 +1,6 @@
 # vbox-api
 
-[![GitHub license](https://img.shields.io/github/license/Zedeldi/vbox-api?style=flat-square)](https://github.com/Zedeldi/vbox-api/blob/master/LICENSE) [![GitHub last commit](https://img.shields.io/github/last-commit/Zedeldi/vbox-api?style=flat-square)](https://github.com/Zedeldi/vbox-api/commits) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg?style=flat-square)](https://github.com/psf/black)
+[![GitHub license](https://img.shields.io/github/license/Zedeldi/vbox-api?style=flat-square)](https://github.com/Zedeldi/vbox-api/blob/master/LICENSE) [![GitHub last commit](https://img.shields.io/github/last-commit/Zedeldi/vbox-api?style=flat-square)](https://github.com/Zedeldi/vbox-api/commits) [![PyPI version](https://img.shields.io/pypi/v/vbox-api-soap?style=flat-square)](https://pypi.org/project/vbox-api-soap/) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg?style=flat-square)](https://github.com/psf/black)
 
 Python bindings to the VirtualBox SOAP API.
 
@@ -40,15 +40,20 @@ Several methods have been added to models to assist with common operations, and 
 Command-line interface:
 
 <p align="center">
-  <img src="docs/vbox-api-cli.gif?raw=true" alt="Demonstration of vbox-api-cli."/>
+  <img
+    src="https://raw.githubusercontent.com/Zedeldi/vbox-api/main/docs/vbox-api-cli.gif"
+    alt="Demonstration of vbox-api-cli"
+  />
 </p>
 
 Web (HTTP) interface:
 
 <p align="center">
-  <img src="docs/vbox-api-http-machine-view.png?raw=true" alt="Demonstration of vbox-api-http machine.view endpoint."/>
+  <img
+    src="https://raw.githubusercontent.com/Zedeldi/vbox-api/main/docs/vbox-api-http-machine-view.png"
+    alt="Demonstration of vbox-api-http machine.view endpoint"
+  />
 </p>
-
 
 ### Components
 
@@ -102,7 +107,7 @@ As the name `vbox-api` conflicts with official `vboxapi` on PyPI,
 
 ### Source
 
-Alternativelty, after cloning the repository with:
+Alternatively, after cloning the repository with:
 `git clone https://github.com/Zedeldi/vbox-api.git`
 
 #### Build
@@ -147,11 +152,13 @@ The VirtualBox container requires the host kernel modules to be installed for `/
 #### Build
 
 Build vbox-api image, passing current directory as the build context:
+
 ```sh
 docker build -t "vbox-api" -f docker/api/Dockerfile .
 ```
 
 Build VirtualBox image, optionally passing additional build arguments:
+
 ```sh
 docker build -t "virtualbox" -f docker/virtualbox/Dockerfile .
 docker build -t "virtualbox" --build-arg USER="user" --build-arg PASS="password" -f docker/virtualbox/Dockerfile .
@@ -161,11 +168,13 @@ docker build -t "virtualbox" --build-arg PACMAN_ARGS="--disable-download-timeout
 #### Run
 
 Run `vbox-api-http` in a container interactively, with host network:
+
 ```sh
 docker run -it --rm --network=host "vbox-api"
 ```
 
 Run `vboxwebsrv` in a container interactively, with host network (note: VirtualBox host kernel modules must be installed):
+
 ```sh
 docker run -it --rm --network=host --device /dev/vboxdrv:/dev/vboxdrv -e DISPLAY=unix:0 "virtualbox"
 ```
@@ -312,21 +321,21 @@ For more information, see the [VirtualBox Changelog](https://www.virtualbox.org/
 
 ### Contributors
 
- - [@Zedeldi](https://github.com/Zedeldi) - creator & maintainer
+- [@Zedeldi](https://github.com/Zedeldi) - creator & maintainer
 
 ### Resources
 
- - [VirtualBox](https://www.virtualbox.org/) - well, duh.
-   - [API Documentation](https://www.virtualbox.org/sdkref/) - reference for interface methods and properties
- - [Bootstrap](https://getbootstrap.com/) - used for HTTP interface
- - [noVNC](https://novnc.com)/[websockify](https://github.com/novnc/websockify) - support for HTTP remote control
- - See [libraries](#libraries) for list of dependencies
+- [VirtualBox](https://www.virtualbox.org/) - well, duh.
+  - [API Documentation](https://www.virtualbox.org/sdkref/) - reference for interface methods and properties
+- [Bootstrap](https://getbootstrap.com/) - used for HTTP interface
+- [noVNC](https://novnc.com)/[websockify](https://github.com/novnc/websockify) - support for HTTP remote control
+- See [libraries](#libraries) for list of dependencies
 
 ### Other Projects
 
- - [vboxwebber](https://github.com/larshson/vboxwebber/) - VirtualBox SOAP API client for Python
- - [phpVirtualBox](https://github.com/phpvirtualbox/phpvirtualbox) - web interface to manage and access Virtualbox machines
- - [RemoteBox](https://remotebox.knobgoblin.org.uk/) - VirtualBox GUI (GTK3) client
+- [vboxwebber](https://github.com/larshson/vboxwebber/) - VirtualBox SOAP API client for Python
+- [phpVirtualBox](https://github.com/phpvirtualbox/phpvirtualbox) - web interface to manage and access Virtualbox machines
+- [RemoteBox](https://remotebox.knobgoblin.org.uk/) - VirtualBox GUI (GTK3) client
 
 ## License
 
