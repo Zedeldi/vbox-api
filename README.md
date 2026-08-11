@@ -1,3 +1,5 @@
+
+
 # vbox-api
 
 [![GitHub license](https://img.shields.io/github/license/Zedeldi/vbox-api?style=flat-square)](https://github.com/Zedeldi/vbox-api/blob/master/LICENSE) [![GitHub last commit](https://img.shields.io/github/last-commit/Zedeldi/vbox-api?style=flat-square)](https://github.com/Zedeldi/vbox-api/commits) [![PyPI version](https://img.shields.io/pypi/v/vbox-api-soap?style=flat-square)](https://pypi.org/project/vbox-api-soap/) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg?style=flat-square)](https://github.com/psf/black)
@@ -79,7 +81,7 @@ Additionally, the `to_dict` and `from_dict` methods allow multiple properties to
 
 Any valid interface name can be used to create a model, using `BaseModel.from_name`.
 The interface is passed via a `Context` object, along with the handle of the model.
-All methods of the interface are bound to this model, using `functools.partial` to implictly pass its handle, then wrapped to return model instances.
+All methods of the interface are bound to this model, using `functools.partial` to implicitly pass its handle, then wrapped to return model instances.
 `BaseModel` also implements `__str__`, allowing models to be passed directly to interface methods as a handle.
 
 Models are automatically instantiated from returned results, by obtaining the interface name from the returned handle, using `ManagedObjectRef.get_interface_name`.
